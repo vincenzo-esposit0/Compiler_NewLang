@@ -28,7 +28,7 @@
     </dependency>
 </dependencies>
 <build>
-    <sourceDirectory> src </sourceDirectory>
+    <sourceDirectory> src/main/java </sourceDirectory>
     <plugins>
         <plugin>
             <groupId>de.jflex</groupId>
@@ -40,7 +40,7 @@
                         <goal>generate</goal>
                     </goals>
                     <configuration>
-                        <outputDirectory>src</outputDirectory>
+                        <outputDirectory>src/main/java</outputDirectory>
                         <lexDefinitions>
                             <lexDefinition>srcjflexcup</lexDefinition>
                         </lexDefinitions>
@@ -60,8 +60,8 @@
                 </execution>
             </executions>
             <configuration>
-                <cupDefinition>srcjflexcup/circuit.cup</cupDefinition>
-                <outputDirectory>src</outputDirectory>
+                <cupDefinition>srcjflexcup/newLang.cup</cupDefinition>
+                <outputDirectory>src/main/java</outputDirectory>
                 <packageName>esercitazione5</packageName>
                 <dumpGrammar>${miaCondizione}</dumpGrammar>
                 <dumpStates>${miaCondizione}</dumpStates>
