@@ -1,7 +1,9 @@
 package esercitazione5;
-import JFlex.sym;import java_cup.runtime.Symbol;
-%%
-// Declarations for JFlex
+import JFlex.sym;
+import java_cup.runtime.Symbol;
+
+%% // Declarations for JFlex
+
 %unicode // We wish to read text files
 
 %cup // Declare that we expect to use Java CUP
@@ -10,13 +12,16 @@ import JFlex.sym;import java_cup.runtime.Symbol;
     StringBuffer string = new StringBuffer();
 %}
 
-whitespace = [ \r\n\t\f]
-InputCharacter = [^\r\n]
+// from JFlex manual
 LineTerminator = \r|\n|\r\n
+InputCharacter = [^\r\n]
+WhiteSpace     = {LineTerminator} | [ \t\f]
 
+/* comments */
 Comment = {TraditionalComment} | {EndOfLineComment}
-TraditionalComment = "|*" [^*] ~"|"
-EndOfLineComment = "||" {InputCharacter}* {LineTerminator}?
+
+TraditionalComment   = "|*" [^*] ~"|"
+EndOfLineComment     = "||" {InputCharacter}* {LineTerminator}?
 
 digit = [0-9]
 integer = {digit}+
@@ -29,7 +34,6 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
 %%
 
 <YYINITIAL> {
-
     "start:" { return new Symbol(sym.MAIN) ; }
     ";"  { return new Symbol(sym.SEMI) ; }
     ","  { return new Symbol(sym.COMMA) ; }
@@ -62,9 +66,6 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
     "<<"  { return new Symbol(sym.ASSIGN) ; }
     "return" { return new Symbol(sym.RETURN) ; }
 
-    espressione STRING_CONST   // usando "
-    espressione CHAR_CONST     // usando '
-
     "true" { return new Symbol(sym.TRUE) ; }
     "false" { return new Symbol(sym.FALSE) ; }
     "+"  { return new Symbol(sym.PLUS) ; }
@@ -87,19 +88,22 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
     {integer} {return new Symbol(sym.INTEGER_CONST,yytext());}
     {real} {return new Symbol(sym.REAL_CONST,yytext());}
 
-    {whitespace} {}
+    /* comment */
     {Comment} {}
+
+    /* whitespace */
+    {WhiteSpace} {}
 
     \" {string.setLength(0); yybegin(STRING);}
     \' {string.setLength(0); yybegin(CHAR);}
 }
 
-<<EOF>> { return new Symbol(sym.EOF); }
-[^] { throw new Error("\n\n Carattere non ammesso < "+ yytext()+" >\n"); }
+<<EOF>> { return new Symbol(sym.EOF) ; }
+[^] { throw new Error("\n\n Carattere non ammesso < "+ yytext()+" >\n") ; }
 
 <STRING> {
     \" { yybegin(YYINITIAL);
-      return new Symbol( sym.STRING_CONST, string.toString()); }
+          return new Symbol( sym.STRING_CONST, string.toString()); }
 
     [^\n\r\"\\]+ { string.append( yytext() ); }
     \\t { string.append('\t'); }
@@ -112,7 +116,7 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
 }
 <CHAR> {
     \' { yybegin(YYINITIAL);
-      return new Symbol( sym.CHAR_CONST, string.toString()); }
+          return new Symbol( sym.CHAR_CONST, string.toString()); }
 
     [^\n\r\'\\]+ { string.append( yytext() ); }
     \\t { string.append('\t'); }
