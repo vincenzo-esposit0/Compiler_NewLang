@@ -1,5 +1,5 @@
 terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
-         DEF, OUT, FOR, IF, ELSE, WHILE, TO, LOOP, READ, WRITE, WRITELN,
+         DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, READ, WRITE, WRITELN,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
          TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT, EQ, NE, LT, LE, GT, GE, AND, OR, NOT;
 
@@ -34,6 +34,18 @@ nonterminal FunCall;
 nonterminal ExprList;
 nonterminal Expr;
 
+// **************** Specifica precedence ****************
+//precedence nonassoc FOR, WHILE, IF, LPAR, RBRACK, RETURN, ID;
+precedence left OR, AND;
+precedence right NOT;
+precedence left GT, GE;
+precedence left EQ, NE, LT, LE;
+precedence left STR_CONCAT;
+precedence left PLUS, MINUS;
+precedence left DIV, TIMES;
+precedence right POW;
+precedence left RBRACK;
+
 // **************** Specifica grammaticale ****************
 
 //Program ::= DeclList MainFunDecl DeclList
@@ -52,11 +64,11 @@ VarDecl ::= Type:type IdInitList:idInitList SEMI
           | VAR IdInitObblList:idInitObblList SEMI;
 
 //Type ::= INTEGER | BOOL | REAL | STRING | CHAR
-Type ::= INTEGER
-       | BOOL
-       | REAL
-       | STRING
-       | CHAR;
+Type ::= INTEGER {:RESULT = "INTEGER";:}
+       | BOOL {:RESULT = "BOOL";:}
+       | REAL {:RESULT = "REAL";:}
+       | STRING {:RESULT = "STRING";:}
+       | CHAR {:RESULT = "CHAR";:};
 
 //IdInitList ::= ID | IdInitList COMMA ID | ID ASSIGN Expr | IdInitList COMMA ID ASSIGN Expr
 IdInitList ::= ID:id
@@ -100,10 +112,10 @@ TypeOrVoid ::= Type:type
 
 //VarDeclList ::= empty | VarDecl VarDeclList
 VarDeclList ::= /* empty */
-              | VarDecl VarDeclList;
+              | VarDecl:varDecl VarDeclList:varDeclList;
 
 //StatList ::= Stat | Stat StatList
-StatList ::= Stat:stat
+StatList ::= /* empty */
            | Stat:stat StatList:statList;
 
 //Stat ::= IfStat | ForStat | ReadStat SEMI | WriteStat SEMI | AssignStat SEMI | WhileStat | FunCall SEMI | RETURN Expr SEMI | Return SEMI | Return | empty
@@ -115,8 +127,7 @@ Stat ::= IfStat:ifStat
        | WhileStat:whileStat
 	   | FunCall:funCall SEMI
 	   | RETURN Expr:expr SEMI
-	   | RETURN SEMI
-	   | /* empty */;
+	   | RETURN SEMI;
 
 //IfStat ::= IF Expr THEN Body Else
 IfStat ::= IF Expr:expr THEN Body:body Else:else;
@@ -181,6 +192,6 @@ Expr ::= TRUE:true
 	   | Expr:expr1 LE Expr:expr2
 	   | Expr:expr1 EQ Expr:expr2
 	   | Expr:expr1 NE Expr:expr2
-	   | MINUS Expr:expr
-	   | NOT Expr:expr
-	   | LPAR Expr:expr RPAR;
+	   | MINUS Expr:expr1
+	   | NOT Expr:expr1
+	   | LPAR Expr:expr1 RPAR;
