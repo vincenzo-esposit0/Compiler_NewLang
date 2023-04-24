@@ -9,8 +9,5 @@
         <module name="prezioso-esposito_es5" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="prezioso-esposito_es5" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>
