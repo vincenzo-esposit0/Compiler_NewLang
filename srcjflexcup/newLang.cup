@@ -1,9 +1,16 @@
+import java_cup.runtime.*;
+
+
 terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
          DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, READ, WRITE, WRITELN,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
-         TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT, EQ, NE, LT, LE, GT, GE, AND, OR, NOT;
+         TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT, EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
 
-terminal String ID, STRING_CONST, CHAR_CONST, INTEGER_CONST, REAL_CONST;
+terminal String ID;
+terminal String STRING_CONST;
+terminal String CHAR_CONST;
+terminal String INTEGER_CONST;
+terminal String REAL_CONST;
 
 nonterminal Program;
 nonterminal DeclList;
@@ -39,7 +46,7 @@ nonterminal Expr;
 precedence left OR, AND;
 precedence right NOT;
 precedence left GT, GE;
-precedence left EQ, NE, LT, LE;
+precedence left EQUALS, NE, LT, LE;
 precedence left STR_CONCAT;
 precedence left PLUS, MINUS;
 precedence left DIV, TIMES;
@@ -77,14 +84,14 @@ IdInitList ::= ID:id
              | IdInitList:idInitList COMMA ID:id ASSIGN Expr:expr;
 
 //IdInitObblList ::= ID ASSIGN Const | IdInitObblList COMMA ID ASSIGN Const
-IdInitObblList ::= ID:id ASSIGN Const:const
-                 | IdInitObblList:idInitObblList COMMA ID:id ASSIGN Const:const;
+IdInitObblList ::= ID:id ASSIGN Const:constant
+                 | IdInitObblList:idInitObblList COMMA ID:id ASSIGN Const:constant;
 
 //Const ::= INTEGER_CONST | REAL_CONST | TRUE | FALSE | STRING_CONST | CHAR_CONST
 Const ::= INTEGER_CONST:intConst
         | REAL_CONST:realConst
-        | TRUE:true
-        | FALSE:false
+        | TRUE:trueConst
+        | FALSE:falseConst
         | STRING_CONST:stringConst
         | CHAR_CONST:charConst;
 
@@ -130,7 +137,7 @@ Stat ::= IfStat:ifStat
 	   | RETURN SEMI;
 
 //IfStat ::= IF Expr THEN Body Else
-IfStat ::= IF Expr:expr THEN Body:body Else:else;
+IfStat ::= IF Expr:expr THEN Body:body Else:elseStat;
 
 //Else ::= empty | ELSE Body
 Else ::= /* empty */
@@ -169,9 +176,9 @@ ExprList ::= Expr:expr
 //       | ID | FunCall | Expr PLUS Expr | Expr MINUS Expr | Expr TIMES Expr
 //       | Expr DIV Expr | Expr AND Expr | Expr POW Expr | Expr STR_CONCAT Expr
 //       | Expr OR Expr | Expr GT Expr | Expr GE Expr | Expr LT Expr | Expr LE Expr
-//       | Expr EQ Expr | Expr NE Expr | MINUS Expr | NOT Expr | LPAR Expr RPAR
-Expr ::= TRUE:true
-	   | FALSE:false
+//       | Expr EQUALS Expr | Expr NE Expr | MINUS Expr | NOT Expr | LPAR Expr RPAR
+Expr ::= TRUE:trueConst
+	   | FALSE:falseConst
 	   | INTEGER_CONST:intConst
 	   | REAL_CONST:realConst
 	   | STRING_CONST:stringConst
@@ -190,7 +197,7 @@ Expr ::= TRUE:true
 	   | Expr:expr1 GE Expr:expr2
 	   | Expr:expr1 LT Expr:expr2
 	   | Expr:expr1 LE Expr:expr2
-	   | Expr:expr1 EQ Expr:expr2
+	   | Expr:expr1 EQUALS Expr:expr2
 	   | Expr:expr1 NE Expr:expr2
 	   | MINUS Expr:expr1
 	   | NOT Expr:expr1

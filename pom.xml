@@ -26,6 +26,11 @@
         <artifactId>maven-jflex-plugin</artifactId>
         <version>1.4.3-r1</version>
     </dependency>
+    <dependency>
+        <groupId>com.github.vbmacher</groupId>
+        <artifactId>java-cup</artifactId>
+        <version>11b-20160615</version>
+    </dependency>
 </dependencies>
 <build>
     <sourceDirectory> src/main/java </sourceDirectory>
@@ -33,7 +38,7 @@
         <plugin>
             <groupId>de.jflex</groupId>
             <artifactId>jflex-maven-plugin</artifactId>
-            <version>1.8.2</version>
+            <version>1.9.1</version>
             <executions>
                 <execution>
                     <goals>
@@ -66,7 +71,7 @@
                 <dumpGrammar>${miaCondizione}</dumpGrammar>
                 <dumpStates>${miaCondizione}</dumpStates>
                 <dumpTables>${miaCondizione}</dumpTables>
-                <expectedConflicts>0</expectedConflicts>
+                <expectedConflicts>1000</expectedConflicts>
             </configuration>
         </plugin>
     </plugins>

@@ -1,5 +1,4 @@
 package esercitazione5;
-import JFlex.sym;
 import java_cup.runtime.Symbol;
 
 %% // Declarations for JFlex
@@ -60,8 +59,8 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
 
     "("  { return new Symbol(sym.LPAR) ; }
     ")"  { return new Symbol(sym.RPAR) ; }
-    "{"  { return new Symbol(sym.LBRAC) ; }
-    "}"  { return new Symbol(sym.RBRAC) ; }
+    "{"  { return new Symbol(sym.LBRACK) ; }
+    "}"  { return new Symbol(sym.RBRACK) ; }
      ":"  { return new Symbol(sym.COLON) ; }
     "<<"  { return new Symbol(sym.ASSIGN) ; }
     "return" { return new Symbol(sym.RETURN) ; }
