@@ -3,7 +3,6 @@
 // source: srcjflexcup/newLang.flex
 
 package esercitazione5;
-import JFlex.sym;
 import java_cup.runtime.Symbol;
 
 
@@ -874,7 +873,7 @@ class Yylex implements java_cup.runtime.Scanner {
           // fall through
           case 79: break;
           case 21:
-            { return new Symbol(sym.LBRAC) ;
+            { return new Symbol(sym.LBRACK) ;
             }
           // fall through
           case 80: break;
@@ -884,7 +883,7 @@ class Yylex implements java_cup.runtime.Scanner {
           // fall through
           case 81: break;
           case 23:
-            { return new Symbol(sym.RBRAC) ;
+            { return new Symbol(sym.RBRACK) ;
             }
           // fall through
           case 82: break;

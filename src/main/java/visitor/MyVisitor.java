@@ -12,4 +12,5 @@ public interface MyVisitor {
     void visit(IdInitListNode node);
     void visit(IdInitObblListNode node);
     void visit(ConstNode node);
+    void visit(ParDeclNode node);
 }
