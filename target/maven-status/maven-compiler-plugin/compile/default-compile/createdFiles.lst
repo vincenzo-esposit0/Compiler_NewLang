@@ -1,4 +1,16 @@
 esercitazione5\parser$CUP$parser$actions.class
+nodes\IdNode.class
+nodes\MainFunDeclNode.class
+nodes\ExprNode.class
+nodes\FunDeclNode.class
+visitor\MyVisitor.class
+nodes\ConstNode.class
+nodes\ProgramNode.class
+nodes\DeclListNode.class
 esercitazione5\parser.class
 esercitazione5\Yylex.class
+nodes\IdInitListNode.class
+nodes\IdInitObblListNode.class
 esercitazione5\sym.class
+nodes\TypeNode.class
+nodes\VarDeclNode.class

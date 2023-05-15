@@ -5,7 +5,8 @@
 
 package esercitazione5;
 
-import java_cup.runtime.*;
+import nodes.*;
+import java.util.ArrayList;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -459,16 +460,16 @@ class CUP$parser$actions {
           case 0: // Program ::= DeclList MainFunDecl DeclList 
             {
               Object RESULT =null;
-		int declist1left = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
-		int declist1right = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
-		Object declist1 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
+		int declList1left = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).left;
+		int declList1right = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)).right;
+		Object declList1 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-2)).value;
 		int mainFunDeclleft = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).left;
 		int mainFunDeclright = ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-1)).right;
 		Object mainFunDecl = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.elementAt(CUP$parser$top-1)).value;
-		int declist2left = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
-		int declist2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
-		Object declist2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
-
+		int declList2left = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).left;
+		int declList2right = ((java_cup.runtime.Symbol)CUP$parser$stack.peek()).right;
+		Object declList2 = (Object)((java_cup.runtime.Symbol) CUP$parser$stack.peek()).value;
+		 RESULT = new ProgramNode((ArrayList<DeclListNode>)declList1, (MainFunDeclNode)mainFunDecl, (ArrayList<DeclListNode>)declList2); 
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Program",0, ((java_cup.runtime.Symbol)CUP$parser$stack.elementAt(CUP$parser$top-2)), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -569,7 +570,7 @@ class CUP$parser$actions {
           case 8: // Type ::= INTEGER 
             {
               Object RESULT =null;
-		RESULT = "INTEGER";
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",4, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -578,7 +579,7 @@ class CUP$parser$actions {
           case 9: // Type ::= BOOL 
             {
               Object RESULT =null;
-		RESULT = "BOOL";
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",4, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -587,7 +588,7 @@ class CUP$parser$actions {
           case 10: // Type ::= REAL 
             {
               Object RESULT =null;
-		RESULT = "REAL";
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",4, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -596,7 +597,7 @@ class CUP$parser$actions {
           case 11: // Type ::= STRING 
             {
               Object RESULT =null;
-		RESULT = "STRING";
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",4, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;
@@ -605,7 +606,7 @@ class CUP$parser$actions {
           case 12: // Type ::= CHAR 
             {
               Object RESULT =null;
-		RESULT = "CHAR";
+
               CUP$parser$result = parser.getSymbolFactory().newSymbol("Type",4, ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), ((java_cup.runtime.Symbol)CUP$parser$stack.peek()), RESULT);
             }
           return CUP$parser$result;

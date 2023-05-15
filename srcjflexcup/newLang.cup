@@ -1,16 +1,12 @@
-import java_cup.runtime.*;
-
+import nodes.*;
+import java.util.ArrayList;
 
 terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
          DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, READ, WRITE, WRITELN,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
          TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT, EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
 
-terminal String ID;
-terminal String STRING_CONST;
-terminal String CHAR_CONST;
-terminal String INTEGER_CONST;
-terminal String REAL_CONST;
+terminal String ID, STRING_CONST, CHAR_CONST, INTEGER_CONST, REAL_CONST;
 
 nonterminal Program;
 nonterminal DeclList;
@@ -56,7 +52,8 @@ precedence left RBRACK;
 // **************** Specifica grammaticale ****************
 
 //Program ::= DeclList MainFunDecl DeclList
-Program ::= DeclList:declist1 MainFunDecl: mainFunDecl DeclList:declist2;
+Program ::= DeclList:declList1 MainFunDecl: mainFunDecl DeclList:declList2
+    {: RESULT = new ProgramNode((ArrayList<DeclListNode>)declList1, (MainFunDeclNode)mainFunDecl, (ArrayList<DeclListNode>)declList2); :};
 
 //DeclList ::= VarDecl DeclList | FunDecl DeclList | empty
 DeclList ::= VarDecl:varDecl DeclList:declList
@@ -71,11 +68,11 @@ VarDecl ::= Type:type IdInitList:idInitList SEMI
           | VAR IdInitObblList:idInitObblList SEMI;
 
 //Type ::= INTEGER | BOOL | REAL | STRING | CHAR
-Type ::= INTEGER {:RESULT = "INTEGER";:}
-       | BOOL {:RESULT = "BOOL";:}
-       | REAL {:RESULT = "REAL";:}
-       | STRING {:RESULT = "STRING";:}
-       | CHAR {:RESULT = "CHAR";:};
+Type ::= INTEGER
+       | BOOL
+       | REAL
+       | STRING
+       | CHAR ;
 
 //IdInitList ::= ID | IdInitList COMMA ID | ID ASSIGN Expr | IdInitList COMMA ID ASSIGN Expr
 IdInitList ::= ID:id

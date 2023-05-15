@@ -1,4 +1,10 @@
-public class ProgramNode implements ASTNode {
+package nodes;
+
+import visitor.MyVisitor;
+
+import java.util.ArrayList;
+
+public class ProgramNode {
     private ArrayList<DeclListNode> declList1 = new ArrayList<DeclListNode>();
     private MainFunDeclNode mainFunDecl;
     private ArrayList<DeclListNode> declList2 = new ArrayList<DeclListNode>();
@@ -33,15 +39,8 @@ public class ProgramNode implements ASTNode {
         this.declList2 = declList2;
     }
 
-    public void accept(ASTVisitor visitor) {
+    public void accept(MyVisitor visitor) {
         visitor.visit(this);
-            for (DeclNode decl : declList1) {
-                decl.accept(visitor);
-            }
-            mainFunDecl.accept(visitor);
-            for (DeclNode decl : declList2) {
-                decl.accept(visitor);
-            }
     }
 
 }
