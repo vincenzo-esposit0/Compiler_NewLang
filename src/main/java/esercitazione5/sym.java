@@ -8,12 +8,12 @@ package esercitazione5;
 /** CUP generated interface containing symbol constants. */
 public interface sym {
   /* terminals */
-  public static final int CHAR_CONST = 51;
+  public static final int CHAR_CONST = 53;
   public static final int POW = 38;
   public static final int CHAR = 11;
   public static final int GE = 45;
   public static final int EQUALS = 40;
-  public static final int INTEGER_CONST = 52;
+  public static final int INTEGER_CONST = 51;
   public static final int INTEGER = 7;
   public static final int SEMI = 3;
   public static final int OUT = 14;
@@ -52,7 +52,7 @@ public interface sym {
   public static final int TO = 19;
   public static final int WHILE = 18;
   public static final int STR_CONCAT = 39;
-  public static final int REAL_CONST = 53;
+  public static final int REAL_CONST = 52;
   public static final int THEN = 20;
   public static final int NE = 41;
   public static final int LPAR = 25;
@@ -114,9 +114,9 @@ public interface sym {
   "NOT",
   "ID",
   "STRING_CONST",
-  "CHAR_CONST",
   "INTEGER_CONST",
-  "REAL_CONST"
+  "REAL_CONST",
+  "CHAR_CONST"
   };
 }
 

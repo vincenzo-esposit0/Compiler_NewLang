@@ -9,8 +9,14 @@ public interface MyVisitor {
     void visit(VarDeclNode node);
     void visit(FunDeclNode node);
     void visit(TypeNode node);
+    void visit(IdNode node);
     void visit(IdInitListNode node);
     void visit(IdInitObblListNode node);
-    void visit(ConstNode node);
     void visit(ParDeclNode node);
+    void visit(CharConstNode node);
+    void visit(StringConstNode node);
+    void visit(IntegerConstNode node);
+    void visit(RealConstNode node);
+    void visit(BooleanConstNode node);
+
 }

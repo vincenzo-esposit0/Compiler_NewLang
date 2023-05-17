@@ -2,11 +2,11 @@ package nodes;
 
 import visitor.MyVisitor;
 
-public class IdNode {
+public class StringConstNode extends ConstNode {
 
     public String value;
 
-    public IdNode(String value) {
+    public StringConstNode(String value) {
         this.value = value;
     }
 
@@ -17,4 +17,5 @@ public class IdNode {
     public void accept(MyVisitor visitor) {
         visitor.visit(this);
     }
+
 }

@@ -6,7 +6,10 @@ terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
          TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT, EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
 
-terminal String ID, STRING_CONST, CHAR_CONST, INTEGER_CONST, REAL_CONST;
+terminal String ID, STRING_CONST;
+terminal int INTEGER_CONST;
+terminal float REAL_CONST;
+terminal char CHAR_CONST;
 
 nonterminal Program;
 nonterminal DeclList;
@@ -68,11 +71,11 @@ VarDecl ::= Type:type IdInitList:idInitList SEMI
           | VAR IdInitObblList:idInitObblList SEMI;
 
 //Type ::= INTEGER | BOOL | REAL | STRING | CHAR
-Type ::= INTEGER
-       | BOOL
-       | REAL
-       | STRING
-       | CHAR ;
+Type ::= INTEGER    {: RESULT = new TypeNode(TypeNode.INTEGER); :}
+       | BOOL       {: RESULT = new TypeNode(TypeNode.BOOL); :}
+       | REAL       {: RESULT = new TypeNode(TypeNode.REAL); :}
+       | STRING     {: RESULT = new TypeNode(TypeNode.STRING); :}
+       | CHAR       {: RESULT = new TypeNode(TypeNode.CHAR); :};
 
 //IdInitList ::= ID | IdInitList COMMA ID | ID ASSIGN Expr | IdInitList COMMA ID ASSIGN Expr
 IdInitList ::= ID:id
@@ -85,12 +88,12 @@ IdInitObblList ::= ID:id ASSIGN Const:constant
                  | IdInitObblList:idInitObblList COMMA ID:id ASSIGN Const:constant;
 
 //Const ::= INTEGER_CONST | REAL_CONST | TRUE | FALSE | STRING_CONST | CHAR_CONST
-Const ::= INTEGER_CONST:intConst
-        | REAL_CONST:realConst
-        | TRUE:trueConst
-        | FALSE:falseConst
-        | STRING_CONST:stringConst
-        | CHAR_CONST:charConst;
+Const ::= INTEGER_CONST:intConst    {: RESULT = new IntegerConstNode(intConst); :}
+        | REAL_CONST:realConst      {: RESULT = new RealConstNode(realConst); :}
+        | TRUE                      {: RESULT = new BooleanConstNode(true); :}
+        | FALSE                     {: RESULT = new BooleanConstNode(false); :}
+        | STRING_CONST:stringConst  {: RESULT = new StringConstNode(stringConst); :}
+        | CHAR_CONST:charConst      {: RESULT = new CharConstNode(charConst); :};
 
 //FunDecl ::= DEF ID LPAR ParamDeclList RPAR COLON TypeOrVoid Body
 FunDecl ::= DEF ID:id LPAR ParamDeclList:paramDeclList RPAR COLON TypeOrVoid:typeOrVoid Body:body;
@@ -174,8 +177,8 @@ ExprList ::= Expr:expr
 //       | Expr DIV Expr | Expr AND Expr | Expr POW Expr | Expr STR_CONCAT Expr
 //       | Expr OR Expr | Expr GT Expr | Expr GE Expr | Expr LT Expr | Expr LE Expr
 //       | Expr EQUALS Expr | Expr NE Expr | MINUS Expr | NOT Expr | LPAR Expr RPAR
-Expr ::= TRUE:trueConst
-	   | FALSE:falseConst
+Expr ::= TRUE
+	   | FALSE
 	   | INTEGER_CONST:intConst
 	   | REAL_CONST:realConst
 	   | STRING_CONST:stringConst

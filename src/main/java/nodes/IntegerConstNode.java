@@ -2,19 +2,20 @@ package nodes;
 
 import visitor.MyVisitor;
 
-public class IdNode {
+public class IntegerConstNode extends ConstNode {
 
-    public String value;
+    public int value;
 
-    public IdNode(String value) {
+    public IntegerConstNode(int value) {
         this.value = value;
     }
 
-    public String getValue() {
+    public int getValue() {
         return value;
     }
 
     public void accept(MyVisitor visitor) {
         visitor.visit(this);
     }
+
 }

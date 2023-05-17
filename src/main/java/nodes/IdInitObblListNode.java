@@ -2,14 +2,22 @@ package nodes;
 
 import visitor.MyVisitor;
 
+import java.util.ArrayList;
+
 public class IdInitObblListNode {
 
     private String id;
     private ConstNode constant;
+    public ArrayList<IdInitObblListNode> idInitObblList;
 
-    public IdInitObblListNode(String id, ConstNode constant) {
+    public IdInitObblListNode(ArrayList<IdInitObblListNode> idInitObblList, String id, ConstNode constant) {
+        this.idInitObblList = idInitObblList;
         this.id = id;
         this.constant = constant;
+    }
+
+    public ArrayList<IdInitObblListNode> getIdInitObblList() {
+        return idInitObblList;
     }
 
     public String getId() {
