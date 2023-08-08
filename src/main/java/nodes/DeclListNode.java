@@ -7,16 +7,20 @@ import java.util.ArrayList;
 public class DeclListNode {
     private VarDeclNode varDecl;
     private FunDeclNode funDecl;
-    private ArrayList<DeclListNode> declList;
+    private ArrayList<DeclListNode> declList1;
 
-    public DeclListNode(VarDeclNode varDecl, ArrayList<DeclListNode> declList) {
-        this.varDecl = varDecl;
-        this.declList = declList;
+    public DeclListNode() {
+
     }
 
-    public DeclListNode(FunDeclNode funDecl, ArrayList<DeclListNode> declList) {
+    public DeclListNode(VarDeclNode varDecl, ArrayList<DeclListNode> declList1) {
+        this.varDecl = varDecl;
+        this.declList1 = declList1;
+    }
+
+    public DeclListNode(FunDeclNode funDecl, ArrayList<DeclListNode> declList1) {
         this.funDecl = funDecl;
-        this.declList = declList;
+        this.declList1 = declList1;
     }
 
     public VarDeclNode getVarDecl() {
@@ -27,8 +31,8 @@ public class DeclListNode {
         return funDecl;
     }
 
-    public ArrayList<DeclListNode> getDeclList() {
-        return declList;
+    public ArrayList<DeclListNode> getDeclList1() {
+        return declList1;
     }
 
     public void accept(MyVisitor visitor) {

@@ -6,11 +6,11 @@ import java.util.ArrayList;
 
 public class IdInitListNode {
 
-    private String id;
+    private IdNode id;
     private ExprNode expression;
     public ArrayList<IdInitListNode> idInitList;
 
-    public IdInitListNode(ArrayList<IdInitListNode> idInitList, String id, ExprNode expression) {
+    public IdInitListNode(ArrayList<IdInitListNode> idInitList, IdNode id, ExprNode expression) {
         this.idInitList = idInitList;
         this.id = id;
         this.expression = expression;
@@ -20,7 +20,7 @@ public class IdInitListNode {
         return idInitList;
     }
 
-    public String getId() {
+    public IdNode getId() {
         return id;
     }
 
