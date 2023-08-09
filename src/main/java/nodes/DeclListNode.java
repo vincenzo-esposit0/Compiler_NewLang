@@ -7,7 +7,18 @@ import java.util.ArrayList;
 public class DeclListNode {
     private VarDeclNode varDecl;
     private FunDeclNode funDecl;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     private ArrayList<DeclListNode> declList1;
+
+    private String name;
 
     public DeclListNode() {
 
