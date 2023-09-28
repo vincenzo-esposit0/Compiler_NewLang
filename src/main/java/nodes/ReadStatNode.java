@@ -6,12 +6,18 @@ import java.util.ArrayList;
 
 public class ReadStatNode extends StatNode{
 
+    private String nome;
     private ArrayList<IdListNode> idList;
     private ConstNode stringConst;
 
-    public ReadStatNode(ArrayList<IdListNode> idList, ConstNode stringConst) {
+    public ReadStatNode(String nome, ArrayList<IdListNode> idList, ConstNode stringConst) {
+        this.nome = nome;
         this.idList = idList;
         this.stringConst = stringConst;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public ArrayList<IdListNode> getIdList() {

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 public class IdInitListNode {
 
+    private String nome;
     private IdNode id;
     private ExprNode expression;
     public ArrayList<IdInitListNode> idInitList;

@@ -4,12 +4,14 @@ import visitor.MyVisitor;
 
 public class ForStatNode extends StatNode{
 
+    private String nome;
     private IdNode id;
     private ConstNode intConst1;
     private ConstNode intConst2;
     private BodyNode body;
 
-    public ForStatNode(IdNode id, ConstNode intConst1, ConstNode intConst2, BodyNode body) {
+    public ForStatNode(String nome, IdNode id, ConstNode intConst1, ConstNode intConst2, BodyNode body) {
+        this.nome = nome;
         this.id = id;
         this.intConst1 = intConst1;
         this.intConst2 = intConst2;

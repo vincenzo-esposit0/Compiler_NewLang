@@ -4,11 +4,13 @@ import visitor.MyVisitor;
 
 public class IfStatNode extends StatNode{
 
+    private String nome;
     private ExprNode expr;
     private BodyNode body;
     private ElseNode elseStat;
 
-    public IfStatNode(ExprNode expr, BodyNode body, ElseNode elseStat) {
+    public IfStatNode(String nome, ExprNode expr, BodyNode body, ElseNode elseStat) {
+        this.nome = nome;
         this.expr = expr;
         this.body = body;
         this.elseStat = elseStat;

@@ -5,33 +5,25 @@ import visitor.MyVisitor;
 import java.util.ArrayList;
 
 public class DeclListNode {
+    private String nome;
     private VarDeclNode varDecl;
     private FunDeclNode funDecl;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     private ArrayList<DeclListNode> declList1;
 
-    private String name;
-
-    public DeclListNode() {
-
-    }
-
-    public DeclListNode(VarDeclNode varDecl, ArrayList<DeclListNode> declList1) {
+    public DeclListNode(String nome, VarDeclNode varDecl, ArrayList<DeclListNode> declList1) {
+        this.nome = nome;
         this.varDecl = varDecl;
         this.declList1 = declList1;
     }
 
-    public DeclListNode(FunDeclNode funDecl, ArrayList<DeclListNode> declList1) {
+    public DeclListNode(String nome, FunDeclNode funDecl, ArrayList<DeclListNode> declList1) {
+        this.nome = nome;
         this.funDecl = funDecl;
         this.declList1 = declList1;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public VarDeclNode getVarDecl() {

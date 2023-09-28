@@ -4,6 +4,7 @@ import visitor.MyVisitor;
 
 public class ExprNode {
 
+    private String nome;
     private String typeExpr;
     private ConstNode constant;
     private IdNode id;

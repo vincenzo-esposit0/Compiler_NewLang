@@ -3,6 +3,7 @@ package nodes;
 import visitor.MyVisitor;
 
 public class TypeNode {
+    private String nome;
     public static final String INTEGER = "integer";
     public static final String BOOL = "bool";
     public static final String REAL = "real";
@@ -11,8 +12,13 @@ public class TypeNode {
 
     private String type;
 
-    public TypeNode(String type) {
+    public TypeNode(String nome, String type) {
+        this.nome = nome;
         this.type = type;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public String getType() {

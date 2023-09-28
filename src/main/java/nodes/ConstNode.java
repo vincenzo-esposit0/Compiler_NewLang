@@ -4,10 +4,16 @@ import visitor.MyVisitor;
 
 public class ConstNode {
 
+    private String nome;
     private Object value;
 
-    public ConstNode(Object value) {
+    public ConstNode(String nome, Object value) {
+        this.nome = nome;
         this.value = value;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public ConstNode(Integer iValue) {

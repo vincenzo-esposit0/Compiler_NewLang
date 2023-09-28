@@ -4,10 +4,12 @@ import visitor.MyVisitor;
 
 public class WhileStatNode extends StatNode{
 
+    private String nome;
     private ExprNode expr;
     private BodyNode body;
 
-    public WhileStatNode(ExprNode expr, BodyNode body) {
+    public WhileStatNode(String nome, ExprNode expr, BodyNode body) {
+        this.nome = nome;
         this.expr = expr;
         this.body = body;
     }

@@ -6,11 +6,13 @@ import java.util.ArrayList;
 
 public class VarDeclNode {
 
+    private String nome;
     private TypeNode type;
     private ArrayList<IdInitListNode> idInitList;
     private ArrayList<IdInitObblListNode> idInitObblList;
 
-    public VarDeclNode(TypeNode type, ArrayList<IdInitListNode> idInitList) {
+    public VarDeclNode(String nome, TypeNode type, ArrayList<IdInitListNode> idInitList) {
+        this.nome = nome;
         this.type = type;
         this.idInitList = idInitList;
     }

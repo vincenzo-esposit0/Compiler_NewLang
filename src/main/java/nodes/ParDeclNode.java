@@ -6,14 +6,20 @@ import java.util.ArrayList;
 
 public class ParDeclNode {
 
+    private String nome;
     public TypeNode type;
     public ArrayList<IdListNode> idListNode;
     public Boolean out;  //se è OUT implica che è un puntatore e viene settato a 1 altrimenti 0
 
-    public ParDeclNode(TypeNode type, ArrayList<IdListNode> idListNode, Boolean out) {
+    public ParDeclNode(String nome, TypeNode type, ArrayList<IdListNode> idListNode, Boolean out) {
+        this.nome = nome;
         this.type = type;
         this.idListNode = idListNode;
         this.out = out;
+    }
+
+    public String getNome() {
+        return nome;
     }
 
     public TypeNode getType() {

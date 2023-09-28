@@ -6,10 +6,12 @@ import java.util.ArrayList;
 
 public class WriteStatNode extends StatNode{
 
+    private String nome;
     private ArrayList<ExprListNode> exprList;
     private String writeType;
 
-    public WriteStatNode(ArrayList<ExprListNode> exprList, String writeType) {
+    public WriteStatNode(String nome, ArrayList<ExprListNode> exprList, String writeType) {
+        this.nome = nome;
         this.exprList = exprList;
         this.writeType = writeType;
     }
