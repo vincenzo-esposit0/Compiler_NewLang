@@ -1,40 +1,45 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 import java.util.ArrayList;
 
-public class VarDeclNode {
+public class VarDeclNode extends ASTNode{
 
-    private String nome;
+    private boolean isVar;
+
     private TypeNode type;
-    private ArrayList<IdInitListNode> idInitList;
-    private ArrayList<IdInitObblListNode> idInitObblList;
 
-    public VarDeclNode(String nome, TypeNode type, ArrayList<IdInitListNode> idInitList) {
-        this.nome = nome;
+    private ArrayList<IdInitNode> idInitList;
+
+    private ArrayList<IdInitNode> idInitObblList;
+
+    public VarDeclNode(String name, TypeNode type, ArrayList<IdInitNode> idInitList) {
+        super(name);
+        this.isVar = false;
         this.type = type;
         this.idInitList = idInitList;
     }
 
-    public VarDeclNode(ArrayList<IdInitObblListNode> idInitObblList) {
+    public VarDeclNode(String name, ArrayList<IdInitNode> idInitObblList) {
+        super(name);
+        this.isVar = true;
         this.idInitObblList = idInitObblList;
+    }
+
+    public boolean isVar() {
+        return isVar;
     }
 
     public TypeNode getType() {
         return type;
     }
 
-    public ArrayList<IdInitListNode> getIdInitList() {
+    public ArrayList<IdInitNode> getIdInitList() {
         return idInitList;
     }
 
-    public ArrayList<IdInitObblListNode> getIdInitObblList() {
+    public ArrayList<IdInitNode> getIdInitObblList() {
         return idInitObblList;
     }
 
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
-    }
 
 }

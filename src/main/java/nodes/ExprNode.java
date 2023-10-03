@@ -1,41 +1,27 @@
 package nodes;
 
-import visitor.MyVisitor;
+public class ExprNode extends StatNode{
 
-public class ExprNode {
-
-    private String nome;
     private String typeExpr;
+
     private ConstNode constant;
+
     private IdNode id;
+
     private FunCallNode funCall;
+
     private ExprNode expr1;
+
     private ExprNode expr2;
 
-    public ExprNode(String typeExpr, ConstNode constant) {
+    public ExprNode(String name, String typeExpr, ConstNode constant, IdNode id, FunCallNode funCall, ExprNode expr1, ExprNode expr2) {
+        super(name);
         this.typeExpr = typeExpr;
         this.constant = constant;
-    }
-
-    public ExprNode(String typeExpr, IdNode id) {
-        this.typeExpr = typeExpr;
         this.id = id;
-    }
-
-    public ExprNode(String typeExpr, FunCallNode funCall) {
-        this.typeExpr = typeExpr;
         this.funCall = funCall;
-    }
-
-    public ExprNode(String typeExpr, ExprNode expr1, ExprNode expr2) {
-        this.typeExpr = typeExpr;
         this.expr1 = expr1;
         this.expr2 = expr2;
-    }
-
-    public ExprNode(String typeExpr, ExprNode expr1) {
-        this.typeExpr = typeExpr;
-        this.expr1 = expr1;
     }
 
     public String getTypeExpr() {
@@ -62,7 +48,4 @@ public class ExprNode {
         return expr2;
     }
 
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
-    }
 }

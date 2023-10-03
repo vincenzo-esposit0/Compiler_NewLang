@@ -1,15 +1,13 @@
 package nodes;
 
-import visitor.MyVisitor;
 
 public class WhileStatNode extends StatNode{
 
-    private String nome;
     private ExprNode expr;
     private BodyNode body;
 
-    public WhileStatNode(String nome, ExprNode expr, BodyNode body) {
-        this.nome = nome;
+    public WhileStatNode(String name, ExprNode expr, BodyNode body) {
+        super(name);
         this.expr = expr;
         this.body = body;
     }
@@ -20,10 +18,6 @@ public class WhileStatNode extends StatNode{
 
     public BodyNode getBody() {
         return body;
-    }
-
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
     }
 
 }

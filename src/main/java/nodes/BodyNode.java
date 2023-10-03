@@ -1,35 +1,24 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 import java.util.ArrayList;
 
-public class BodyNode {
+public class BodyNode extends ASTNode{
 
-    private String nome;
-    private ArrayList<VarDeclListNode> varDeclList;
-    private ArrayList<StatListNode> statList;
+    private ArrayList<VarDeclNode> varDeclList;
+    private ArrayList<StatNode> statList;
 
-    public BodyNode(String nome, ArrayList<VarDeclListNode> varDeclList, ArrayList<StatListNode> statList) {
-        this.nome = nome;
+    public BodyNode(String name, ArrayList<VarDeclNode> varDeclList, ArrayList<StatNode> statList) {
+        super(name);
         this.varDeclList = varDeclList;
         this.statList = statList;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public ArrayList<VarDeclListNode> getVarDeclList() {
+    public ArrayList<VarDeclNode> getVarDeclList() {
         return varDeclList;
     }
 
-    public ArrayList<StatListNode> getStatList() {
+    public ArrayList<StatNode> getStatList() {
         return statList;
-    }
-
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
     }
 
 }

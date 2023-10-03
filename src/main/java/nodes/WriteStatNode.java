@@ -1,31 +1,25 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 import java.util.ArrayList;
 
 public class WriteStatNode extends StatNode{
 
-    private String nome;
-    private ArrayList<ExprListNode> exprList;
-    private String writeType;
+    private ArrayList<ExprNode> exprList;
 
-    public WriteStatNode(String nome, ArrayList<ExprListNode> exprList, String writeType) {
-        this.nome = nome;
+    private String typeWrite;
+
+    public WriteStatNode(String name, ArrayList<ExprNode> exprList, String typeWrite) {
+        super(name);
         this.exprList = exprList;
-        this.writeType = writeType;
+        this.typeWrite = typeWrite;
     }
 
-    public ArrayList<ExprListNode> getExprList() {
+    public ArrayList<ExprNode> getExprList() {
         return exprList;
     }
 
-    public String getWriteType() {
-        return writeType;
-    }
-
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
+    public String getTypeWrite() {
+        return typeWrite;
     }
 
 }

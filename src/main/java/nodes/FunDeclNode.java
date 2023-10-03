@@ -1,35 +1,52 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 import java.util.ArrayList;
 
-public class FunDeclNode {
+public class FunDeclNode extends ASTNode{
 
-    private String nome;
+    private boolean isMain;
+
+    private FunDeclNode funDecl;
+
     private IdNode id;
-    private ArrayList<ParamDeclListNode> paramDeclList;
+
+    private ArrayList<ParDeclNode> parDeclList;
+
     private String typeOrVoid;
+
     private BodyNode body;
 
-    public FunDeclNode(String nome, IdNode id, ArrayList<ParamDeclListNode> paramDeclList, String typeOrVoid, BodyNode body) {
-        this.nome = nome;
+    public FunDeclNode(String name, FunDeclNode funDecl) {
+        super(name);
+
+        this.isMain = true;
+        this.funDecl = funDecl;
+    }
+
+    public FunDeclNode(String name, IdNode id, ArrayList<ParDeclNode> parDeclList, String typeOrVoid, BodyNode body) {
+        super(name);
+
+        this.isMain = false;
         this.id = id;
-        this.paramDeclList = paramDeclList;
+        this.parDeclList = parDeclList;
         this.typeOrVoid = typeOrVoid;
         this.body = body;
     }
 
-    public String getNome() {
-        return nome;
+    public boolean isMain() {
+        return isMain;
+    }
+
+    public FunDeclNode getFunDecl() {
+        return funDecl;
     }
 
     public IdNode getId() {
         return id;
     }
 
-    public ArrayList<ParamDeclListNode> getParamDeclList() {
-        return paramDeclList;
+    public ArrayList<ParDeclNode> getParDeclList() {
+        return parDeclList;
     }
 
     public String getTypeOrVoid() {
@@ -40,8 +57,5 @@ public class FunDeclNode {
         return body;
     }
 
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
-    }
 }
 

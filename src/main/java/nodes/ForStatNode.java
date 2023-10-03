@@ -1,17 +1,14 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 public class ForStatNode extends StatNode{
 
-    private String nome;
     private IdNode id;
     private ConstNode intConst1;
     private ConstNode intConst2;
     private BodyNode body;
 
-    public ForStatNode(String nome, IdNode id, ConstNode intConst1, ConstNode intConst2, BodyNode body) {
-        this.nome = nome;
+    public ForStatNode(String name, IdNode id, ConstNode intConst1, ConstNode intConst2, BodyNode body) {
+        super(name);
         this.id = id;
         this.intConst1 = intConst1;
         this.intConst2 = intConst2;
@@ -32,10 +29,6 @@ public class ForStatNode extends StatNode{
 
     public BodyNode getBody() {
         return body;
-    }
-
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
     }
 
 }

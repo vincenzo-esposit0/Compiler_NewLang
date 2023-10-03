@@ -1,34 +1,24 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 import java.util.ArrayList;
 
 public class AssignStatNode extends StatNode{
 
-    private String nome;
-    private ArrayList<IdListNode> idList;
-    private ArrayList<ExprListNode> exprList;
+    private ArrayList<IdInitNode> idList;
+    private ArrayList<ExprNode> exprList;
 
-    public AssignStatNode(String nome, ArrayList<IdListNode> idList, ArrayList<ExprListNode> exprList) {
-        this.nome = nome;
+    public AssignStatNode(String name, ArrayList<IdInitNode> idList, ArrayList<ExprNode> exprList) {
+        super(name);
         this.idList = idList;
         this.exprList = exprList;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public ArrayList<IdListNode> getIdList() {
+    public ArrayList<IdInitNode> getIdList() {
         return idList;
     }
 
-    public ArrayList<ExprListNode> getExprList() {
+    public ArrayList<ExprNode> getExprList() {
         return exprList;
     }
 
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
-    }
 }

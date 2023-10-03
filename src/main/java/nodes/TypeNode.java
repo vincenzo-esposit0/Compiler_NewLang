@@ -1,32 +1,22 @@
 package nodes;
 
-import visitor.MyVisitor;
+public class TypeNode extends ASTNode{
 
-public class TypeNode {
-    private String nome;
     public static final String INTEGER = "integer";
     public static final String BOOL = "bool";
     public static final String REAL = "real";
     public static final String STRING = "string";
     public static final String CHAR = "char";
 
-    private String type;
+    private String typeVar;
 
-    public TypeNode(String nome, String type) {
-        this.nome = nome;
-        this.type = type;
+    public TypeNode(String name, String typeVar) {
+        super(name);
+        this.typeVar = typeVar;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
+    public String getTypeVar() {
+        return typeVar;
     }
 
 }

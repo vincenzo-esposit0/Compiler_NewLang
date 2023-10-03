@@ -1,40 +1,38 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 import java.util.ArrayList;
 
-public class ProgramNode {
-    private String nomeProgramNode;
-    private ArrayList<DeclListNode> declList1 = new ArrayList<DeclListNode>();
-    private MainFunDeclNode mainFunDecl;
-    private ArrayList<DeclListNode> declList2 = new ArrayList<DeclListNode>();
+public class ProgramNode extends ASTNode{
 
-    public ProgramNode(String nomeProgramNode, ArrayList<DeclListNode> declList1, MainFunDeclNode mainFunDecl, ArrayList<DeclListNode> declList2) {
-        this.nomeProgramNode = nomeProgramNode;
-        this.declList1 = declList1;
-        this.mainFunDecl = mainFunDecl;
-        this.declList2 = declList2;
+    private ArrayList<VarDeclNode> varDeclList = new ArrayList<>();
+
+    private ArrayList<FunDeclNode> funDeclList = new ArrayList<>();
+
+    public ProgramNode(String name, ArrayList<ASTNode> declList1, FunDeclNode mainFunDecl, ArrayList<ASTNode> declList2) {
+        super(name);
+        for (ASTNode node : declList1) {
+            if (node instanceof VarDeclNode) {
+                varDeclList.add((VarDeclNode) node);
+            } else if (node instanceof FunDeclNode) {
+                funDeclList.add((FunDeclNode) node);
+            }
+        }
+        this.funDeclList.add(mainFunDecl);
+        for (ASTNode node : declList2) {
+            if (node instanceof VarDeclNode) {
+                varDeclList.add((VarDeclNode) node);
+            } else if (node instanceof FunDeclNode) {
+                funDeclList.add((FunDeclNode) node);
+            }
+        }
     }
 
-    public String getNomeProgramNode() {
-        return nomeProgramNode;
+    public ArrayList<VarDeclNode> getVarDeclList() {
+        return varDeclList;
     }
 
-    public ArrayList<DeclListNode> getDeclList1() {
-        return declList1;
-    }
-
-    public MainFunDeclNode getMainFunDecl() {
-        return mainFunDecl;
-    }
-
-    public ArrayList<DeclListNode> getDeclList2() {
-        return declList2;
-    }
-
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
+    public ArrayList<FunDeclNode> getFunDeclList() {
+        return funDeclList;
     }
 
 }

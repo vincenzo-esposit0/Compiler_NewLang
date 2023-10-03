@@ -2,22 +2,22 @@ package nodes;
 
 import visitor.MyVisitor;
 
-public class MainFunDeclNode {
+public abstract class ASTNode {
 
     private String name;
-    private FunDeclNode funDecl;
 
-    public MainFunDeclNode(String name, FunDeclNode funDecl) {
+    private Integer getType;
+
+    public ASTNode(String name) {
         this.name = name;
-        this.funDecl = funDecl;
     }
 
     public String getName() {
         return name;
     }
 
-    public FunDeclNode getFunDecl() {
-        return funDecl;
+    public Integer getGetType() {
+        return getType;
     }
 
     public void accept(MyVisitor visitor) {

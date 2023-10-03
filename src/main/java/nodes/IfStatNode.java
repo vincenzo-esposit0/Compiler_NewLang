@@ -1,16 +1,13 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 public class IfStatNode extends StatNode{
 
-    private String nome;
     private ExprNode expr;
     private BodyNode body;
     private ElseNode elseStat;
 
-    public IfStatNode(String nome, ExprNode expr, BodyNode body, ElseNode elseStat) {
-        this.nome = nome;
+    public IfStatNode(String name, ExprNode expr, BodyNode body, ElseNode elseStat) {
+        super(name);
         this.expr = expr;
         this.body = body;
         this.elseStat = elseStat;
@@ -28,7 +25,4 @@ public class IfStatNode extends StatNode{
         return elseStat;
     }
 
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
-    }
 }

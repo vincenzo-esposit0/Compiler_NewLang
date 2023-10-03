@@ -1,40 +1,32 @@
 package nodes;
 
-import visitor.MyVisitor;
-
 import java.util.ArrayList;
 
-public class ParDeclNode {
+public class ParDeclNode extends ASTNode{
 
-    private String nome;
-    public TypeNode type;
-    public ArrayList<IdListNode> idListNode;
-    public Boolean out;  //se è OUT implica che è un puntatore e viene settato a 1 altrimenti 0
+    private TypeNode typeVar;
 
-    public ParDeclNode(String nome, TypeNode type, ArrayList<IdListNode> idListNode, Boolean out) {
-        this.nome = nome;
-        this.type = type;
-        this.idListNode = idListNode;
+    private ArrayList<IdNode> idList;
+
+    private Boolean out;  //se è OUT implica che è un puntatore e viene settato a 1 altrimenti 0
+
+    public ParDeclNode(String name, TypeNode typeVar, ArrayList<IdNode> idList, Boolean out) {
+        super(name);
+        this.typeVar = typeVar;
+        this.idList = idList;
         this.out = out;
     }
 
-    public String getNome() {
-        return nome;
+    public TypeNode getTypeVar() {
+        return typeVar;
     }
 
-    public TypeNode getType() {
-        return type;
-    }
-
-    public ArrayList<IdListNode> getIdListNode() {
-        return idListNode;
+    public ArrayList<IdNode> getIdList() {
+        return idList;
     }
 
     public Boolean getOut() {
         return out;
     }
 
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
-    }
 }
