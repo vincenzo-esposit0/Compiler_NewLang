@@ -20,8 +20,8 @@ public abstract class ASTNode {
         return getType;
     }
 
-    public void accept(MyVisitor visitor) {
-        visitor.visit(this);
+    public String accept(MyVisitor visitor) {
+        return visitor.visit(this);
     }
 
 }

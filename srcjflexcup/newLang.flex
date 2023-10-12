@@ -1,6 +1,8 @@
 package esercitazione5;
 import java_cup.runtime.Symbol;
 
+
+
 %% // Declarations for JFlex
 
 %unicode // We wish to read text files
@@ -94,21 +96,20 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
     {WhiteSpace} {}
 
     \" {string.setLength(0); yybegin(STRING);}
-    \' {string.setLength(0); yybegin(CHAR);}
+    \' {yybegin(CHAR);}
 }
 
 <<EOF>> { return new Symbol(sym.EOF) ; }
-[^] { throw new Error("\n\n Carattere non ammesso < "+ yytext()+" >\n") ; }
 
 <STRING> {
     \" { yybegin(YYINITIAL);
           return new Symbol( sym.STRING_CONST, string.toString()); }
 
     [^\n\r\"\\]+ { string.append( yytext() ); }
-    \\t { string.append('\t'); }
-    \\n { string.append('\n'); }
-    \\r { string.append('\r'); }
-    \\\" { string.append('\"'); }
+    \t { string.append('\t'); }
+    \n { string.append('\n'); }
+    \r { string.append('\r'); }
+    \" { string.append('"'); }
     \\ { string.append('\\'); }
 
     <<EOF>> { throw new Error("Stringa incompleta"); }
@@ -126,6 +127,8 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
 
     <<EOF>> { throw new Error("Char non completo"); }
 }
+[^] { throw new Error("\n\n Carattere non ammesso < "+ yytext()+" >\n") ; }
+
 
 
 

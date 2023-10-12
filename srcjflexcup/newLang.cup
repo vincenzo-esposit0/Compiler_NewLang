@@ -8,8 +8,8 @@ terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
          EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
 
 terminal String ID, STRING_CONST;
-terminal Integer INTEGER_CONST;
-terminal Float REAL_CONST;
+terminal String INTEGER_CONST;
+terminal String REAL_CONST;
 terminal Character CHAR_CONST;
 
 nonterminal Program;
@@ -117,8 +117,8 @@ IdInitObblList ::= ID:id ASSIGN Const:constant {:
                 :};
 
 //Const ::= INTEGER_CONST | REAL_CONST | TRUE | FALSE | STRING_CONST | CHAR_CONST
-Const ::= INTEGER_CONST:integerConst        {: RESULT = new ConstNode("ConstInteger", (Integer)integerConst); :}
-        | REAL_CONST:realConst              {: RESULT = new ConstNode("ConstReal", (Float)realConst); :}
+Const ::= INTEGER_CONST:integerConst        {: RESULT = new ConstNode("ConstInteger", Integer.parseInt(integerConst)); :}
+        | REAL_CONST:realConst              {: RESULT = new ConstNode("ConstReal", Double.valueOf(realConst)); :}
         | TRUE                              {: RESULT = new ConstNode("ConstTrue", true); :}
         | FALSE                             {: RESULT = new ConstNode("ConstFalse", false); :}
         | STRING_CONST:stringConst          {: RESULT = new ConstNode("ConstString", (String)stringConst); :}
@@ -156,14 +156,14 @@ TypeOrVoid ::= Type:type {: RESULT = (TypeNode)type; :}
 Body ::= LBRACK VarDeclList:varDeclList StatList:statList RBRACK {: RESULT = new BodyNode("Body", (ArrayList<VarDeclNode>)varDeclList, (ArrayList<StatNode>)statList); :};
 
 //VarDeclList ::= empty | VarDecl VarDeclList
-VarDeclList ::= /* empty */ {: RESULT = null; :}
+VarDeclList ::= /* empty */ {: RESULT = new ArrayList<VarDeclNode>(); :}
               | VarDecl:varDecl VarDeclList:varDeclList {:
                 ((ArrayList<VarDeclNode>)varDeclList).add(varDecl);
                 RESULT = varDeclList;
               :};
 
 //StatList ::= Stat | Stat StatList
-StatList ::= /* empty */ {: RESULT = null; :}
+StatList ::= /* empty */ {: RESULT = new ArrayList<StatNode>(); :}
            | Stat:stat StatList:statList {:
                 ((ArrayList<StatNode>)statList).add(stat);
                 RESULT = statList;
@@ -202,7 +202,7 @@ Else ::= /* empty */ {: RESULT = null; :}
 WhileStat ::= WHILE Expr:expr LOOP Body:body {: RESULT = new WhileStatNode("WhileStat", (ExprNode)expr, (BodyNode)body); :};
 
 //ForStat ::= FOR ID ASSIGN INTEGER_CONST TO INTEGER_CONST LOOP Body
-ForStat ::= FOR ID:id ASSIGN INTEGER_CONST:intConst1 TO INTEGER_CONST:intConst2 LOOP Body:body {: RESULT = new ForStatNode("ForStat", new IdNode("Id",id), new ConstNode("ConstInteger", (Integer)intConst1), new ConstNode("ConstInteger", (Integer)intConst2), (BodyNode)body); :};
+ForStat ::= FOR ID:id ASSIGN INTEGER_CONST:intConst1 TO INTEGER_CONST:intConst2 LOOP Body:body {: RESULT = new ForStatNode("ForStat", new IdNode("Id",id), new ConstNode("ConstInteger", intConst1), new ConstNode("ConstInteger", intConst2), (BodyNode)body); :};
 
 //ReadStat ::= IdList READ STRING_CONST | IdList READ
 ReadStat ::= IdList:idList READ STRING_CONST:stringConst {: new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, new ConstNode("ConstString", (String)stringConst)); :}
@@ -248,8 +248,8 @@ ExprList ::= Expr:expr {:
 //       | Expr EQUALS Expr | Expr NE Expr | MINUS Expr | NOT Expr | LPAR Expr RPAR
 Expr ::= TRUE {: RESULT = new ExprNode("Expr", "TRUE", new ConstNode("ConstNode", true), null, null, null, null); :}
 	   | FALSE {: RESULT = new ExprNode("Expr", "FALSE", new ConstNode("ConstNode", false), null, null, null, null); :}
-	   | INTEGER_CONST:integerConst {: RESULT = new ExprNode("Expr", "INTEGER_CONST", new ConstNode("ConstNode", (Integer)integerConst), null, null, null, null); :}
-	   | REAL_CONST:realConst {: RESULT = new ExprNode("Expr", "REAL_CONST", new ConstNode("ConstNode", (Float)realConst), null, null, null, null); :}
+	   | INTEGER_CONST:integerConst {: RESULT = new ExprNode("Expr", "INTEGER_CONST", new ConstNode("ConstNode", integerConst), null, null, null, null); :}
+	   | REAL_CONST:realConst {: RESULT = new ExprNode("Expr", "REAL_CONST", new ConstNode("ConstNode", realConst), null, null, null, null); :}
 	   | STRING_CONST:stringConst {: RESULT = new ExprNode("Expr", "STRING_CONST", new ConstNode("ConstNode", (String)stringConst), null, null, null, null); :}
 	   | CHAR_CONST:charConst {: RESULT = new ExprNode("Expr", "CHAR_CONST", new ConstNode("ConstNode", (Character)charConst), null, null, null, null); :}
 	   | ID:id {: RESULT = new ExprNode("Expr", "ID", null, new IdNode("IdNode",id), null, null, null); :}

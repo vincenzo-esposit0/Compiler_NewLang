@@ -4,6 +4,6 @@ import nodes.ASTNode;
 
 public interface MyVisitor {
 
-    void visit(ASTNode node);
+    String visit(ASTNode node);
 
 }

@@ -17,7 +17,9 @@ public class ProgramNode extends ASTNode{
                 funDeclList.add((FunDeclNode) node);
             }
         }
+
         this.funDeclList.add(mainFunDecl);
+
         for (ASTNode node : declList2) {
             if (node instanceof VarDeclNode) {
                 varDeclList.add((VarDeclNode) node);
