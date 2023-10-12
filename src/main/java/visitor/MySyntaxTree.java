@@ -35,26 +35,20 @@ public class MySyntaxTree implements MyVisitor {
         if (node instanceof VarDeclNode){
             treeContent = String.format("<%s>", node.getName());
 
-
-            treeContent += String.format("<%s>", ((VarDeclNode) node).isVar());
-
-            treeContent += String.format("</%s>", node.getName());
-
-
-            ArrayList<IdInitNode> idInitNode = ((VarDeclNode) node).getIdInitList();
-            if(idInitNode != null){
-                for (IdInitNode idInit : idInitNode) {
-                    if (idInit != null) {
-                        treeContent += idInit.accept(this);
+            ArrayList<IdInitNode> idInit = ((VarDeclNode) node).getIdInitList();
+            if(idInit != null){
+                for (IdInitNode idElement : idInit) {
+                    if (idElement != null) {
+                        treeContent += idElement.accept(this);
                     }
                 }
             }
 
             ArrayList<IdInitNode> idInitObbl = ((VarDeclNode) node).getIdInitObblList();
             if(idInitObbl != null){
-                for (IdInitNode idInit : idInitObbl) {
-                    if (idInit != null) {
-                        treeContent += idInit.accept(this);
+                for (IdInitNode idElement : idInitObbl) {
+                    if (idElement != null) {
+                        treeContent += idElement.accept(this);
                     }
                 }
             }
