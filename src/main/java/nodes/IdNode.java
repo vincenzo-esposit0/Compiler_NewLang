@@ -1,16 +1,19 @@
 package nodes;
 
-public class IdNode extends ASTNode{
+public class IdNode extends ExprNode{
 
-    public String value;
+    public String nomeId;
 
-    public IdNode(String name, String value) {
-        super(name);
-        this.value = value;
+    public IdNode(String name, String modeExpr, String nomeId) {
+        super(name, modeExpr);
+        this.nomeId = nomeId;
     }
 
-    public String getValue() {
-        return value;
+    public String getNomeId() {
+        return nomeId;
     }
 
+    public void setNomeId(String nomeId) {
+        this.nomeId = nomeId;
+    }
 }

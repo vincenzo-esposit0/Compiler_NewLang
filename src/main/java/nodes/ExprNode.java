@@ -2,50 +2,22 @@ package nodes;
 
 public class ExprNode extends StatNode{
 
-    private String typeExpr;
+    private String modeExpr;
+    /*
+    Nel caso delle operazioni indica quale op deve assumere. Es: AddOp, MulOp
+    Nel caso di una costante indica la constante da assumere. Es: integer_const
+     */
 
-    private ConstNode constant;
-
-    private IdNode id;
-
-    private FunCallNode funCall;
-
-    private ExprNode expr1;
-
-    private ExprNode expr2;
-
-    public ExprNode(String name, String typeExpr, ConstNode constant, IdNode id, FunCallNode funCall, ExprNode expr1, ExprNode expr2) {
+    public ExprNode(String name, String modeExpr) {
         super(name);
-        this.typeExpr = typeExpr;
-        this.constant = constant;
-        this.id = id;
-        this.funCall = funCall;
-        this.expr1 = expr1;
-        this.expr2 = expr2;
+        this.modeExpr = modeExpr;
     }
 
-    public String getTypeExpr() {
-        return typeExpr;
+    public String getModeExpr() {
+        return modeExpr;
     }
 
-    public ConstNode getConstant() {
-        return constant;
+    public void setModeExpr(String modeExpr) {
+        this.modeExpr = modeExpr;
     }
-
-    public IdNode getId() {
-        return id;
-    }
-
-    public FunCallNode getFunCall() {
-        return funCall;
-    }
-
-    public ExprNode getExpr1() {
-        return expr1;
-    }
-
-    public ExprNode getExpr2() {
-        return expr2;
-    }
-
 }

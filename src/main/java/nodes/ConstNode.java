@@ -1,11 +1,11 @@
 package nodes;
 
-public class ConstNode extends ASTNode{
+public class ConstNode extends ExprNode{
 
     private Object value;
 
-    public ConstNode(String name, Object value) {
-        super(name);
+    public ConstNode(String name, String modeExpr, Object value) {
+        super(name, modeExpr);
         this.value = value;
     }
 
@@ -13,4 +13,7 @@ public class ConstNode extends ASTNode{
         return value;
     }
 
+    public void setValue(Object value) {
+        this.value = value;
+    }
 }

@@ -2,13 +2,13 @@ package nodes;
 
 import java.util.ArrayList;
 
-public class FunCallNode extends StatNode{
+public class FunCallNode extends ExprNode{
 
     private IdNode id;
     private ArrayList<ExprNode> exprList;
 
-    public FunCallNode(String name, IdNode id, ArrayList<ExprNode> exprList) {
-        super(name);
+    public FunCallNode(String name, String modeExpr, IdNode id, ArrayList<ExprNode> exprList) {
+        super(name, modeExpr);
         this.id = id;
         this.exprList = exprList;
     }
