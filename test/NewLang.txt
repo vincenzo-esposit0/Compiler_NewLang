@@ -1,0 +1,40 @@
+start: def NewLang() : void{
+    string op;
+    string ans;
+    while ans = "si" loop {
+        var a << 0, b << 0;
+        string ans;
+        real risultato;
+        op <-- "scegli che operazione fare (+,-,*,/)";
+        a <-- "inserisci un intero o un double";
+        b <-- "inserisci un intero o un double";
+        risultato << Operation(a,b,op);
+        ("il risultato e ") -->;
+        (risultato) -->;
+        ans <-- "vuoi continuare? (si/no)";
+    }
+}
+
+def Operation(integer a | integer  b |out string op): integer{
+    if op = '+' then {
+        return (a+b);
+    }
+    if op = '-' then {
+        return (a-b);
+    }
+    if op = '*' then {
+        return (a*b);
+    }
+    if op = '/' then {
+        return (a/b);
+    }
+}
+
+def ForTesting(): real{
+    for i << 4 to 50 loop{
+        //"ciao" -->;
+    }
+}
+
+
+

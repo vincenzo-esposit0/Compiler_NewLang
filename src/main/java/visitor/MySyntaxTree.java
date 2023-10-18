@@ -87,6 +87,9 @@ public class MySyntaxTree implements MyVisitor {
             }
             else if(node instanceof ConstNode){
                 treeContent = String.format("<%s>", "ConstNode");
+
+                treeContent += "<ModeExpr>" + String.format("<%s>", ((ConstNode) node).getModeExpr()) + "</ModeExpr>";
+
                 treeContent += String.format("<%s>", ((ConstNode)node).getValue());
                 treeContent += String.format("</%s>", "ConstNode") + "\n";
             }
@@ -141,6 +144,8 @@ public class MySyntaxTree implements MyVisitor {
             else{
                 treeContent = String.format("<%s>", "FunDeclNode");
 
+                treeContent += "<NameFunDeclNode>" + String.format("<%s>", node.getName()) + "</NameFunDeclNode>";
+
                 IdNode idNode = ((FunDeclNode) node).getId();
                 treeContent += idNode.accept(this);
 
@@ -151,10 +156,7 @@ public class MySyntaxTree implements MyVisitor {
                     }
                 }
 
-                treeContent += String.format("<%s>", "ReturnType");
-                String typeOrVoid = ((FunDeclNode) node).getTypeOrVoid();
-                treeContent += typeOrVoid;
-                treeContent = String.format("<%s>", "ReturnType");
+                treeContent += "<ReturnType>" + String.format("<%s>", ((FunDeclNode) node).getTypeOrVoid()) + "</ReturnType>";
 
                 BodyNode body = ((FunDeclNode) node).getBody();
                 treeContent += body.accept(this);
