@@ -1,6 +1,6 @@
 package nodes;
 
-public class ElseNode extends ASTNode{
+public class ElseNode extends StatNode{
 
     private BodyNode body;
 

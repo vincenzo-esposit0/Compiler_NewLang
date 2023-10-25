@@ -6,7 +6,7 @@ public abstract class ASTNode {
 
     private String name;
 
-    private Integer getType;
+    private Integer astType;
 
     public ASTNode(String name) {
         this.name = name;
@@ -16,8 +16,8 @@ public abstract class ASTNode {
         return name;
     }
 
-    public Integer getGetType() {
-        return getType;
+    public Integer getAstType() {
+        return astType;
     }
 
     public String accept(MyVisitor visitor) {

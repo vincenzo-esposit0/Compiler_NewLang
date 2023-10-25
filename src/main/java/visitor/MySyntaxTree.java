@@ -14,7 +14,7 @@ public class MySyntaxTree implements MyVisitor {
 
         //ProgramNode
         if (node instanceof ProgramNode) {
-            treeContent = String.format("<%s>", node.getName());
+            treeContent = String.format("<%s>", node.getName()) + "\n";
 
             ArrayList<VarDeclNode> varDeclListNode = ((ProgramNode) node).getVarDeclList();
             for (VarDeclNode varDecl : varDeclListNode) {
@@ -36,7 +36,7 @@ public class MySyntaxTree implements MyVisitor {
         }
 
         if (node instanceof VarDeclNode){
-            treeContent = String.format("<%s>", "VarDecl");
+            treeContent = String.format("<%s>", "VarDecl") + "\n";
             ArrayList<IdInitNode> idInit = ((VarDeclNode) node).getIdInitList();
             if(idInit != null){
                 for (IdInitNode idElement : idInit) {
@@ -60,7 +60,7 @@ public class MySyntaxTree implements MyVisitor {
         }
 
         if(node instanceof IdInitNode){
-            treeContent = String.format("<%s>", "IdInitNode");
+            treeContent = String.format("<%s>", "IdInitNode") + "\n";
 
             IdNode id = ((IdInitNode) node).getId();
             treeContent += id.accept(this);
@@ -81,20 +81,20 @@ public class MySyntaxTree implements MyVisitor {
 
         if(node instanceof ExprNode){
             if(node instanceof IdNode){
-                treeContent = String.format("<%s>", "IdNode");
-                treeContent += String.format("<%s>", ((IdNode) node).getNomeId());
+                treeContent = String.format("<%s>", "IdNode") + "\n";
+                treeContent += String.format("<%s>", ((IdNode) node).getNomeId()) + "\n";
                 treeContent += String.format("</%s>", "IdNode") + "\n";
             }
             else if(node instanceof ConstNode){
-                treeContent = String.format("<%s>", "ConstNode");
+                treeContent = String.format("<%s>", "ConstNode") + "\n";
 
                 treeContent += "<ModeExpr>" + String.format("<%s>", ((ConstNode) node).getModeExpr()) + "</ModeExpr>";
 
-                treeContent += String.format("<%s>", ((ConstNode)node).getValue());
+                treeContent += String.format("<%s>", ((ConstNode)node).getValue()) + "\n";
                 treeContent += String.format("</%s>", "ConstNode") + "\n";
             }
             else if(node instanceof BiVarExprNode){
-                treeContent = String.format("<%s>", "BiVarExprNode");
+                treeContent = String.format("<%s>", "BiVarExprNode") + "\n";
 
                 ExprNode exprNode1 = ((BiVarExprNode) node).getExprNode1();
                 treeContent += exprNode1.accept(this);
@@ -105,7 +105,7 @@ public class MySyntaxTree implements MyVisitor {
                 treeContent += String.format("</%s>", "BiVarExprNode") + "\n";
             }
             else if(node instanceof UniVarExprNode){
-                treeContent = String.format("<%s>", "UniVarExprNode");
+                treeContent = String.format("<%s>", "UniVarExprNode") + "\n";
 
                 ExprNode exprNode = ((UniVarExprNode) node).getExprNode();
                 treeContent += exprNode.accept(this);
@@ -113,7 +113,7 @@ public class MySyntaxTree implements MyVisitor {
                 treeContent += String.format("</%s>", "UniVarExprNode") + "\n";
             }
             else if(node instanceof FunCallNode){
-                treeContent = String.format("<%s>", "FunCallNode");
+                treeContent = String.format("<%s>", "FunCallNode") + "\n";
 
                 IdNode idNode = ((FunCallNode) node).getId();
                 treeContent += idNode.accept(this);
@@ -133,7 +133,7 @@ public class MySyntaxTree implements MyVisitor {
 
         if(node instanceof FunDeclNode){
             if(((FunDeclNode) node).isMain()){
-                treeContent = String.format("<%s>", "Main");
+                treeContent = String.format("<%s>", "Main") + "\n";
 
                 FunDeclNode funDeclNode= ((FunDeclNode) node).getFunDecl();
                 treeContent += funDeclNode.accept(this);
@@ -142,9 +142,9 @@ public class MySyntaxTree implements MyVisitor {
 
             }
             else{
-                treeContent = String.format("<%s>", "FunDeclNode");
+                treeContent = String.format("<%s>", "FunDeclNode") + "\n";
 
-                treeContent += "<NameFunDeclNode>" + String.format("<%s>", node.getName()) + "</NameFunDeclNode>";
+                treeContent += "<NameFunDeclNode>" + String.format("<%s>", node.getName()) + "</NameFunDeclNode>" + "\n";
 
                 IdNode idNode = ((FunDeclNode) node).getId();
                 treeContent += idNode.accept(this);
@@ -156,19 +156,19 @@ public class MySyntaxTree implements MyVisitor {
                     }
                 }
 
-                treeContent += "<ReturnType>" + String.format("<%s>", ((FunDeclNode) node).getTypeOrVoid()) + "</ReturnType>";
+                treeContent += "<ReturnType>" + String.format("<%s>", ((FunDeclNode) node).getTypeOrVoid()) + "</ReturnType>" + "\n";
 
                 BodyNode body = ((FunDeclNode) node).getBody();
                 treeContent += body.accept(this);
 
-                treeContent += String.format("</%s>", "Main") + "\n";
+                treeContent += String.format("</%s>", "FunDeclNode") + "\n";
             }
 
             return treeContent;
         }
 
         if(node instanceof BodyNode){
-            treeContent = String.format("<%s>", "Body");
+            treeContent = String.format("<%s>", "Body") + "\n";
 
             ArrayList<VarDeclNode> varDeclListNode = ((BodyNode) node).getVarDeclList();
             for (VarDeclNode varDecl : varDeclListNode) {
@@ -189,8 +189,9 @@ public class MySyntaxTree implements MyVisitor {
         }
 
         if(node instanceof StatNode){
+            System.out.println(node.getName() + node.getAstType());
             if(node instanceof IfStatNode){
-                treeContent = String.format("<%s>", "IfStat");
+                treeContent = String.format("<%s>", "IfStat") + "\n";
 
                 ExprNode expr = ((IfStatNode) node).getExpr();
                 treeContent += expr.accept(this);
@@ -205,7 +206,7 @@ public class MySyntaxTree implements MyVisitor {
 
             }
             else if(node instanceof ElseNode){
-                treeContent = String.format("<%s>", "ElseStat");
+                treeContent = String.format("<%s>", "ElseStat") + "\n";
 
                 BodyNode body = ((ElseNode) node).getBody();
                 treeContent += body.accept(this);
@@ -214,7 +215,7 @@ public class MySyntaxTree implements MyVisitor {
 
             }
             else if(node instanceof ForStatNode){
-                treeContent = String.format("<%s>", "ForStat");
+                treeContent = String.format("<%s>", "ForStat") + "\n";
 
                 IdNode id = ((ForStatNode) node).getId();
                 treeContent += id.accept(this);
@@ -231,7 +232,7 @@ public class MySyntaxTree implements MyVisitor {
                 treeContent += String.format("</%s>", "ForStat") + "\n";
             }
             else if(node instanceof WhileStatNode){
-                treeContent = String.format("<%s>", "WhileStat");
+                treeContent = String.format("<%s>", "WhileStat") + "\n";
 
                 ExprNode expr = ((WhileStatNode) node).getExpr();
                 treeContent += expr.accept(this);
@@ -242,7 +243,7 @@ public class MySyntaxTree implements MyVisitor {
                 treeContent += String.format("</%s>", "WhileStat") + "\n";
             }
             else if(node instanceof AssignStatNode){
-                treeContent = String.format("<%s>", "AssignStat");
+                treeContent = String.format("<%s>", "AssignStat") + "\n";
 
                 ArrayList<IdInitNode> idList = ((AssignStatNode) node).getIdList();
                 for (IdInitNode idElement : idList) {
@@ -262,7 +263,8 @@ public class MySyntaxTree implements MyVisitor {
 
             }
             else if(node instanceof ReadStatNode){
-                treeContent = String.format("<%s>", "ReadStat");
+                System.out.println("inside if readStatNode");
+                treeContent = String.format("<%s>", "ReadStat") + "\n";
 
                 ArrayList<IdInitNode> idList = ((ReadStatNode) node).getIdList();
                 for (IdInitNode idElement : idList) {
@@ -278,7 +280,7 @@ public class MySyntaxTree implements MyVisitor {
 
             }
             else if(node instanceof WriteStatNode){
-                treeContent = String.format("<%s>", "WriteStat");
+                treeContent = String.format("<%s>", "WriteStat") + "\n";
 
                 ArrayList<ExprNode> exprNode = ((WriteStatNode) node).getExprList();
                 for (ExprNode expr : exprNode) {
@@ -298,21 +300,21 @@ public class MySyntaxTree implements MyVisitor {
         }
 
         if(node instanceof ParDeclNode){
-            treeContent = String.format("<%s>", "ParDeclNode");
+            treeContent = String.format("<%s>", "ParDeclNode") + "\n";
 
             TypeNode type = ((ParDeclNode) node).getTypeVar();
             treeContent += type.accept(this);
 
-            ArrayList<IdNode> idList = ((ParDeclNode) node).getIdList();
+            ArrayList<IdInitNode> idList = ((ParDeclNode) node).getIdList();
             if(idList != null){
-                for (IdNode idElement : idList) {
+                for (IdInitNode idElement : idList) {
                     if (idElement != null) {
                         treeContent += idElement.accept(this);
                     }
                 }
             }
 
-            treeContent += "<Out>" + String.format("<%s>", ((ParDeclNode) node).getOut()) + "</Out>";
+            treeContent += "<Out>" + String.format("<%s>", ((ParDeclNode) node).getOut()) + "</Out>" + "\n";
 
             treeContent += String.format("</%s>", "ParDeclNode") + "\n";
 
@@ -320,7 +322,7 @@ public class MySyntaxTree implements MyVisitor {
         }
 
         if(node instanceof TypeNode){
-            treeContent = String.format("<%s>", "TypeNode");
+            treeContent = String.format("<%s>", "TypeNode") + "\n";
 
             treeContent += "<TypeVar>" + String.format("<%s>", ((TypeNode) node).getTypeVar()) + "</TypeVar>";
 

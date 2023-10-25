@@ -2,7 +2,7 @@ import nodes.*;
 import java.util.ArrayList;
 
 terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
-         DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, READ, WRITE, WRITELN,
+         DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, WRITE, WRITELN, READ,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
          TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT,
          EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
@@ -12,33 +12,33 @@ terminal String INTEGER_CONST;
 terminal String REAL_CONST;
 terminal Character CHAR_CONST;
 
-nonterminal Program;
+nonterminal ProgramNode Program;
 nonterminal ArrayList<ASTNode> DeclList;
 nonterminal MainFunDecl;
 nonterminal VarDeclNode VarDecl;
-nonterminal Type;
-nonterminal IdInitList;
-nonterminal IdInitObblList;
-nonterminal Const;
+nonterminal TypeNode Type;
+nonterminal ArrayList<IdInitNode> IdInitList;
+nonterminal ArrayList<IdInitNode> IdInitObblList;
+nonterminal ConstNode Const;
 nonterminal FunDeclNode FunDecl;
-nonterminal Body;
+nonterminal BodyNode Body;
 nonterminal ParamDeclList;
 nonterminal NonEmptyParamDeclList;
 nonterminal ParDeclNode ParDecl;
 nonterminal TypeOrVoid;
 nonterminal ArrayList<VarDeclNode> VarDeclList;
-nonterminal StatList;
+nonterminal ArrayList<StatNode> StatList;
 nonterminal StatNode Stat;
 nonterminal IfStatNode IfStat;
 nonterminal ElseNode Else;
 nonterminal WhileStatNode WhileStat;
 nonterminal ForStatNode ForStat;
 nonterminal ReadStatNode ReadStat;
-nonterminal IdList;
+nonterminal ArrayList<IdInitNode> IdList;
 nonterminal WriteStatNode WriteStat;
 nonterminal AssignStatNode AssignStat;
 nonterminal FunCallNode FunCall;
-nonterminal ExprList;
+nonterminal ArrayList<ExprNode> ExprList;
 nonterminal ExprNode Expr;
 
 // **************** Specifica precedence ****************
@@ -145,8 +145,8 @@ NonEmptyParamDeclList ::= ParDecl:parDecl {:
                         :};
 
 //ParDecl ::= Type IdList | OUT Type IdList
-ParDecl ::= Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", (TypeNode)type, (ArrayList<IdNode>)idList, false); :}
-          | OUT Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", (TypeNode)type, (ArrayList<IdNode>)idList, true); :};
+ParDecl ::= Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", (TypeNode)type, idList, false); :}
+          | OUT Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", (TypeNode)type, idList, true); :};
 
 //TypeOrVoid ::= Type | VOID
 TypeOrVoid ::= Type:type {: RESULT = (TypeNode)type; :}
@@ -175,7 +175,7 @@ Stat ::= IfStat:ifStat
 	   | ForStat:forStat
         {: RESULT = (ForStatNode)forStat; :}
 	   | ReadStat:readStat SEMI
-        {: RESULT = (ReadStatNode)readStat; :}
+        {: RESULT = readStat; :}
 	   | WriteStat:writeStat SEMI
         {: RESULT = (WriteStatNode)writeStat; :}
 	   | AssignStat:assignStat SEMI
@@ -205,7 +205,7 @@ WhileStat ::= WHILE Expr:expr LOOP Body:body {: RESULT = new WhileStatNode("Whil
 ForStat ::= FOR ID:id ASSIGN INTEGER_CONST:intConst1 TO INTEGER_CONST:intConst2 LOOP Body:body {: RESULT = new ForStatNode("ForStat", new IdNode("Expr", "Id",id), new ConstNode("Expr", "ConstInteger", intConst1), new ConstNode("Expr", "ConstInteger", intConst2), (BodyNode)body); :};
 
 //ReadStat ::= IdList READ STRING_CONST | IdList READ
-ReadStat ::= IdList:idList READ STRING_CONST:stringConst {: new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, new ConstNode("Expr", "ConstString", (String)stringConst)); :}
+ReadStat ::= IdList:idList READ STRING_CONST:stringConst {: new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, new ConstNode("Expr", "ConstString", (String)stringConst)); System.out.println("inside read"); :}
            | IdList:idList READ {: new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, null); :};
 
 //IdList ::= ID | IdList COMMA ID
@@ -213,6 +213,8 @@ IdList ::= ID:id {:
             ArrayList<IdInitNode> idList = new ArrayList<>();
             idList.add(new IdInitNode("IdList", new IdNode("Expr", "Id",(String) id), null, null));
             RESULT = idList;
+
+            System.out.println("inside list only id");
          :}
          | IdList:idList COMMA ID:id {:
             ((ArrayList<IdInitNode>)idList).add(new IdInitNode("IdList", new IdNode("Expr", "Id",(String) id), null, null));
