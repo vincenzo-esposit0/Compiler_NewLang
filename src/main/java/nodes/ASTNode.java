@@ -20,6 +20,14 @@ public abstract class ASTNode {
         return astType;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAstType(Integer getType) {
+        this.astType = getType;
+    }
+
     public String accept(MyVisitor visitor) {
         return visitor.visit(this);
     }
