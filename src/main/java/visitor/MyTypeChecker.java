@@ -5,28 +5,100 @@ import esercitazione5.sym;
 public class MyTypeChecker {
 
     public static int getInferenceType(String type) {
-        switch (type) {
-            case "INTEGER":
-            case "INTEGER_CONST":
-                return sym.INTEGER;
-            case "REAL":
-            case "REAL_CONST":
-                return sym.REAL;
-            case "TRUE":
-            case "FALSE":
-            case "BOOL":
-                return sym.BOOL;
-            case "STRING":
-            case "STRING_CONST":
-                return sym.STRING;
-            case "CHAR":
-            case "CHAR_CONST":
-                return sym.CHAR;
-            case "VOID":
-                return sym.VOID;
-            default:
-                return sym.error;
-        }
-
+        return switch (type) {
+            case "INTEGER", "INTEGER_CONST" -> sym.INTEGER;
+            case "REAL", "REAL_CONST" -> sym.REAL;
+            case "TRUE", "FALSE", "BOOL" -> sym.BOOL;
+            case "STRING", "STRING_CONST" -> sym.STRING;
+            case "CHAR", "CHAR_CONST" -> sym.CHAR;
+            case "VOID" -> sym.VOID;
+            default -> sym.error;
+        };
     }
+
+    public static int unaryOperations(String operation, int operator) {
+        switch (operation) {
+            case "UMINUS" -> {
+                if (operator == sym.INTEGER) {
+                    return sym.INTEGER;
+                } else if (operator == sym.REAL) {
+                    return sym.REAL;
+                }
+                return sym.error;
+            }
+            case "NOT" -> {
+                if (operator == sym.BOOL) {
+                    return sym.BOOL;
+                }
+                return sym.error;
+            }
+            default -> {
+                return sym.error;
+            }
+        }
+    }
+
+    public static int binaryOperations(String operation, int operator1, int operator2) {
+        switch (operation){
+            case "PLUS", "MINUS", "TIMES", "DIV", "POW" -> {
+                if (operator1 == sym.INTEGER && operator2 == sym.INTEGER) {
+                    return sym.INTEGER;
+                } else if (operator1 == sym.INTEGER && operator2 == sym.REAL) {
+                    return sym.REAL;
+                } else if (operator1 == sym.REAL && operator2 == sym.REAL) {
+                    return sym.REAL;
+                } else if (operator1 == sym.REAL && operator2 == sym.INTEGER) {
+                    return sym.REAL;
+                }
+                return sym.error;
+            }
+            case "STR_CONCAT" -> {
+                if (operator1 == sym.VOID && operator2 == sym.VOID) {
+                    return sym.STRING;
+                }
+                return sym.error;
+            }
+            case "AND", "OR" -> {
+                if (operator1 == sym.BOOL && operator2 == sym.BOOL) {
+                    return sym.BOOL;
+                }
+                return sym.error;
+            }
+            case "NE", "LT", "LE", "GT", "GE" -> {
+                if((operator1 == sym.INTEGER || operator1 == sym.REAL) && (operator2 == sym.INTEGER || operator2 == sym.REAL)) {
+                    return sym.BOOL;
+                } else if ((operator1 == sym.STRING || operator1 == sym.CHAR) && (operator2 == sym.STRING || operator2 == sym.CHAR)) {
+                    return sym.BOOL;
+                }
+                return sym.error;
+            }
+            default -> {
+                return sym.error;
+            }
+        }
+    }
+
+    public static int AssignOperations(int operator1, int operator2) {
+        if ((operator1 == sym.INTEGER && operator2 == sym.INTEGER) ||
+                (operator1 == sym.REAL && operator2 == sym.REAL) ||
+                (operator1 == sym.INTEGER && operator2 == sym.REAL) ||
+                (operator1 == sym.REAL && operator2 == sym.INTEGER) ||
+                (operator1 == sym.BOOL && operator2 == sym.BOOL) ||
+                (operator1 == sym.INTEGER && operator2 == sym.BOOL) ||
+                (operator1 == sym.BOOL && operator2 == sym.INTEGER) ||
+                (operator1 == sym.STRING && operator2 == sym.STRING) ||
+                (operator1 == sym.CHAR && operator2 == sym.CHAR)) {
+            return sym.VOID;
+        }
+        return sym.error;
+    }
+
+    public static boolean returnChecker(int operator1, int operator2) {
+        return (operator1 == operator2) ||
+                (operator1 == sym.INTEGER && operator2 == sym.REAL) ||
+                (operator1 == sym.REAL && operator2 == sym.INTEGER) ||
+                (operator1 == sym.INTEGER && operator2 == sym.BOOL) ||
+                (operator1 == sym.BOOL && operator2 == sym.INTEGER);
+    }
+
 }
