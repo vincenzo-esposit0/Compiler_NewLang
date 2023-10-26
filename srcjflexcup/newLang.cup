@@ -175,7 +175,7 @@ Stat ::= IfStat:ifStat
 	   | ForStat:forStat
         {: RESULT = (ForStatNode)forStat; :}
 	   | ReadStat:readStat SEMI
-        {: RESULT = readStat; :}
+        {: RESULT = (ReadStatNode)readStat; :}
 	   | WriteStat:writeStat SEMI
         {: RESULT = (WriteStatNode)writeStat; :}
 	   | AssignStat:assignStat SEMI

@@ -82,15 +82,15 @@ public class MySyntaxTree implements MyVisitor {
         if(node instanceof ExprNode){
             if(node instanceof IdNode){
                 treeContent = String.format("<%s>", "IdNode") + "\n";
-                treeContent += String.format("<%s>", ((IdNode) node).getNomeId()) + "\n";
+                treeContent += String.format("%s", ((IdNode) node).getNomeId()) + "\n";
                 treeContent += String.format("</%s>", "IdNode") + "\n";
             }
             else if(node instanceof ConstNode){
                 treeContent = String.format("<%s>", "ConstNode") + "\n";
 
-                treeContent += "<ModeExpr>" + String.format("<%s>", ((ConstNode) node).getModeExpr()) + "</ModeExpr>";
+                treeContent += "<ModeExpr>" + String.format("%s", ((ConstNode) node).getModeExpr()) + "</ModeExpr>";
 
-                treeContent += String.format("<%s>", ((ConstNode)node).getValue()) + "\n";
+                treeContent += String.format("%s", ((ConstNode)node).getValue()) + "\n";
                 treeContent += String.format("</%s>", "ConstNode") + "\n";
             }
             else if(node instanceof BiVarExprNode){
@@ -144,7 +144,7 @@ public class MySyntaxTree implements MyVisitor {
             else{
                 treeContent = String.format("<%s>", "FunDeclNode") + "\n";
 
-                treeContent += "<NameFunDeclNode>" + String.format("<%s>", node.getName()) + "</NameFunDeclNode>" + "\n";
+                treeContent += "<NameFunDeclNode>" + String.format("%s", node.getName()) + "</NameFunDeclNode>" + "\n";
 
                 IdNode idNode = ((FunDeclNode) node).getId();
                 treeContent += idNode.accept(this);
@@ -156,7 +156,7 @@ public class MySyntaxTree implements MyVisitor {
                     }
                 }
 
-                treeContent += "<ReturnType>" + String.format("<%s>", ((FunDeclNode) node).getTypeOrVoid()) + "</ReturnType>" + "\n";
+                treeContent += "<ReturnType>" + String.format("%s", ((FunDeclNode) node).getTypeOrVoid()) + "</ReturnType>" + "\n";
 
                 BodyNode body = ((FunDeclNode) node).getBody();
                 treeContent += body.accept(this);
@@ -189,7 +189,6 @@ public class MySyntaxTree implements MyVisitor {
         }
 
         if(node instanceof StatNode){
-            System.out.println(node.getName() + node.getAstType());
             if(node instanceof IfStatNode){
                 treeContent = String.format("<%s>", "IfStat") + "\n";
 
@@ -200,7 +199,9 @@ public class MySyntaxTree implements MyVisitor {
                 treeContent += body.accept(this);
 
                 ElseNode elseStat = ((IfStatNode) node).getElseStat();
-                treeContent += elseStat.accept(this);
+                if(elseStat != null) {
+                    treeContent += elseStat.accept(this);
+                }
 
                 treeContent += String.format("</%s>", "IfStat") + "\n";
 
@@ -290,7 +291,7 @@ public class MySyntaxTree implements MyVisitor {
                 }
 
                 String typeWrite = ((WriteStatNode) node).getTypeWrite();
-                treeContent += String.format("</%s>", typeWrite);
+                treeContent += String.format("%s", typeWrite);
 
                 treeContent += String.format("</%s>", "WriteStat") + "\n";
 
@@ -314,7 +315,7 @@ public class MySyntaxTree implements MyVisitor {
                 }
             }
 
-            treeContent += "<Out>" + String.format("<%s>", ((ParDeclNode) node).getOut()) + "</Out>" + "\n";
+            treeContent += "<Out>" + String.format("%s", ((ParDeclNode) node).getOut()) + "</Out>" + "\n";
 
             treeContent += String.format("</%s>", "ParDeclNode") + "\n";
 
@@ -324,7 +325,7 @@ public class MySyntaxTree implements MyVisitor {
         if(node instanceof TypeNode){
             treeContent = String.format("<%s>", "TypeNode") + "\n";
 
-            treeContent += "<TypeVar>" + String.format("<%s>", ((TypeNode) node).getTypeVar()) + "</TypeVar>";
+            treeContent += "<TypeVar>" + String.format("%s", ((TypeNode) node).getTypeVar()) + "</TypeVar>";
 
             treeContent += String.format("</%s>", "TypeNode") + "\n";
 
