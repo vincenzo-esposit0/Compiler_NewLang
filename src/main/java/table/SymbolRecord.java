@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class SymbolRecord {
 
     private String symbolName;
-    private String typeVarOrFun;    //definisce il tipo VAR o FUN
+    private String kind;    //definisce il tipo VAR o FUN
     private int typeVar;    //valore intero restituito dal TypeChecker
     private ArrayList<Integer> paramsTypeList;
     private ArrayList<Boolean> paramsOutList;
@@ -13,30 +13,30 @@ public class SymbolRecord {
     private boolean pointer = false;
 
     //Costruttore per variabili
-    public SymbolRecord(String symbolName, String typeVarOrFun, int typeVar) {
-        initialize(symbolName, typeVarOrFun, typeVar);
+    public SymbolRecord(String symbolName, String kind, int typeVar) {
+        initialize(symbolName, kind, typeVar);
     }
 
     //Costruttore per variabili puntatori
-    public SymbolRecord(String symbolName, String typeVarOrFun, int typeVar, boolean pointer) {
-        initialize(symbolName, typeVarOrFun, typeVar);
+    public SymbolRecord(String symbolName, String kind, int typeVar, boolean pointer) {
+        initialize(symbolName, kind, typeVar);
         this.pointer = pointer;
     }
 
     //Costruttore per funzioni
-    public SymbolRecord(String symbolName, String typeVarOrFun, ArrayList<Integer> paramsTypeList, ArrayList<Boolean> paramsOutList, int returnTypeFun) {
-        initialize(symbolName, typeVarOrFun, paramsTypeList, paramsOutList, returnTypeFun);
+    public SymbolRecord(String symbolName, String kind, ArrayList<Integer> paramsTypeList, ArrayList<Boolean> paramsOutList, int returnTypeFun) {
+        initialize(symbolName, kind, paramsTypeList, paramsOutList, returnTypeFun);
     }
 
-    private void initialize(String symbolName, String typeVarOrFun, int typeVar) {
+    private void initialize(String symbolName, String kind, int typeVar) {
         this.symbolName = symbolName;
-        this.typeVarOrFun = typeVarOrFun;
+        this.kind = kind;
         this.typeVar = typeVar;
     }
 
-    private void initialize(String symbolName, String typeVarOrFun, ArrayList<Integer> paramsTypeList, ArrayList<Boolean> paramsOutList, int returnTypeFun) {
+    private void initialize(String symbolName, String kind, ArrayList<Integer> paramsTypeList, ArrayList<Boolean> paramsOutList, int returnTypeFun) {
         this.symbolName = symbolName;
-        this.typeVarOrFun = typeVarOrFun;
+        this.kind = kind;
         this.paramsTypeList = paramsTypeList;
         this.paramsOutList = paramsOutList;
         this.returnTypeFun = returnTypeFun;
@@ -50,12 +50,12 @@ public class SymbolRecord {
         this.symbolName = symbolName;
     }
 
-    public String getTypeVarOrFun() {
-        return typeVarOrFun;
+    public String getKind() {
+        return kind;
     }
 
-    public void setTypeVarOrFun(String typeVarOrFun) {
-        this.typeVarOrFun = typeVarOrFun;
+    public void setKind(String kind) {
+        this.kind = kind;
     }
 
     public int getTypeVar() {

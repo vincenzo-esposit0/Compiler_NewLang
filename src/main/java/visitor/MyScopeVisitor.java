@@ -7,7 +7,6 @@ import esercitazione5.sym;
 
 import java.util.ArrayList;
 import java.util.Stack;
-import java.util.zip.InflaterInputStream;
 
 public class MyScopeVisitor implements MyVisitor{
 
@@ -57,15 +56,14 @@ public class MyScopeVisitor implements MyVisitor{
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
-        ArrayList<VarDeclNode> varDeclListNode = ((ProgramNode) node).getVarDeclList();
+        ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
         for (VarDeclNode varDecl : varDeclListNode) {
             if (varDecl != null) {
                 varDecl.accept(this);
             }
         }
 
-        //capire come gestire il main
-        ArrayList<FunDeclNode> funDeclListNode = ((ProgramNode) node).getFunDeclList();
+        ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
         for (FunDeclNode funDecl : funDeclListNode) {
             if (funDecl != null) {
                 funDecl.accept(this);
@@ -73,6 +71,8 @@ public class MyScopeVisitor implements MyVisitor{
         }
 
         stackScope.pop();
+
+        //Dalle specifiche ogni nodo deve avere un tipo.
         node.setAstType(sym.VOID);
     }
 
@@ -98,7 +98,6 @@ public class MyScopeVisitor implements MyVisitor{
         ArrayList<IdInitNode> idInit = node.getIdInitList();
 
         if(node.getType().getName() == "VAR" ) {
-            node.setAstType(sym.error);
 
             for (IdInitNode idElement : idInit) {
                 String nomeID = idElement.getId().getNomeId();
@@ -111,6 +110,7 @@ public class MyScopeVisitor implements MyVisitor{
                     node.setAstType(typeCheck);
                 }
                 else {
+                    node.setAstType(sym.error);
                     throw new Error("Id: " + nomeID + " già dichiarato all'interno dello scope");
                 }
             }
@@ -128,20 +128,79 @@ public class MyScopeVisitor implements MyVisitor{
                     throw new Error("Id: " + nomeID + " già dichiarato all'interno dello scope");
                 }
             }
-
             node.setAstType(typeCheck);
-
-            }
-
+        }
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
+        FunDeclNode funDeclNode = node.getFunDecl();
+        String nomeID = funDeclNode.getId().getNomeId();
+        int returnTypeCheck = node.getAstType();
 
+        SymbolTable symbolTableGlobal = stackScope.peek();
+
+        if(!stackScope.peek().containsKey(nomeID)){
+            symbolTable = new SymbolTable("FUN", nomeID);
+            stackScope.push(symbolTable);
+
+            ArrayList<ParDeclNode> parDeclList = node.getParDeclList();
+            ArrayList<Integer> parTypesList = new ArrayList<>();
+            ArrayList<Boolean> parOutList = new ArrayList<>();
+
+            if (parDeclList != null) {
+                for (ParDeclNode parElement : parDeclList) {
+                    parElement.accept(this);
+                    for (int i = 0; i < parElement.getIdList().size(); i++) {
+                        int parTypeCheck = MyTypeChecker.getInferenceType(parElement.getTypeVar().getTypeVar());
+                        boolean isOutParam = parElement.getOut().equals(Boolean.TRUE);
+
+                        //Possibilità diu miglioramento della logica definita sottostante.
+
+                        parTypesList.add(parTypeCheck);
+                        parOutList.add(isOutParam);
+                    }
+                }
+            }
+
+            symbolTableGlobal.put(nomeID, new SymbolRecord(nomeID, "FUN", parTypesList, parOutList, returnTypeCheck));
+
+            funDeclNode.getBody().accept(this);
+
+        } else {
+            throw new Error("ID della funzione: " + nomeID + "già dichiarato all'interno dello scope");
+        }
+
+        funDeclNode.setAstType(returnTypeCheck);
+        node.setAstType(returnTypeCheck);
+        funDeclNode.setSymbolTable(stackScope.peek());
+        stackScope.pop();
     }
 
-    private void visitParDeclNode(ASTNode node) {
 
+    private void visitParDeclNode(ParDeclNode node) {
+        ArrayList<IdInitNode> idInitNodeList = node.getIdList();
+        int typeCheck = MyTypeChecker.getInferenceType(node.getTypeVar().getTypeVar());
+
+        for(IdInitNode idElement: idInitNodeList){
+            String nomeID = idElement.getId().getNomeId();
+
+            if (!stackScope.peek().containsKey(nomeID)) {
+                if(node.getOut().equals(Boolean.TRUE)) {
+                    stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck, true));
+                } else {
+                    stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
+                }
+            }
+            else {
+                throw new Error("Id: " + nomeID + " già dichiarato all'interno dello scope");
+            }
+
+            idElement.setAstType(sym.VOID);
+        }
+
+        node.setAstType(typeCheck);
     }
+
 
     private void visitIfStatNode(IfStatNode node) {
         symbolTable = new SymbolTable("IF");

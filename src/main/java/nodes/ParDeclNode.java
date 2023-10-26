@@ -29,4 +29,15 @@ public class ParDeclNode extends ASTNode{
         return out;
     }
 
+    public void setTypeVar(TypeNode typeVar) {
+        this.typeVar = typeVar;
+    }
+
+    public void setIdList(ArrayList<IdInitNode> idList) {
+        this.idList = idList;
+    }
+
+    public void setOut(Boolean out) {
+        this.out = out;
+    }
 }

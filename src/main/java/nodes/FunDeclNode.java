@@ -1,5 +1,7 @@
 package nodes;
 
+import table.SymbolTable;
+
 import java.util.ArrayList;
 
 public class FunDeclNode extends ASTNode{
@@ -15,6 +17,8 @@ public class FunDeclNode extends ASTNode{
     private String typeOrVoid;
 
     private BodyNode body;
+
+    private SymbolTable symbolTable;
 
     public FunDeclNode(String name, FunDeclNode funDecl) {
         super(name);
@@ -57,5 +61,36 @@ public class FunDeclNode extends ASTNode{
         return body;
     }
 
+    public void setMain(boolean main) {
+        isMain = main;
+    }
+
+    public void setFunDecl(FunDeclNode funDecl) {
+        this.funDecl = funDecl;
+    }
+
+    public void setId(IdNode id) {
+        this.id = id;
+    }
+
+    public void setParDeclList(ArrayList<ParDeclNode> parDeclList) {
+        this.parDeclList = parDeclList;
+    }
+
+    public void setTypeOrVoid(String typeOrVoid) {
+        this.typeOrVoid = typeOrVoid;
+    }
+
+    public void setBody(BodyNode body) {
+        this.body = body;
+    }
+
+    public SymbolTable getSymbolTable() {
+        return symbolTable;
+    }
+
+    public void setSymbolTable(SymbolTable symbolTable) {
+        this.symbolTable = symbolTable;
+    }
 }
 
