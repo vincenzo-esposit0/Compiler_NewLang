@@ -205,8 +205,8 @@ WhileStat ::= WHILE Expr:expr LOOP Body:body {: RESULT = new WhileStatNode("Whil
 ForStat ::= FOR ID:id ASSIGN INTEGER_CONST:intConst1 TO INTEGER_CONST:intConst2 LOOP Body:body {: RESULT = new ForStatNode("ForStat", new IdNode("Expr", "Id",id), new ConstNode("Expr", "ConstInteger", intConst1), new ConstNode("Expr", "ConstInteger", intConst2), (BodyNode)body); :};
 
 //ReadStat ::= IdList READ STRING_CONST | IdList READ
-ReadStat ::= IdList:idList READ STRING_CONST:stringConst {: new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, new ConstNode("Expr", "ConstString", (String)stringConst)); System.out.println("inside read"); :}
-           | IdList:idList READ {: new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, null); :};
+ReadStat ::= IdList:idList READ STRING_CONST:stringConst {: RESULT = new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, new ConstNode("Expr", "ConstString", (String)stringConst)); System.out.println("inside read"); :}
+           | IdList:idList READ {: RESULT = new ReadStatNode("ReadStat", (ArrayList<IdInitNode>)idList, null); :};
 
 //IdList ::= ID | IdList COMMA ID
 IdList ::= ID:id {:
