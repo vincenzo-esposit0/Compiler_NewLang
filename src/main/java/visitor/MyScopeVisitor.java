@@ -1,6 +1,7 @@
 package visitor;
 
 import nodes.*;
+import table.ParInitialize;
 import table.SymbolRecord;
 import table.SymbolTable;
 import esercitazione5.sym;
@@ -144,25 +145,25 @@ public class MyScopeVisitor implements MyVisitor{
             stackScope.push(symbolTable);
 
             ArrayList<ParDeclNode> parDeclList = node.getParDeclList();
+
             ArrayList<Integer> parTypesList = new ArrayList<>();
             ArrayList<Boolean> parOutList = new ArrayList<>();
+
+            ParInitialize parInitialize = new ParInitialize(parTypesList, parOutList);
 
             if (parDeclList != null) {
                 for (ParDeclNode parElement : parDeclList) {
                     parElement.accept(this);
                     for (int i = 0; i < parElement.getIdList().size(); i++) {
                         int parTypeCheck = MyTypeChecker.getInferenceType(parElement.getTypeVar().getTypeVar());
-                        boolean isOutParam = parElement.getOut().equals(Boolean.TRUE);
 
-                        //Possibilità diu miglioramento della logica definita sottostante.
-
-                        parTypesList.add(parTypeCheck);
-                        parOutList.add(isOutParam);
+                        parInitialize.addParamsTypeList(parTypeCheck);
+                        parInitialize.addParamsOutList(parElement.getOut());
                     }
                 }
             }
 
-            symbolTableGlobal.put(nomeID, new SymbolRecord(nomeID, "FUN", parTypesList, parOutList, returnTypeCheck));
+            symbolTableGlobal.put(nomeID, new SymbolRecord(nomeID, "FUN", parInitialize, returnTypeCheck));
 
             funDeclNode.getBody().accept(this);
 

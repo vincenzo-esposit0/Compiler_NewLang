@@ -7,6 +7,7 @@ public class SymbolRecord {
     private String symbolName;
     private String kind;    //definisce il tipo VAR o FUN
     private int typeVar;    //valore intero restituito dal TypeChecker
+    private ParInitialize parInitialize;
     private ArrayList<Integer> paramsTypeList;
     private ArrayList<Boolean> paramsOutList;
     private int returnTypeFun;
@@ -24,8 +25,8 @@ public class SymbolRecord {
     }
 
     //Costruttore per funzioni
-    public SymbolRecord(String symbolName, String kind, ArrayList<Integer> paramsTypeList, ArrayList<Boolean> paramsOutList, int returnTypeFun) {
-        initialize(symbolName, kind, paramsTypeList, paramsOutList, returnTypeFun);
+    public SymbolRecord(String symbolName, String kind, ParInitialize parInitialize, int returnTypeFun) {
+        initialize(symbolName, kind, parInitialize, returnTypeFun);
     }
 
     private void initialize(String symbolName, String kind, int typeVar) {
@@ -34,11 +35,10 @@ public class SymbolRecord {
         this.typeVar = typeVar;
     }
 
-    private void initialize(String symbolName, String kind, ArrayList<Integer> paramsTypeList, ArrayList<Boolean> paramsOutList, int returnTypeFun) {
+    private void initialize(String symbolName, String kind, ParInitialize parInitialize, int returnTypeFun) {
         this.symbolName = symbolName;
         this.kind = kind;
-        this.paramsTypeList = paramsTypeList;
-        this.paramsOutList = paramsOutList;
+        this.parInitialize = parInitialize;
         this.returnTypeFun = returnTypeFun;
     }
 
@@ -96,5 +96,13 @@ public class SymbolRecord {
 
     public void setPointer(boolean pointer) {
         this.pointer = pointer;
+    }
+
+    public ParInitialize getParInitialize() {
+        return parInitialize;
+    }
+
+    public void setParInitialize(ParInitialize parInitialize) {
+        this.parInitialize = parInitialize;
     }
 }
