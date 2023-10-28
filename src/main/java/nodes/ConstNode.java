@@ -2,18 +2,18 @@ package nodes;
 
 public class ConstNode extends ExprNode{
 
-    private Object value;
+    private String value;
 
-    public ConstNode(String name, String modeExpr, Object value) {
+    public ConstNode(String name, String modeExpr, String value) {
         super(name, modeExpr);
         this.value = value;
     }
 
-    public Object getValue() {
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public void setValue(String value) {
         this.value = value;
     }
 }

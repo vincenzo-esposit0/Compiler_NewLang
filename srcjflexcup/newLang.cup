@@ -10,13 +10,13 @@ terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
 terminal String ID, STRING_CONST;
 terminal String INTEGER_CONST;
 terminal String REAL_CONST;
-terminal Character CHAR_CONST;
+terminal String CHAR_CONST;
 
 nonterminal ProgramNode Program;
 nonterminal ArrayList<ASTNode> DeclList;
 nonterminal MainFunDecl;
 nonterminal VarDeclNode VarDecl;
-nonterminal TypeNode Type;
+nonterminal String Type;
 nonterminal ArrayList<IdInitNode> IdInitList;
 nonterminal ArrayList<IdInitNode> IdInitObblList;
 nonterminal ConstNode Const;
@@ -25,7 +25,7 @@ nonterminal BodyNode Body;
 nonterminal ParamDeclList;
 nonterminal NonEmptyParamDeclList;
 nonterminal ParDeclNode ParDecl;
-nonterminal TypeOrVoid;
+nonterminal String TypeOrVoid;
 nonterminal ArrayList<VarDeclNode> VarDeclList;
 nonterminal ArrayList<StatNode> StatList;
 nonterminal StatNode Stat;
@@ -37,6 +37,8 @@ nonterminal ReadStatNode ReadStat;
 nonterminal ArrayList<IdInitNode> IdList;
 nonterminal WriteStatNode WriteStat;
 nonterminal AssignStatNode AssignStat;
+nonterminal FunCallStatNode FunCallStat;
+nonterminal FunCallExprNode FunCallExpr;
 nonterminal FunCallNode FunCall;
 nonterminal ArrayList<ExprNode> ExprList;
 nonterminal ExprNode Expr;
@@ -75,15 +77,15 @@ DeclList ::= VarDecl:varDecl DeclList:declList {:
 MainFunDecl ::= MAIN FunDecl:funDecl {: RESULT = new FunDeclNode("MainFunDecl", (FunDeclNode)funDecl); :};
 
 //VarDecl ::= Type IdInitList SEMI | VAR IdInitObblList SEMI
-VarDecl ::= Type:type IdInitList:idInitList SEMI {: RESULT = new VarDeclNode("VarDecl", (TypeNode)type, (ArrayList<IdInitNode>)idInitList); :}
+VarDecl ::= Type:type IdInitList:idInitList SEMI {: RESULT = new VarDeclNode("VarDecl", type, (ArrayList<IdInitNode>)idInitList); :}
           | VAR IdInitObblList:idInitObblList SEMI {: RESULT = new VarDeclNode("VarDecl", (ArrayList<IdInitNode>)idInitObblList); :};
 
 //Type ::= INTEGER | BOOL | REAL | STRING | CHAR
-Type ::= INTEGER    {: RESULT = new TypeNode("TypeInteger", TypeNode.INTEGER); :}
-       | BOOL       {: RESULT = new TypeNode("TypeBool", TypeNode.BOOL); :}
-       | REAL       {: RESULT = new TypeNode("TypeReal", TypeNode.REAL); :}
-       | STRING     {: RESULT = new TypeNode("TypeString", TypeNode.STRING); :}
-       | CHAR       {: RESULT = new TypeNode("TypeChar", TypeNode.CHAR); :};
+Type ::= INTEGER    {: RESULT = "INTEGER"; :}
+       | BOOL       {: RESULT = "BOOL"; :}
+       | REAL       {: RESULT = "REAL"; :}
+       | STRING     {: RESULT = "STRING"; :}
+       | CHAR       {: RESULT = "CHAR"; :};
 
 //IdInitList ::= ID | IdInitList COMMA ID | ID ASSIGN Expr | IdInitList COMMA ID ASSIGN Expr
 IdInitList ::= ID:id {:
@@ -117,15 +119,15 @@ IdInitObblList ::= ID:id ASSIGN Const:constant {:
                 :};
 
 //Const ::= INTEGER_CONST | REAL_CONST | TRUE | FALSE | STRING_CONST | CHAR_CONST
-Const ::= INTEGER_CONST:integerConst        {: RESULT = new ConstNode("Expr", "ConstInteger", Integer.parseInt(integerConst)); :}
-        | REAL_CONST:realConst              {: RESULT = new ConstNode("Expr", "ConstReal", Double.valueOf(realConst)); :}
-        | TRUE                              {: RESULT = new ConstNode("Expr", "ConstTrue", true); :}
-        | FALSE                             {: RESULT = new ConstNode("Expr", "ConstFalse", false); :}
-        | STRING_CONST:stringConst          {: RESULT = new ConstNode("Expr", "ConstString", (String)stringConst); :}
-        | CHAR_CONST:charConst              {: RESULT = new ConstNode("Expr", "ConstChar", (Character)charConst); :};
+Const ::= INTEGER_CONST:integerConst        {: RESULT = new ConstNode("Const", "ConstInteger", integerConst.toString()); :}
+        | REAL_CONST:realConst              {: RESULT = new ConstNode("Const", "ConstReal", realConst.toString()); :}
+        | TRUE                              {: RESULT = new ConstNode("Const", "ConstTrue", "true"); :}
+        | FALSE                             {: RESULT = new ConstNode("Const", "ConstFalse", "false"); :}
+        | STRING_CONST:stringConst          {: RESULT = new ConstNode("Const", "ConstString", stringConst.toString()); :}
+        | CHAR_CONST:charConst              {: RESULT = new ConstNode("Const", "ConstChar", charConst.toString()); :};
 
 //FunDecl ::= DEF ID LPAR ParamDeclList RPAR COLON TypeOrVoid Body
-FunDecl ::= DEF ID:id LPAR ParamDeclList:paramDeclList RPAR COLON TypeOrVoid:typeOrVoid Body:body {: RESULT = new FunDeclNode("FunDecl", new IdNode("Expr", "Id", id), (ArrayList<ParDeclNode>)paramDeclList, (String)typeOrVoid, (BodyNode)body); :};
+FunDecl ::= DEF ID:id LPAR ParamDeclList:paramDeclList RPAR COLON TypeOrVoid:typeOrVoid Body:body {: RESULT = new FunDeclNode("FunDecl", new IdNode("Expr", "Id", id), (ArrayList<ParDeclNode>)paramDeclList, typeOrVoid, (BodyNode)body); :};
 
 //ParamDeclList ::= empty | NonEmptyParamDeclList
 ParamDeclList ::= /* empty */ {: RESULT = null; :}
@@ -145,11 +147,11 @@ NonEmptyParamDeclList ::= ParDecl:parDecl {:
                         :};
 
 //ParDecl ::= Type IdList | OUT Type IdList
-ParDecl ::= Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", (TypeNode)type, idList, false); :}
-          | OUT Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", (TypeNode)type, idList, true); :};
+ParDecl ::= Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", type, idList, false); :}
+          | OUT Type:type IdList:idList {: RESULT = new ParDeclNode("ParDecl", type, idList, true); :};
 
 //TypeOrVoid ::= Type | VOID
-TypeOrVoid ::= Type:type {: RESULT = (TypeNode)type; :}
+TypeOrVoid ::= Type:type {: RESULT = type; :}
              | VOID {: RESULT = "VOID"; :};
 
 //Body ::= LBRACK VarDeclList StatList RBRACK
@@ -182,8 +184,8 @@ Stat ::= IfStat:ifStat
         {: RESULT = (AssignStatNode)assignStat; :}
        | WhileStat:whileStat
         {: RESULT = (WhileStatNode)whileStat; :}
-	   | FunCall:funCall SEMI
-        {: RESULT = (FunCallNode)funCall; :}
+	   | FunCallStat:funCallStat SEMI
+        {: RESULT = (FunCallStatNode)funCallStat; :}
 	   | RETURN Expr:expr SEMI
         {: RESULT = (ExprNode)expr; :}
 	   | RETURN SEMI
@@ -228,9 +230,15 @@ WriteStat ::= LPAR ExprList:exprList RPAR WRITE {: RESULT = new WriteStatNode("W
 //AssignStat ::=  IdList ASSIGN ExprList
 AssignStat ::= IdList:idList ASSIGN ExprList:exprList {: RESULT = new AssignStatNode("AssignStat", (ArrayList<IdInitNode>)idList, (ArrayList<ExprNode>)exprList); :};
 
+FunCallStat ::= FunCall:funCall
+            {: RESULT = new FunCallStatNode("Stat"); :};
+
+FunCallExpr ::= FunCall:funCall
+             {: RESULT = new FunCallExprNode("Expr", ""); :};
+
 //FunCall ::= ID LPAR ExprList RPAR | ID LPAR RPAR
-FunCall ::= ID:id LPAR ExprList:exprList RPAR {: RESULT = new FunCallNode("Expr or Stat", "FunCall", new IdNode("Expr", "IdNode", id), (ArrayList<ExprNode>)exprList); :}
-	      | ID:id LPAR RPAR {: RESULT = new FunCallNode("Expr or Stat", "FunCall", new IdNode("Expr", "IdNode", id), null); :};
+FunCall ::= ID:id LPAR ExprList:exprList RPAR {: RESULT = new FunCallNode("FunCall", new IdNode("Expr", "Id",id), (ArrayList<ExprNode>)exprList); :}
+	      | ID:id LPAR RPAR {: RESULT = new FunCallNode("FunCall", new IdNode("Expr", "Id",id), null); :};
 
 //ExprList ::= Expr | Expr COMMA ExprList
 ExprList ::= Expr:expr {:
@@ -250,12 +258,12 @@ ExprList ::= Expr:expr {:
 //       | Expr EQUALS Expr | Expr NE Expr | MINUS Expr | NOT Expr | LPAR Expr RPAR
 Expr ::= TRUE {: RESULT = new ConstNode("Expr", "BOOLEAN", "TRUE"); :}
 	   | FALSE {: RESULT = new ConstNode("Expr", "BOOLEAN", "FALSE"); :}
-	   | INTEGER_CONST:integerConst {: RESULT = new ConstNode("Expr", "IntegerConst", integerConst); :}
-	   | REAL_CONST:realConst {: RESULT = new ConstNode("Expr", "RealConst", realConst); :}
-	   | STRING_CONST:stringConst {: RESULT = new ConstNode("Expr", "StringConst", stringConst); :}
-	   | CHAR_CONST:charConst {: RESULT = new ConstNode("Expr", "CharConst", charConst); :}
+	   | INTEGER_CONST:integerConst {: RESULT = new ConstNode("Expr", "ConstInteger", integerConst.toString()); :}
+	   | REAL_CONST:realConst {: RESULT = new ConstNode("Expr", "ConstReal", realConst.toString()); :}
+	   | STRING_CONST:stringConst {: RESULT = new ConstNode("Expr", "ConstString", stringConst.toString()); :}
+	   | CHAR_CONST:charConst {: RESULT = new ConstNode("Expr", "ConstChar", charConst.toString()); :}
 	   | ID:id {: RESULT = new IdNode("Expr", "ID", id); :}
-	   | FunCall:funCall {: RESULT = funCall; :}
+	   | FunCallExpr:funCallExpr {: RESULT = (FunCallExprNode)funCallExpr; :}
 	   | Expr:expr1 PLUS Expr:expr2 {: RESULT = new BiVarExprNode("Expr", "PLUS", expr1, expr2); :}
 	   | Expr:expr1 MINUS Expr:expr2 {: RESULT = new BiVarExprNode("Expr", "MINUS", expr1, expr2); :}
 	   | Expr:expr1 TIMES Expr:expr2 {: RESULT = new BiVarExprNode("Expr", "TIMES", expr1, expr2); :}

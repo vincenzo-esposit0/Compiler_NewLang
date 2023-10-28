@@ -6,13 +6,13 @@ public class VarDeclNode extends ASTNode{
 
     private boolean isVar;
 
-    private TypeNode type;
+    private String type;
 
     private ArrayList<IdInitNode> idInitList;
 
     private ArrayList<IdInitNode> idInitObblList;
 
-    public VarDeclNode(String name, TypeNode type, ArrayList<IdInitNode> idInitList) {
+    public VarDeclNode(String name, String type, ArrayList<IdInitNode> idInitList) {
         super(name);
         this.isVar = false;
         this.type = type;
@@ -29,7 +29,7 @@ public class VarDeclNode extends ASTNode{
         return isVar;
     }
 
-    public TypeNode getType() {
+    public String getType() {
         return type;
     }
 

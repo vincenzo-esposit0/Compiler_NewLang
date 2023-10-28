@@ -98,7 +98,7 @@ public class MyScopeVisitor implements MyVisitor{
     private void visitVarDeclNode(VarDeclNode node) {
         ArrayList<IdInitNode> idInit = node.getIdInitList();
 
-        if(node.getType().getName() == "VAR" ) {
+        if(node.getType().equals("VAR") ) {
 
             for (IdInitNode idElement : idInit) {
                 String nomeID = idElement.getId().getNomeId();
@@ -117,7 +117,7 @@ public class MyScopeVisitor implements MyVisitor{
             }
         }
         else {
-            int typeCheck = MyTypeChecker.getInferenceType(node.getType().getTypeVar());
+            int typeCheck = MyTypeChecker.getInferenceType(node.getType());
 
             for (IdInitNode idElement : idInit) {
                 String nomeID = idElement.getId().getNomeId();
@@ -155,7 +155,7 @@ public class MyScopeVisitor implements MyVisitor{
                 for (ParDeclNode parElement : parDeclList) {
                     parElement.accept(this);
                     for (int i = 0; i < parElement.getIdList().size(); i++) {
-                        int parTypeCheck = MyTypeChecker.getInferenceType(parElement.getTypeVar().getTypeVar());
+                        int parTypeCheck = MyTypeChecker.getInferenceType(parElement.getTypeVar());
 
                         parInitialize.addParamsTypeList(parTypeCheck);
                         parInitialize.addParamsOutList(parElement.getOut());
@@ -180,7 +180,7 @@ public class MyScopeVisitor implements MyVisitor{
 
     private void visitParDeclNode(ParDeclNode node) {
         ArrayList<IdInitNode> idInitNodeList = node.getIdList();
-        int typeCheck = MyTypeChecker.getInferenceType(node.getTypeVar().getTypeVar());
+        int typeCheck = MyTypeChecker.getInferenceType(node.getTypeVar());
 
         for(IdInitNode idElement: idInitNodeList){
             String nomeID = idElement.getId().getNomeId();

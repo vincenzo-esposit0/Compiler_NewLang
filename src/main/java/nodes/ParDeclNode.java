@@ -4,20 +4,20 @@ import java.util.ArrayList;
 
 public class ParDeclNode extends ASTNode{
 
-    private TypeNode typeVar;
+    private String typeVar;
 
     private ArrayList<IdInitNode> idList;
 
     private Boolean out;  //se è OUT implica che è un puntatore e viene settato a 1 altrimenti 0
 
-    public ParDeclNode(String name, TypeNode typeVar, ArrayList<IdInitNode> idList, Boolean out) {
+    public ParDeclNode(String name, String typeVar, ArrayList<IdInitNode> idList, Boolean out) {
         super(name);
         this.typeVar = typeVar;
         this.idList = idList;
         this.out = out;
     }
 
-    public TypeNode getTypeVar() {
+    public String getTypeVar() {
         return typeVar;
     }
 
@@ -29,7 +29,7 @@ public class ParDeclNode extends ASTNode{
         return out;
     }
 
-    public void setTypeVar(TypeNode typeVar) {
+    public void setTypeVar(String typeVar) {
         this.typeVar = typeVar;
     }
 
