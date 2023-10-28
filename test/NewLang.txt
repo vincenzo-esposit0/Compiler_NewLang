@@ -15,7 +15,7 @@ start: def NewLang() : void{
     }
 }
 
-def Operation(integer a | integer  b |out string op): integer{
+def Operation(integer a | integer  b | out string op): integer{
     if op = '+' then {
         return (a+b);
     }
@@ -27,12 +27,6 @@ def Operation(integer a | integer  b |out string op): integer{
     }
     if op = '/' then {
         return (a/b);
-    }
-}
-
-def ForTesting(): real{
-    for i << 4 to 50 loop{
-        //"ciao" -->;
     }
 }
 
