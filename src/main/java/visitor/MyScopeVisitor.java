@@ -237,7 +237,7 @@ public class MyScopeVisitor implements MyVisitor{
         stackScope.push(symbolTable);
 
         String i = node.getId().getNomeId();
-        Integer typeCheck = sym.INTEGER;
+        int typeCheck = sym.INTEGER;
         stackScope.peek().put(i, new SymbolRecord(i, "var", typeCheck));
 
         node.setSymbolTable(symbolTable);

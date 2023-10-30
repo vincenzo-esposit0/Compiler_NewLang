@@ -1,6 +1,5 @@
 package visitor;
 
-import com.sun.nio.file.ExtendedOpenOption;
 import nodes.*;
 
 import java.util.ArrayList;
