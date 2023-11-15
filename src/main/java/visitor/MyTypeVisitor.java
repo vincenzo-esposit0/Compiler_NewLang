@@ -2,8 +2,10 @@ package visitor;
 
 import esercitazione5.sym;
 import exceptions.IncompatibleTypeException;
+import exceptions.VariableNotDeclaredException;
 import nodes.ASTNode;
 import nodes.*;
+import table.SymbolRecord;
 import table.SymbolTable;
 
 import java.util.ArrayList;
@@ -57,7 +59,7 @@ public class MyTypeVisitor implements MyVisitor{
                 visitWriteStatNode((WriteStatNode) node);
                 break;
             case "FunCallExprNode":
-                visitFunCallExprNode((FunCallExprNode) node);
+                visitFunCallNode((FunCallNode) node);
                 break;
             case "ConstNode":
                 visitConstNode((ConstNode) node);
@@ -69,6 +71,9 @@ public class MyTypeVisitor implements MyVisitor{
         }
 
         return null;
+    }
+
+    private void visitFunCallNode(FunCallNode node) {
     }
 
     private void visitProgramNode(ProgramNode node) {
@@ -305,14 +310,22 @@ public class MyTypeVisitor implements MyVisitor{
         node.setAstType(sym.VOID);
     }
 
-    private void visitFunCallExprNode(FunCallExprNode node) {
-    }
 
     private void visitConstNode(ConstNode node) {
+        int typeChecking = MyTypeChecker.getInferenceType(node.getName());
 
+        node.setAstType(typeChecking);
     }
 
-    private void visitIdNode(IdNode node) {
+    void visitIdNode(IdNode node) {
+        try {
+            String nomeId = node.getNomeId();
+            SymbolRecord symbolRecord = getFromScope(nomeId);
+            int typeVar = symbolRecord.getTypeVar();
+            node.setAstType(typeVar);
+        } catch (VariableNotDeclaredException e) {
+            e.printStackTrace();
+        }
     }
 
     private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
@@ -322,5 +335,15 @@ public class MyTypeVisitor implements MyVisitor{
             }
         }
     }
+
+    SymbolRecord getFromScope(String nomeID) {
+        for (SymbolTable symbolTable : stack) {
+            if (symbolTable.containsKey(nomeID)) {
+                return symbolTable.get(nomeID);
+            }
+        }
+        throw new VariableNotDeclaredException(nomeID);
+    }
+
 
 }
