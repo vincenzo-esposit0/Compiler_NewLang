@@ -335,16 +335,6 @@ public class MySyntaxTree implements MyVisitor {
             return treeContent;
         }
 
-        if(node instanceof TypeNode){
-            treeContent = String.format("<%s>", "TypeNode") + "\n";
-
-            treeContent += "<TypeVar>" + String.format("%s", ((TypeNode) node).getTypeVar()) + "</TypeVar>";
-
-            treeContent += String.format("</%s>", "TypeNode") + "\n";
-
-            return treeContent;
-        }
-
         return treeContent;
     }
 }

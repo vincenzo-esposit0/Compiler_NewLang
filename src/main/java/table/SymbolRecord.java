@@ -8,8 +8,6 @@ public class SymbolRecord {
     private String kind;    //definisce il tipo VAR o FUN
     private int typeVar;    //valore intero restituito dal TypeChecker
     private ParInitialize parInitialize;
-    private ArrayList<Integer> paramsTypeList;
-    private ArrayList<Boolean> paramsOutList;
     private int returnTypeFun;
     private boolean pointer = false;
 
@@ -64,22 +62,6 @@ public class SymbolRecord {
 
     public void setTypeVar(int typeVar) {
         this.typeVar = typeVar;
-    }
-
-    public ArrayList<Integer> getParamsTypeList() {
-        return paramsTypeList;
-    }
-
-    public void setParamsTypeList(ArrayList<Integer> paramsTypeList) {
-        this.paramsTypeList = paramsTypeList;
-    }
-
-    public ArrayList<Boolean> getParamsOutList() {
-        return paramsOutList;
-    }
-
-    public void setParamsOutList(ArrayList<Boolean> paramsOutList) {
-        this.paramsOutList = paramsOutList;
     }
 
     public int getReturnTypeFun() {

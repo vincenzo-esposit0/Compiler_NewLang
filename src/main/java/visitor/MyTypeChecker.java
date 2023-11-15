@@ -1,6 +1,6 @@
 package visitor;
 
-import esercitazione5.sym;
+import esercitazione5.*;
 
 public class MyTypeChecker {
 
