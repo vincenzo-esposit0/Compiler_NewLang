@@ -1,6 +1,7 @@
 package visitor;
 
 import esercitazione5.sym;
+import exceptions.IncompatibleTypeException;
 import nodes.ASTNode;
 import nodes.*;
 import table.SymbolTable;
@@ -48,6 +49,21 @@ public class MyTypeVisitor implements MyVisitor{
                 break;
             case "UniVarExprNode":
                 visitUniVarExprNode((UniVarExprNode) node);
+                break;
+            case "ReadStatNode":
+                visitReadStatNode((ReadStatNode) node);
+                break;
+            case "WriteStatNode":
+                visitWriteStatNode((WriteStatNode) node);
+                break;
+            case "FunCallExprNode":
+                visitFunCallExprNode((FunCallExprNode) node);
+                break;
+            case "ConstNode":
+                visitConstNode((ConstNode) node);
+                break;
+            case "IdNode":
+                visitIdNode((IdNode) node);
                 break;
 
         }
@@ -141,7 +157,7 @@ public class MyTypeVisitor implements MyVisitor{
                 stack.pop();
             }
         } else {
-            throw new Error("La condizione dell'if deve essere un BOOL");
+            throw new IncompatibleTypeException("La condizione dell'if deve essere un BOOL");
         }
 
         stack.pop();
@@ -161,7 +177,7 @@ public class MyTypeVisitor implements MyVisitor{
             BodyNode bodyNode = node.getBody();
             bodyNode.accept(this);
         } else{
-            throw new Error("I tipi del for devono essere INTEGER");
+            throw new IncompatibleTypeException("I tipi del for devono essere INTEGER");
         }
 
         stack.pop();
@@ -177,7 +193,7 @@ public class MyTypeVisitor implements MyVisitor{
             BodyNode bodyNode = node.getBody();
             bodyNode.accept(this);
         }else{
-            throw new Error("La condizione del while deve essere BOOL");
+            throw new IncompatibleTypeException("La condizione del while deve essere BOOL");
         }
 
         stack.pop();
@@ -214,7 +230,7 @@ public class MyTypeVisitor implements MyVisitor{
                     }
                 }
             } else {
-                throw new Error("Il numero di variabili non coincide con il numero di espressioni da assegnare");
+                throw new Error("Il numero di variabili non coincide con il numero di espressioni da assegnare.");
             }
 
             node.setAstType(sym.VOID);
@@ -222,9 +238,81 @@ public class MyTypeVisitor implements MyVisitor{
     }
 
     private void visitBiVarExprNode(BiVarExprNode node) {
+        String operation = node.getName();
+        ExprNode exprNode1 = node.getExprNode1();
+        ExprNode exprNode2 = node.getExprNode2();
+
+        exprNode1.accept(this);
+        exprNode2.accept(this);
+
+        int typeChecker = sym.error;
+
+        if(operation.equals("PLUS") || operation.equals("MINUS") || operation.equals("TIMES") || operation.equals("DIV") || operation.equals("POW")){
+            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
+        } else if(operation.equals("AND") || operation.equals("OR")){
+            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
+        } else if(operation.equals("STR_CONCAT")){
+            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
+        } else if(operation.equals("EQUALS") || operation.equals("NE") || operation.equals("LT") || operation.equals("LE") || operation.equals("GT") || operation.equals("GR")){
+            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
+        }
+
+        if(typeChecker != sym.error){
+            node.setAstType(typeChecker);
+        } else{
+            throw new IncompatibleTypeException("Il tipo " + exprNode1.getAstType() + " e il tipo " + exprNode2.getAstType() + " non sono compatibili.");
+        }
     }
 
     private void visitUniVarExprNode(UniVarExprNode node) {
+        String operation = node.getName();
+        ExprNode exprNode = node.getExprNode();
+
+        exprNode.accept(this);
+
+        int typeChecker = sym.error;
+
+        if(operation.equals("UMINUS")){
+            typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
+        } else if(operation.equals("NOT")){
+            typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
+        }
+
+        if(typeChecker != sym.error){
+            node.setAstType(typeChecker);
+        } else{
+            throw new IncompatibleTypeException("L'operazione " + operation + " non è compatibile con i tipi.");
+        }
+
+    }
+
+    private void visitReadStatNode(ReadStatNode node) {
+        for (IdInitNode idElement : node.getIdList()) {
+            ExprNode exprNode = idElement.getExpr();
+            exprNode.accept(this);
+
+            idElement.setAstType(sym.VOID);
+        }
+
+        node.setAstType(sym.VOID);
+    }
+
+    private void visitWriteStatNode(WriteStatNode node) {
+        ArrayList<ExprNode> exprNodeList = node.getExprList();
+
+        visitNodeList(exprNodeList);
+
+        node.setAstType(sym.VOID);
+    }
+
+    private void visitFunCallExprNode(FunCallExprNode node) {
+    }
+
+    private void visitConstNode(ConstNode node) {
+
+    }
+
+    private void visitIdNode(IdNode node) {
     }
 
     private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {

@@ -1,6 +1,7 @@
 package visitor;
 
 import esercitazione5.*;
+import exceptions.IncompatibleTypeException;
 
 public class MyTypeChecker {
 
@@ -64,7 +65,7 @@ public class MyTypeChecker {
                 }
                 return sym.error;
             }
-            case "NE", "LT", "LE", "GT", "GE" -> {
+            case "EQUALS", "NE", "LT", "LE", "GT", "GE" -> {
                 if((operator1 == sym.INTEGER || operator1 == sym.REAL) && (operator2 == sym.INTEGER || operator2 == sym.REAL)) {
                     return sym.BOOL;
                 } else if ((operator1 == sym.STRING || operator1 == sym.CHAR) && (operator2 == sym.STRING || operator2 == sym.CHAR)) {
