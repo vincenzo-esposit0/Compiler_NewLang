@@ -1,10 +1,10 @@
 package visitor;
 
+import esercitazione5.sym;
 import nodes.*;
 import table.ParInitialize;
 import table.SymbolRecord;
 import table.SymbolTable;
-import esercitazione5.sym;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -21,32 +21,34 @@ public class MyScopeVisitor implements MyVisitor{
 
     @Override
     public String visit(ASTNode node) {
-        if(node instanceof ProgramNode){
-            visitProgramNode((ProgramNode) node);
-        }
-        else if(node instanceof BodyNode){
-            visitBodyNode((BodyNode) node);
-        }
-        else if(node instanceof VarDeclNode){
-            visitVarDeclNode((VarDeclNode) node);
-        }
-        else if(node instanceof FunDeclNode){
-            visitFunDeclNode((FunDeclNode) node);
-        }
-        else if(node instanceof ParDeclNode){
-            visitParDeclNode((ParDeclNode) node);
-        }
-        else if(node instanceof IfStatNode){
-            visitIfStatNode((IfStatNode) node);
-        }
-        else if(node instanceof ElseNode){
-            visitElseNode((ElseNode) node);
-        }
-        else if(node instanceof ForStatNode){
-            visitForStatNode((ForStatNode) node);
-        }
-        else if(node instanceof WhileStatNode){
-            visitWhileStatNode((WhileStatNode) node);
+        switch (node.getClass().getSimpleName()) {
+            case "ProgramNode":
+                visitProgramNode((ProgramNode) node);
+                break;
+            case "BodyNode":
+                visitBodyNode((BodyNode) node);
+                break;
+            case "VarDeclNode":
+                visitVarDeclNode((VarDeclNode) node);
+                break;
+            case "FunDeclNode":
+                visitFunDeclNode((FunDeclNode) node);
+                break;
+            case "ParDeclNode":
+                visitParDeclNode((ParDeclNode) node);
+                break;
+            case "IfStatNode":
+                visitIfStatNode((IfStatNode) node);
+                break;
+            case "ElseNode":
+                visitElseNode((ElseNode) node);
+                break;
+            case "ForStatNode":
+                visitForStatNode((ForStatNode) node);
+                break;
+            case "WhileStatNode":
+                visitWhileStatNode((WhileStatNode) node);
+                break;
         }
 
         return null;
@@ -57,24 +59,24 @@ public class MyScopeVisitor implements MyVisitor{
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
+
         ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
-        for (VarDeclNode varDecl : varDeclListNode) {
-            if (varDecl != null) {
-                varDecl.accept(this);
-            }
-        }
+        visitNodeList(varDeclListNode);
 
         ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
-        for (FunDeclNode funDecl : funDeclListNode) {
-            if (funDecl != null) {
-                funDecl.accept(this);
-            }
-        }
+        visitNodeList(funDeclListNode);
 
         stackScope.pop();
 
-        //Dalle specifiche ogni nodo deve avere un tipo.
         node.setAstType(sym.VOID);
+    }
+
+    private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
+        if (nodeList != null) {
+            for (int i = 0; i <= nodeList.size(); i++){
+                nodeList.get(i).accept(this);
+            }
+        }
     }
 
     private void visitBodyNode(BodyNode node) {

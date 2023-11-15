@@ -58,4 +58,6 @@ public class IfStatNode extends StatNode{
     public void setElseSymbolTable(SymbolTable elseSymbolTable) {
         this.elseSymbolTable = elseSymbolTable;
     }
+
+
 }
