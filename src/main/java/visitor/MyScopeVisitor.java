@@ -1,6 +1,7 @@
 package visitor;
 
 import esercitazione5.sym;
+import exceptions.AlreadyDeclaredVariableException;
 import nodes.*;
 import table.ParInitialize;
 import table.SymbolRecord;
@@ -114,7 +115,7 @@ public class MyScopeVisitor implements MyVisitor{
                 }
                 else {
                     node.setAstType(sym.error);
-                    throw new Error("Id: " + nomeID + " già dichiarato all'interno dello scope");
+                    throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
                 }
             }
         }
@@ -128,7 +129,7 @@ public class MyScopeVisitor implements MyVisitor{
                     stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
                 }
                 else {
-                    throw new Error("Id: " + nomeID + " già dichiarato all'interno dello scope");
+                    throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
                 }
             }
             node.setAstType(typeCheck);
@@ -170,7 +171,7 @@ public class MyScopeVisitor implements MyVisitor{
             funDeclNode.getBody().accept(this);
 
         } else {
-            throw new Error("ID della funzione: " + nomeID + "già dichiarato all'interno dello scope");
+            throw new AlreadyDeclaredVariableException("Identifier of function is already declared within the scope: " + nomeID);
         }
 
         funDeclNode.setAstType(returnTypeCheck);
@@ -195,7 +196,7 @@ public class MyScopeVisitor implements MyVisitor{
                 }
             }
             else {
-                throw new Error("Id: " + nomeID + " già dichiarato all'interno dello scope");
+                throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
             }
 
             idElement.setAstType(sym.VOID);

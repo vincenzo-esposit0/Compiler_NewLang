@@ -67,7 +67,6 @@ public class MyTypeVisitor implements MyVisitor{
             case "IdNode":
                 visitIdNode((IdNode) node);
                 break;
-
         }
 
         return null;
@@ -91,7 +90,7 @@ public class MyTypeVisitor implements MyVisitor{
     private void visitVarDeclNode(VarDeclNode node) {
 
         String varType = node.getType();
-        int type = MyTypeChecker.getInferenceType(varType);
+        int typeChecker = MyTypeChecker.getInferenceType(varType);
 
         ArrayList<IdInitNode> idInitList = node.getIdInitList();
         ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
@@ -107,7 +106,7 @@ public class MyTypeVisitor implements MyVisitor{
 
                 if(exprNode != null){
                     exprNode.accept(this);
-                    idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(),type));
+                    idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(),typeChecker));
                 }
             }
         }
@@ -310,7 +309,6 @@ public class MyTypeVisitor implements MyVisitor{
         node.setAstType(sym.VOID);
     }
 
-
     private void visitConstNode(ConstNode node) {
         int typeChecking = MyTypeChecker.getInferenceType(node.getName());
 
@@ -318,14 +316,10 @@ public class MyTypeVisitor implements MyVisitor{
     }
 
     void visitIdNode(IdNode node) {
-        try {
-            String nomeId = node.getNomeId();
-            SymbolRecord symbolRecord = getFromScope(nomeId);
-            int typeVar = symbolRecord.getTypeVar();
-            node.setAstType(typeVar);
-        } catch (VariableNotDeclaredException e) {
-            e.printStackTrace();
-        }
+        String nomeId = node.getNomeId();
+        SymbolRecord symbolRecord = getElementFromScope(nomeId);
+        int typeVar = symbolRecord.getTypeVar();
+        node.setAstType(typeVar);
     }
 
     private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
@@ -336,13 +330,13 @@ public class MyTypeVisitor implements MyVisitor{
         }
     }
 
-    SymbolRecord getFromScope(String nomeID) {
+    SymbolRecord getElementFromScope(String nomeID) {
         for (SymbolTable symbolTable : stack) {
             if (symbolTable.containsKey(nomeID)) {
                 return symbolTable.get(nomeID);
             }
         }
-        throw new VariableNotDeclaredException(nomeID);
+        throw new VariableNotDeclaredException("Not Declared: " + nomeID);
     }
 
 
