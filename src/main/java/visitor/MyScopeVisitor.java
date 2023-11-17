@@ -23,33 +23,15 @@ public class MyScopeVisitor implements MyVisitor{
     @Override
     public String visit(ASTNode node) {
         switch (node.getClass().getSimpleName()) {
-            case "ProgramNode":
-                visitProgramNode((ProgramNode) node);
-                break;
-            case "BodyNode":
-                visitBodyNode((BodyNode) node);
-                break;
-            case "VarDeclNode":
-                visitVarDeclNode((VarDeclNode) node);
-                break;
-            case "FunDeclNode":
-                visitFunDeclNode((FunDeclNode) node);
-                break;
-            case "ParDeclNode":
-                visitParDeclNode((ParDeclNode) node);
-                break;
-            case "IfStatNode":
-                visitIfStatNode((IfStatNode) node);
-                break;
-            case "ElseNode":
-                visitElseNode((ElseNode) node);
-                break;
-            case "ForStatNode":
-                visitForStatNode((ForStatNode) node);
-                break;
-            case "WhileStatNode":
-                visitWhileStatNode((WhileStatNode) node);
-                break;
+            case "ProgramNode" -> visitProgramNode((ProgramNode) node);
+            case "BodyNode" -> visitBodyNode((BodyNode) node);
+            case "VarDeclNode" -> visitVarDeclNode((VarDeclNode) node);
+            case "FunDeclNode" -> visitFunDeclNode((FunDeclNode) node);
+            case "ParDeclNode" -> visitParDeclNode((ParDeclNode) node);
+            case "IfStatNode" -> visitIfStatNode((IfStatNode) node);
+            case "ElseNode" -> visitElseNode((ElseNode) node);
+            case "ForStatNode" -> visitForStatNode((ForStatNode) node);
+            case "WhileStatNode" -> visitWhileStatNode((WhileStatNode) node);
         }
 
         return null;
