@@ -1,17 +1,31 @@
 integer s << 4;
 start: def NewLang() : void{
-    string op;
-    string ans;
-    while ans = "si" loop {
-        var a << 0, b << 0;
-        string ans;
-        real risultato;
-        op <-- "scegli che operazione fare (+,-,*,/)";
-        a <-- "inserisci un intero o un double";
-        b <-- "inserisci un intero o un double";
-        risultato << Operation(a,b,op);
-        ("il risultato e ") -->;
-        (risultato) -->;
-        ans <-- "vuoi continuare? (si/no)";
+    string check << "si";
+    integer op1 << 2;
+    integer op2 << 1;
+    char op << '+';
+    integer result;
+    if check = "si" then {
+        Stampa("Prova stampa");
+        result << Operation(op1, op2, op);
+    }
+}
+
+def Stampa(string message) : void{
+    message << "Ok funziona";
+}
+
+def Operation(integer a | integer  b | out string op): integer{
+    if op = '+' then {
+        return (a+b);
+    }
+    if op = '-' then {
+        return (a-b);
+    }
+    if op = '*' then {
+        return (a*b);
+    }
+    if op = '/' then {
+        return (a/b);
     }
 }

@@ -231,10 +231,10 @@ WriteStat ::= LPAR ExprList:exprList RPAR WRITE {: RESULT = new WriteStatNode("W
 AssignStat ::= IdList:idList ASSIGN ExprList:exprList {: RESULT = new AssignStatNode("AssignStat", (ArrayList<IdInitNode>)idList, (ArrayList<ExprNode>)exprList); :};
 
 FunCallStat ::= FunCall:funCall
-            {: RESULT = new FunCallStatNode("Stat"); :};
+            {: RESULT = new FunCallStatNode("Stat", (FunCallNode)funCall); :};
 
 FunCallExpr ::= FunCall:funCall
-             {: RESULT = new FunCallExprNode("Expr", ""); :};
+             {: RESULT = new FunCallExprNode("Expr", null, (FunCallNode)funCall); :};
 
 //FunCall ::= ID LPAR ExprList RPAR | ID LPAR RPAR
 FunCall ::= ID:id LPAR ExprList:exprList RPAR {: RESULT = new FunCallNode("FunCall", new IdNode("Expr", "Id",id), (ArrayList<ExprNode>)exprList); :}

@@ -1,7 +1,6 @@
 package visitor;
 
 import nodes.*;
-
 import java.util.ArrayList;
 
 public class MySyntaxTree implements MyVisitor {
@@ -10,331 +9,433 @@ public class MySyntaxTree implements MyVisitor {
 
     @Override
     public String visit(ASTNode node) {
-
-        //ProgramNode
-        if (node instanceof ProgramNode) {
-            treeContent = String.format("<%s>", node.getName()) + "\n";
-
-            ArrayList<VarDeclNode> varDeclListNode = ((ProgramNode) node).getVarDeclList();
-            for (VarDeclNode varDecl : varDeclListNode) {
-                if (varDecl != null) {
-                    treeContent += varDecl.accept(this);
-                }
+        switch (node.getClass().getSimpleName()) {
+            case "ProgramNode" -> {
+                return visitProgramNode((ProgramNode) node);
             }
-
-            ArrayList<FunDeclNode> funDeclListNode = ((ProgramNode) node).getFunDeclList();
-            for (FunDeclNode funDecl : funDeclListNode) {
-                if (funDecl != null) {
-                    treeContent += funDecl.accept(this);
-                }
+            case "VarDeclNode" -> {
+                return visitVarDeclNode((VarDeclNode) node);
             }
-
-            treeContent += String.format("</%s>", node.getName()) + "\n";
-
-            return treeContent;
+            case "IdInitNode" -> {
+                return visitIdInitNode((IdInitNode) node);
+            }
+            case "IdNode" -> {
+                return visitIdNode((IdNode) node);
+            }
+            case "ConstNode" -> {
+                return visitConstNode((ConstNode) node);
+            }
+            case "BiVarExprNode" -> {
+                return visitBiVarExprNode((BiVarExprNode) node);
+            }
+            case "UniVarExprNode" -> {
+                return visitUniVarExprNode((UniVarExprNode) node);
+            }
+            case "FunCallExprNode" -> {
+                return visitFunCallExprNode((FunCallExprNode) node);
+            }
+            case "FunDeclNode" -> {
+                return visitFunDeclNode((FunDeclNode) node);
+            }
+            case "BodyNode" -> {
+                return visitBodyNode((BodyNode) node);
+            }
+            case "ParDeclNode" -> {
+                return visitParDeclNode((ParDeclNode) node);
+            }
+            case "IfStatNode" -> {
+                return visitIfStatNode((IfStatNode) node);
+            }
+            case "ElseNode" -> {
+                return visitElseNode((ElseNode) node);
+            }
+            case "ForStatNode" -> {
+                return visitForStatNode((ForStatNode) node);
+            }
+            case "WhileStatNode" -> {
+                return visitWhileStatNode((WhileStatNode) node);
+            }
+            case "AssignStatNode" -> {
+                return visitAssignStatNode((AssignStatNode) node);
+            }
+            case "FunCallStatNode" -> {
+                return visitFunCallStatNode((FunCallStatNode) node);
+            }
+            case "ReadStatNode" -> {
+                return visitReadStatNode((ReadStatNode) node);
+            }
+            case "WriteStatNode" -> {
+                return visitWriteStatNode((WriteStatNode) node);
+            }
+            case "FunCallNode" -> {
+                return visitFunCallNode((FunCallNode) node);
+            }
         }
 
-        if (node instanceof VarDeclNode){
-            treeContent = String.format("<%s>", "VarDecl") + "\n";
-            ArrayList<IdInitNode> idInit = ((VarDeclNode) node).getIdInitList();
-            if(idInit != null){
-                for (IdInitNode idElement : idInit) {
-                    if (idElement != null) {
-                        treeContent += idElement.accept(this);
-                    }
-                }
-            }
-
-            ArrayList<IdInitNode> idInitObbl = ((VarDeclNode) node).getIdInitObblList();
-            if(idInitObbl != null){
-                for (IdInitNode idElement : idInitObbl) {
-                    if (idElement != null) {
-                        treeContent += idElement.accept(this);
-                    }
-                }
-            }
-            treeContent += String.format("</%s>", "VarDecl") + "\n";
-
-            return treeContent;
-        }
-
-        if(node instanceof IdInitNode){
-            treeContent = String.format("<%s>", "IdInitNode") + "\n";
-
-            IdNode id = ((IdInitNode) node).getId();
-            treeContent += id.accept(this);
-
-            ExprNode exprNode = ((IdInitNode) node).getExpr();
-            if(exprNode != null){
-                treeContent += exprNode.accept(this);
-            }
-            ConstNode constNode = ((IdInitNode) node).getConstant();
-            if(constNode != null){
-                treeContent += constNode.accept(this);
-            }
-
-            treeContent += String.format("</%s>", "IdInitNode")+ "\n";
-
-            return treeContent;
-        }
-
-        if(node instanceof ExprNode){
-            if(node instanceof IdNode){
-                treeContent = String.format("<%s>", "IdNode") + "\n";
-                treeContent += String.format("%s", ((IdNode) node).getNomeId()) + "\n";
-                treeContent += String.format("</%s>", "IdNode") + "\n";
-            }
-            else if(node instanceof ConstNode){
-                treeContent = String.format("<%s>", "ConstNode") + "\n";
-
-                treeContent += "<ModeExpr>" + String.format("%s", ((ConstNode) node).getModeExpr()) + "</ModeExpr> ";
-
-                treeContent += String.format("%s", ((ConstNode)node).getValue()) + "\n";
-                treeContent += String.format("</%s>", "ConstNode") + "\n";
-            }
-            else if(node instanceof BiVarExprNode){
-                treeContent = String.format("<%s>", "BiVarExprNode") + "\n";
-
-                ExprNode exprNode1 = ((BiVarExprNode) node).getExprNode1();
-                treeContent += exprNode1.accept(this);
-
-                ExprNode exprNode2 = ((BiVarExprNode) node).getExprNode2();
-                treeContent += exprNode2.accept(this);
-
-                treeContent += String.format("</%s>", "BiVarExprNode") + "\n";
-            }
-            else if(node instanceof UniVarExprNode){
-                treeContent = String.format("<%s>", "UniVarExprNode") + "\n";
-
-                ExprNode exprNode = ((UniVarExprNode) node).getExprNode();
-                treeContent += exprNode.accept(this);
-
-                treeContent += String.format("</%s>", "UniVarExprNode") + "\n";
-            }
-            else if(node instanceof FunCallExprNode){
-                treeContent = String.format("<%s>", "FunCallExprNode") + "\n";
-
-                /*IdNode idNode = ((FunCallNode) node).getId();
-                treeContent += idNode.accept(this);
-
-                ArrayList<ExprNode> exprNode = ((FunCallNode) node).getExprList();
-                for (ExprNode expr : exprNode) {
-                    if (expr != null) {
-                        treeContent += expr.accept(this);
-                    }
-                }*/
-
-                treeContent += String.format("</%s>", "FunCallExprNode") + "\n";
-            }
-
-            return treeContent;
-        }
-
-        if(node instanceof FunDeclNode){
-            if(((FunDeclNode) node).isMain()){
-                treeContent = String.format("<%s>", "Main") + "\n";
-
-                FunDeclNode funDeclNode= ((FunDeclNode) node).getFunDecl();
-                treeContent += funDeclNode.accept(this);
-
-                treeContent += String.format("</%s>", "Main") + "\n";
-
-            }
-            else{
-                treeContent = String.format("<%s>", "FunDeclNode") + "\n";
-
-                treeContent += "<NameFunDeclNode>" + String.format("%s", node.getName()) + "</NameFunDeclNode>" + "\n";
-
-                IdNode idNode = ((FunDeclNode) node).getId();
-                treeContent += idNode.accept(this);
-
-                ArrayList<ParDeclNode> parDeclList = ((FunDeclNode) node).getParDeclList();
-                if(parDeclList != null){
-                    for(ParDeclNode parDecl : parDeclList ){
-                        treeContent += parDecl.accept(this);
-                    }
-                }
-
-                treeContent += "<ReturnType>" + String.format("%s", ((FunDeclNode) node).getTypeOrVoid()) + "</ReturnType>" + "\n";
-
-                BodyNode body = ((FunDeclNode) node).getBody();
-                treeContent += body.accept(this);
-
-                treeContent += String.format("</%s>", "FunDeclNode") + "\n";
-            }
-
-            return treeContent;
-        }
-
-        if(node instanceof BodyNode){
-            treeContent = String.format("<%s>", "Body") + "\n";
-
-            ArrayList<VarDeclNode> varDeclListNode = ((BodyNode) node).getVarDeclList();
-            for (VarDeclNode varDecl : varDeclListNode) {
-                if (varDecl != null) {
-                    treeContent += varDecl.accept(this);
-                }
-            }
-
-            ArrayList<StatNode> statList = ((BodyNode) node).getStatList();
-            for (StatNode stat : statList) {
-                if (stat != null) {
-                    treeContent += stat.accept(this);
-                }
-            }
-
-            treeContent += String.format("</%s>", "Body") + "\n";
-            return treeContent;
-        }
-
-        if(node instanceof StatNode){
-            if(node instanceof IfStatNode){
-                treeContent = String.format("<%s>", "IfStat") + "\n";
-
-                ExprNode expr = ((IfStatNode) node).getExpr();
-                treeContent += expr.accept(this);
-
-                BodyNode body = ((IfStatNode) node).getBody();
-                treeContent += body.accept(this);
-
-                ElseNode elseStat = ((IfStatNode) node).getElseStat();
-                if(elseStat != null) {
-                    treeContent += elseStat.accept(this);
-                }
-
-                treeContent += String.format("</%s>", "IfStat") + "\n";
-
-            }
-            else if(node instanceof ElseNode){
-                treeContent = String.format("<%s>", "ElseStat") + "\n";
-
-                BodyNode body = ((ElseNode) node).getBody();
-                treeContent += body.accept(this);
-
-                treeContent += String.format("</%s>", "ElseStat") + "\n";
-
-            }
-            else if(node instanceof ForStatNode){
-                treeContent = String.format("<%s>", "ForStat") + "\n";
-
-                IdNode id = ((ForStatNode) node).getId();
-                treeContent += id.accept(this);
-
-                ConstNode const1 = ((ForStatNode) node).getIntConst1();
-                treeContent += const1.accept(this);
-
-                ConstNode const2 = ((ForStatNode) node).getIntConst2();
-                treeContent += const2.accept(this);
-
-                BodyNode body = ((ForStatNode) node).getBody();
-                treeContent += body.accept(this);
-
-                treeContent += String.format("</%s>", "ForStat") + "\n";
-            }
-            else if(node instanceof WhileStatNode){
-                treeContent = String.format("<%s>", "WhileStat") + "\n";
-
-                ExprNode expr = ((WhileStatNode) node).getExpr();
-                treeContent += expr.accept(this);
-
-                BodyNode body = ((WhileStatNode) node).getBody();
-                treeContent += body.accept(this);
-
-                treeContent += String.format("</%s>", "WhileStat") + "\n";
-            }
-            else if(node instanceof AssignStatNode){
-                treeContent = String.format("<%s>", "AssignStat") + "\n";
-
-                ArrayList<IdInitNode> idList = ((AssignStatNode) node).getIdList();
-                for (IdInitNode idElement : idList) {
-                    if (idElement != null) {
-                        treeContent += idElement.accept(this);
-                    }
-                }
-
-                ArrayList<ExprNode> exprNode = ((AssignStatNode) node).getExprList();
-                for (ExprNode expr : exprNode) {
-                    if (expr != null) {
-                        treeContent += expr.accept(this);
-                    }
-                }
-
-                treeContent += String.format("</%s>", "AssignStat") + "\n";
-
-            }
-            else if(node instanceof FunCallStatNode){
-                treeContent = String.format("<%s>", "FunCallStatNode") + "\n";
-
-                /*IdNode idNode = ((FunCallNode) node).getId();
-                treeContent += idNode.accept(this);
-
-                ArrayList<ExprNode> exprNode = ((FunCallNode) node).getExprList();
-                for (ExprNode expr : exprNode) {
-                    if (expr != null) {
-                        treeContent += expr.accept(this);
-                    }
-                }*/
-
-                treeContent += String.format("</%s>", "FunCallStatNode") + "\n";
-            }
-            else if(node instanceof ReadStatNode){
-                System.out.println("inside if readStatNode");
-                treeContent = String.format("<%s>", "ReadStat") + "\n";
-
-                ArrayList<IdInitNode> idList = ((ReadStatNode) node).getIdList();
-                for (IdInitNode idElement : idList) {
-                    if (idElement != null) {
-                        treeContent += idElement.accept(this);
-                    }
-                }
-
-                ConstNode stringConst = ((ReadStatNode) node).getStringConst();
-                treeContent += stringConst.accept(this);
-
-                treeContent += String.format("</%s>", "ReadStat") + "\n";
-
-            }
-            else if(node instanceof WriteStatNode){
-                treeContent = String.format("<%s>", "WriteStat") + "\n";
-
-                ArrayList<ExprNode> exprNode = ((WriteStatNode) node).getExprList();
-                for (ExprNode expr : exprNode) {
-                    if (expr != null) {
-                        treeContent += expr.accept(this);
-                    }
-                }
-
-                String typeWrite = ((WriteStatNode) node).getTypeWrite();
-                treeContent += String.format("%s", typeWrite);
-
-                treeContent += String.format("</%s>", "WriteStat") + "\n";
-
-            }
-
-            return treeContent;
-        }
-
-        if(node instanceof ParDeclNode){
-            treeContent = String.format("<%s>", "ParDeclNode") + "\n";
-
-            treeContent += "<Type>" + String.format("%s", ((ParDeclNode) node).getTypeVar()) + "</Type>" + "\n";
-
-            ArrayList<IdInitNode> idList = ((ParDeclNode) node).getIdList();
-            if(idList != null){
-                for (IdInitNode idElement : idList) {
-                    if (idElement != null) {
-                        treeContent += idElement.accept(this);
-                    }
-                }
-            }
-
-            treeContent += "<Out>" + String.format("%s", ((ParDeclNode) node).getOut()) + "</Out>" + "\n";
-
-            treeContent += String.format("</%s>", "ParDeclNode") + "\n";
-
-            return treeContent;
+        if (node.getName().equals("Return")) {
+            return treeContent = "Return\n";
         }
 
         return treeContent;
     }
+
+    private String visitProgramNode(ProgramNode node) {
+        treeContent = String.format("<%s>", node.getName()) + "\n";
+
+        ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
+        for (VarDeclNode varDecl : varDeclListNode) {
+            if (varDecl != null) {
+                treeContent += varDecl.accept(this);
+            }
+        }
+
+        ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
+        for (FunDeclNode funDecl : funDeclListNode) {
+            if (funDecl != null) {
+                treeContent += funDecl.accept(this);
+            }
+        }
+
+        treeContent += String.format("</%s>", node.getName()) + "\n";
+
+        return treeContent;
+    }
+
+    private String visitVarDeclNode(VarDeclNode node) {
+        treeContent = String.format("<%s>", "VarDecl") + "\n";
+        ArrayList<IdInitNode> idInit = node.getIdInitList();
+        if(idInit != null){
+            for (IdInitNode idElement : idInit) {
+                if (idElement != null) {
+                    treeContent += idElement.accept(this);
+                }
+            }
+        }
+
+        ArrayList<IdInitNode> idInitObbl = node.getIdInitObblList();
+        if(idInitObbl != null){
+            for (IdInitNode idElement : idInitObbl) {
+                if (idElement != null) {
+                    treeContent += idElement.accept(this);
+                }
+            }
+        }
+        treeContent += String.format("</%s>", "VarDecl") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitIdInitNode(IdInitNode node) {
+        treeContent = String.format("<%s>", "IdInitNode") + "\n";
+
+        IdNode id = node.getId();
+        treeContent += id.accept(this);
+
+        ExprNode exprNode = node.getExpr();
+        if(exprNode != null){
+            treeContent += exprNode.accept(this);
+        }
+        ConstNode constNode = node.getConstant();
+        if(constNode != null){
+            treeContent += constNode.accept(this);
+        }
+
+        treeContent += String.format("</%s>", "IdInitNode")+ "\n";
+
+        return treeContent;
+    }
+
+    private String visitIdNode(IdNode node) {
+        treeContent = String.format("<%s>", "IdNode") + "\n";
+
+        treeContent += String.format("%s", node.getNomeId()) + "\n";
+
+        treeContent += String.format("</%s>", "IdNode") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitConstNode(ConstNode node) {
+        treeContent = String.format("<%s>", "ConstNode") + "\n";
+
+        treeContent += "<ModeExpr>" + String.format("%s", node.getModeExpr()) + "</ModeExpr> ";
+
+        treeContent += String.format("%s", node.getValue()) + "\n";
+        treeContent += String.format("</%s>", "ConstNode") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitBiVarExprNode(BiVarExprNode node) {
+        treeContent = String.format("<%s>", "BiVarExprNode") + "\n";
+
+        ExprNode exprNode1 = node.getExprNode1();
+        treeContent += exprNode1.accept(this);
+
+        ExprNode exprNode2 = node.getExprNode2();
+        treeContent += exprNode2.accept(this);
+
+        treeContent += String.format("</%s>", "BiVarExprNode") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitUniVarExprNode(UniVarExprNode node) {
+        treeContent = String.format("<%s>", "UniVarExprNode") + "\n";
+
+        ExprNode exprNode = node.getExprNode();
+        treeContent += exprNode.accept(this);
+
+        treeContent += String.format("</%s>", "UniVarExprNode") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitFunCallExprNode(FunCallExprNode node) {
+        treeContent = String.format("<%s>", "FunCallExprNode") + "\n";
+
+        FunCallNode funCall = node.getFunCall();
+        treeContent += funCall.accept(this);
+
+        treeContent += String.format("</%s>", "FunCallExprNode") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitFunDeclNode(FunDeclNode node) {
+        if(node.isMain()){
+            treeContent = String.format("<%s>", "Main") + "\n";
+
+            FunDeclNode funDeclNode= node.getFunDecl();
+            treeContent += funDeclNode.accept(this);
+
+            treeContent += String.format("</%s>", "Main") + "\n";
+
+        }
+        else{
+            treeContent = String.format("<%s>", "FunDeclNode") + "\n";
+
+            treeContent += "<NameFunDeclNode>" + String.format("%s", node.getName()) + "</NameFunDeclNode>" + "\n";
+
+            IdNode idNode = node.getId();
+            treeContent += idNode.accept(this);
+
+            ArrayList<ParDeclNode> parDeclList = node.getParDeclList();
+            if(parDeclList != null){
+                for(ParDeclNode parDecl : parDeclList ){
+                    treeContent += parDecl.accept(this);
+                }
+            }
+
+            treeContent += "<ReturnType>" + String.format("%s", node.getTypeOrVoid()) + "</ReturnType>" + "\n";
+
+            BodyNode body = node.getBody();
+            treeContent += body.accept(this);
+
+            treeContent += String.format("</%s>", "FunDeclNode") + "\n";
+        }
+
+        return treeContent;
+    }
+
+    private String visitBodyNode(BodyNode node) {
+        treeContent = String.format("<%s>", "Body") + "\n";
+
+        ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
+        for (VarDeclNode varDecl : varDeclListNode) {
+            if (varDecl != null) {
+                treeContent += varDecl.accept(this);
+            }
+        }
+
+        ArrayList<StatNode> statList = node.getStatList();
+        for (StatNode stat : statList) {
+            if (stat != null) {
+                System.out.println(stat.getName());
+                if(stat.getName().equals("Expr")){
+                    treeContent += "Return\n";
+                    treeContent += stat.accept(this);
+
+                } else {
+                    treeContent += stat.accept(this);
+                }
+            }
+        }
+
+        treeContent += String.format("</%s>", "Body") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitIfStatNode(IfStatNode node) {
+        treeContent = String.format("<%s>", "IfStat") + "\n";
+
+        ExprNode expr = node.getExpr();
+        treeContent += expr.accept(this);
+
+        BodyNode body = node.getBody();
+        treeContent += body.accept(this);
+
+        ElseNode elseStat = node.getElseStat();
+        if(elseStat != null) {
+            treeContent += elseStat.accept(this);
+        }
+
+        treeContent += String.format("</%s>", "IfStat") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitElseNode(ElseNode node) {
+        treeContent = String.format("<%s>", "ElseStat") + "\n";
+
+        BodyNode body = node.getBody();
+        treeContent += body.accept(this);
+
+        treeContent += String.format("</%s>", "ElseStat") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitForStatNode(ForStatNode node) {
+        treeContent = String.format("<%s>", "ForStat") + "\n";
+
+        IdNode id = node.getId();
+        treeContent += id.accept(this);
+
+        ConstNode const1 = node.getIntConst1();
+        treeContent += const1.accept(this);
+
+        ConstNode const2 = node.getIntConst2();
+        treeContent += const2.accept(this);
+
+        BodyNode body = node.getBody();
+        treeContent += body.accept(this);
+
+        treeContent += String.format("</%s>", "ForStat") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitWhileStatNode(WhileStatNode node) {
+        treeContent = String.format("<%s>", "WhileStat") + "\n";
+
+        ExprNode expr = node.getExpr();
+        treeContent += expr.accept(this);
+
+        BodyNode body = node.getBody();
+        treeContent += body.accept(this);
+
+        treeContent += String.format("</%s>", "WhileStat") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitAssignStatNode(AssignStatNode node) {
+        treeContent = String.format("<%s>", "AssignStat") + "\n";
+
+        ArrayList<IdInitNode> idList = node.getIdList();
+        for (IdInitNode idElement : idList) {
+            if (idElement != null) {
+                treeContent += idElement.accept(this);
+            }
+        }
+
+        ArrayList<ExprNode> exprNode = node.getExprList();
+        for (ExprNode expr : exprNode) {
+            if (expr != null) {
+                treeContent += expr.accept(this);
+            }
+        }
+
+        treeContent += String.format("</%s>", "AssignStat") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitFunCallStatNode(FunCallStatNode node) {
+        treeContent = String.format("<%s>", "FunCallStatNode") + "\n";
+
+        FunCallNode funCall = node.getFunCall();
+        treeContent += funCall.accept(this);
+
+        treeContent += String.format("</%s>", "FunCallStatNode") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitReadStatNode(ReadStatNode node) {
+        treeContent = String.format("<%s>", "ReadStat") + "\n";
+
+        ArrayList<IdInitNode> idList = node.getIdList();
+        for (IdInitNode idElement : idList) {
+            if (idElement != null) {
+                treeContent += idElement.accept(this);
+            }
+        }
+
+        ConstNode stringConst = node.getStringConst();
+        treeContent += stringConst.accept(this);
+
+        treeContent += String.format("</%s>", "ReadStat") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitWriteStatNode(WriteStatNode node) {
+        treeContent = String.format("<%s>", "WriteStat") + "\n";
+
+        ArrayList<ExprNode> exprNode = node.getExprList();
+        for (ExprNode expr : exprNode) {
+            if (expr != null) {
+                treeContent += expr.accept(this);
+            }
+        }
+
+        String typeWrite = node.getTypeWrite();
+        treeContent += String.format("%s", typeWrite);
+
+        treeContent += String.format("</%s>", "WriteStat") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitFunCallNode(FunCallNode node) {
+        treeContent = String.format("<%s>", "FunCall") + "\n";
+
+        IdNode id = node.getId();
+        treeContent += id.accept(this);
+
+        ArrayList<ExprNode> exprNode = node.getExprList();
+        for (ExprNode expr : exprNode) {
+            if (expr != null) {
+                treeContent += expr.accept(this);
+            }
+        }
+
+        treeContent += String.format("</%s>", "FunCall") + "\n";
+        return treeContent;
+    }
+
+    private String visitParDeclNode(ParDeclNode node) {
+        treeContent = String.format("<%s>", "ParDeclNode") + "\n";
+
+        treeContent += "<Type>" + String.format("%s", node.getTypeVar()) + "</Type>" + "\n";
+
+        ArrayList<IdInitNode> idList = node.getIdList();
+        if(idList != null){
+            for (IdInitNode idElement : idList) {
+                if (idElement != null) {
+                    treeContent += idElement.accept(this);
+                }
+            }
+        }
+
+        treeContent += "<Out>" + String.format("%s", node.getOut()) + "</Out>" + "\n";
+
+        treeContent += String.format("</%s>", "ParDeclNode") + "\n";
+
+        return treeContent;
+    }
+
 }
