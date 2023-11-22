@@ -13,7 +13,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
     private Stack<SymbolTable> stackScope = new Stack<>();
     private String codeGeneratorC = "";
     private boolean varDeclGlobal = true;
-    private ArrayList<String> globalStringConcat = new ArrayList<>();
 
     @Override
     public String visit(ASTNode node) {
@@ -52,7 +51,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
             if(funDecl != null){
                 //Intestazione della funzione
-                sb.append(numericToStringType(funDecl.getAstType())).append(" ").append(funDecl.getId().getNomeId()).append("(");
+                sb.append(converterNumericToStringType(funDecl.getAstType())).append(" ").append(funDecl.getId().getNomeId()).append("(");
 
                 //Analisi dei parametri
                 if(funDecl.getParDeclList() != null){
@@ -134,7 +133,73 @@ public class MyCTranslatorVisitor implements MyVisitor {
     }
 
     private void visitVarDeclNode(VarDeclNode node) {
+        StringBuilder sb = new StringBuilder();
 
+        String varType = node.getType();
+
+        ArrayList<IdInitNode> idInitNodeList = node.getIdInitList();
+
+        //Controllo se il flag della variabili globali è TRUE
+        if(varDeclGlobal){
+            for(IdInitNode idElement : idInitNodeList){
+                String typeC = typeConverter(converterNumericToStringType(idElement.getId().getAstType()));
+
+                //Se è di tipo VAR
+                if(varType.equals("VAR")){
+                    ConstNode costante = idElement.getConstant();
+
+                    //Assegna il typo dato dal converter
+                    sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" = ");
+                    sb.append(costante.accept(this)).append(";");
+                }
+                //Se la variabile non è di tipo VAR
+                else {
+                    if(idElement.getExpr() != null) {
+
+                        sb.append("#define ").append(idElement.getId().getNomeId()).append(" (").append(typeC).append(" )");
+                        sb.append(idElement.getExpr().accept(this));
+                    } else {
+                        sb.append(typeConverter(varType)).append(" ").append(idElement.getId().getNomeId()).append(";");
+
+                    }
+                }
+
+                sb.append("\n");
+            }
+        }
+        //Se il flag della variabili globali è FALSE
+        else {
+            if(varType.equals("VAR")){
+                for(IdInitNode idElement: idInitNodeList){
+                    String typeC = typeConverter(converterNumericToStringType(idElement.getId().getAstType()));
+
+                    //Dichiaro la variabile prendendo il tipo dal typeConverter
+                    sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" = ").append(idElement.getConstant().accept(this)).append(";\n");
+                }
+            } else{
+                for(IdInitNode idElement: idInitNodeList){
+                    //Se è una STRINGA viene trattato diversamente
+                    if(typeConverter(varType).equals("char *")){
+                        //Il typeConverter mi restituirà il tipo in C
+                        sb.append(typeConverter(varType)).append(idElement.getId().getNomeId());
+
+                        if (idElement.getExpr() == null) {
+                            sb.append(" = \"\"");
+                        }
+
+                    } else {
+                        sb.append(typeConverter(varType)).append(" ").append(idElement.getId().getNomeId());
+                    }
+
+                    if (idElement.getExpr() != null) {
+                        sb.append(" = ").append(idElement.getExpr().accept(this));
+                    }
+                    sb.append(";\n");
+                }
+            }
+        }
+
+        codeGeneratorC += sb.toString();
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
@@ -152,7 +217,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
         };
     }
 
-    private String numericToStringType(int numericType){
+    private String converterNumericToStringType(int numericType){
         return switch (numericType) {
             case sym.INTEGER -> "INTEGER";
             case sym.REAL -> "REAL" ;
