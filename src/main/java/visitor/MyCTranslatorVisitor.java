@@ -22,14 +22,12 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "ProgramNode" -> visitProgramNode((ProgramNode) node);
             case "VarDeclNode" -> visitVarDeclNode((VarDeclNode) node);
             case "FunDeclNode" -> visitFunDeclNode((FunDeclNode) node);
+            case "BodyNode" -> visitBodyNode((BodyNode) node);
+            case "ParDeclNode" -> visitParDeclNode((ParDeclNode) node);
 
         }
 
         return codeGeneratorC;
-    }
-
-    public void setVarDeclGlobal(boolean varDeclGlobal) {
-        this.varDeclGlobal = varDeclGlobal;
     }
 
     private void visitProgramNode(ProgramNode node) {
@@ -203,7 +201,148 @@ public class MyCTranslatorVisitor implements MyVisitor {
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        FunDeclNode funDeclNode = node.getFunDecl();
+
+        stackScope.push(funDeclNode.getSymbolTable());
+
+        if(funDeclNode.isMain()){
+            codeGeneratorC += "int main(int argc, char** argv){ \n";
+            codeGeneratorC += funDeclNode.getId().getNomeId()+"(";
+
+            //Generazione dei parametri della funzione
+            if(funDeclNode.getParDeclList() != null){
+                for (ParDeclNode parDeclNode : funDeclNode.getParDeclList()) {
+                    int sizeParInput = parDeclNode.getIdList().size();
+
+                    for(int i=0;i<sizeParInput;i++){
+                        if (parDeclNode.getAstType() == sym.INTEGER) {
+                            sb.append('0');
+                        }
+                        else if (parDeclNode.getAstType() == sym.REAL) {
+                            sb.append("0.0");
+                        }
+                        else if (parDeclNode.getAstType() == sym.STRING) {
+                            if(parDeclNode.getOut().equals("OUT")){
+                                sb.append("argv");
+                            }
+                            else{
+                                sb.append("\"\"");
+                            }
+                        }
+                        else if (parDeclNode.getAstType() == sym.CHAR) {
+                            sb.append("''");
+                        }
+                        else if (parDeclNode.getAstType() == sym.BOOL) {
+                            sb.append("false");
+                        }
+
+                        sb.append(',');
+                    }
+                }
+                //Toglie l'ultima virgola aggiunta
+                sb.deleteCharAt(sb.length()-1);
+            }
+            codeGeneratorC += sb + ");\n";
+            codeGeneratorC += "return (EXIT_SUCCESS);\n}\n";
+        }
+        else {
+            codeGeneratorC += typeConverter(funDeclNode.getTypeOrVoid()) + " " + funDeclNode.getId().getNomeId() + "(";
+
+            ArrayList<ParDeclNode> parDeclNodeList = funDeclNode.getParDeclList();
+            String code = codeGeneratorC;
+            sb.setLength(0);
+
+            if (parDeclNodeList != null) {
+                for (ParDeclNode parElement : parDeclNodeList) {
+                    sb.append(parElement.accept(this));
+                }
+                //sb.deleteCharAt(sb.length() - 1);
+            }
+            codeGeneratorC = code + sb + "){\n";
+            codeGeneratorC += funDeclNode.getBody().accept(this);
+            codeGeneratorC += "}\n";
+
+            stackScope.pop();
+        }
     }
+
+    private void visitBodyNode(BodyNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        ArrayList<VarDeclNode> varDeclNodeList = node.getVarDeclList();
+        ArrayList<StatNode> statNodeList = node.getStatList();
+
+        ArrayList<VarDeclNode> varNotAssignedList = new ArrayList<>();
+        ArrayList<VarDeclNode> varAssignedList = new ArrayList<>();
+
+        /**
+         * Siccome nel nostro linguaggio possiamo utilizzare una variabile prima che la si dichiari,
+         * metto prime le dichiarazioni senza assegnamento e poi quelle con assegnamento
+         * così sono sicuro che anche se le utilizzo prima di dichiararle va bene lo stesso in C
+         */
+        for(VarDeclNode varElement: varDeclNodeList){
+            for(IdInitNode idElement: varElement.getIdInitList()){
+                if(idElement.getExpr() == null){
+                    varNotAssignedList.add(varElement);
+                } else {
+                    varAssignedList.add(varElement);
+                }
+            }
+        }
+
+        varDeclNodeList.clear();
+
+        ArrayList<VarDeclNode> allVarDeclList =  new ArrayList<>();
+
+        varNotAssignedList.addAll(varAssignedList);
+        allVarDeclList.addAll(varNotAssignedList);
+
+        //Aggiungo la lista delle variabili riordinate
+        varDeclNodeList.addAll(allVarDeclList);
+
+        for(VarDeclNode varElement: varDeclNodeList){
+            if(varElement != null){
+                sb.append(varElement.accept(this));
+            }
+        }
+
+        for(StatNode statElement: statNodeList){
+            if(statElement != null){
+                sb.append(statElement.accept(this));
+            }
+        }
+
+        codeGeneratorC = sb.toString();
+    }
+
+    private void visitParDeclNode(ParDeclNode node) {
+        StringBuilder sb = new StringBuilder();
+        String typeC = node.getTypeVar();
+
+        ArrayList<IdInitNode> idInitNodeList = node.getIdList();
+
+        for(IdInitNode idElement: idInitNodeList){
+            if(typeConverter(node.getTypeVar()).equals("char *")){
+                sb.append(typeC);
+            } else {
+                sb.append(typeC).append(" ");
+            }
+
+            if(node.getOut()){
+                sb.append("*");
+            }
+
+            sb.append(idElement.getId().getNomeId()).append(",");
+        }
+
+        sb.deleteCharAt(sb.length() - 1);
+
+        codeGeneratorC = sb.toString();
+    }
+
+
 
 
     public String typeConverter(String typeConverter){
