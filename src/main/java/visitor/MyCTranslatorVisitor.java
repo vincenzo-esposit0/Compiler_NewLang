@@ -203,7 +203,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
     private void visitFunDeclNode(FunDeclNode node) {
         StringBuilder sb = new StringBuilder();
 
-        FunDeclNode funDeclNode = node.getFunDecl();
+        FunDeclNode funDeclNode;
+
+        if(node.isMain()){
+            funDeclNode = node.getFunDecl();
+        } else{
+            funDeclNode = node;
+        }
 
         stackScope.push(funDeclNode.getSymbolTable());
 
@@ -277,14 +283,10 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<VarDeclNode> varNotAssignedList = new ArrayList<>();
         ArrayList<VarDeclNode> varAssignedList = new ArrayList<>();
 
-        /**
-         * Siccome nel nostro linguaggio possiamo utilizzare una variabile prima che la si dichiari,
-         * metto prime le dichiarazioni senza assegnamento e poi quelle con assegnamento
-         * così sono sicuro che anche se le utilizzo prima di dichiararle va bene lo stesso in C
-         */
-        for(VarDeclNode varElement: varDeclNodeList){
-            for(IdInitNode idElement: varElement.getIdInitList()){
-                if(idElement.getExpr() == null){
+        // Separo le dichiarazioni di variabili in due liste: assegnate e non assegnate
+        for (VarDeclNode varElement : varDeclNodeList) {
+            for (IdInitNode idElement : varElement.getIdInitList()) {
+                if (idElement.getExpr() == null) {
                     varNotAssignedList.add(varElement);
                 } else {
                     varAssignedList.add(varElement);
@@ -292,30 +294,28 @@ public class MyCTranslatorVisitor implements MyVisitor {
             }
         }
 
-        varDeclNodeList.clear();
-
-        ArrayList<VarDeclNode> allVarDeclList =  new ArrayList<>();
-
+        // Unisco le due liste mantenendo l'ordine delle variabili non assegnate prima di quelle assegnate
         varNotAssignedList.addAll(varAssignedList);
-        allVarDeclList.addAll(varNotAssignedList);
+        varDeclNodeList.clear();
+        varDeclNodeList.addAll(varNotAssignedList);
 
-        //Aggiungo la lista delle variabili riordinate
-        varDeclNodeList.addAll(allVarDeclList);
-
-        for(VarDeclNode varElement: varDeclNodeList){
-            if(varElement != null){
+        // Itero sulla lista ordinata e genero il codice
+        for (VarDeclNode varElement : varDeclNodeList) {
+            if (varElement != null) {
                 sb.append(varElement.accept(this));
             }
         }
 
-        for(StatNode statElement: statNodeList){
-            if(statElement != null){
+        // Itero sulla lista delle istruzioni e genero il codice
+        for (StatNode statElement : statNodeList) {
+            if (statElement != null) {
                 sb.append(statElement.accept(this));
             }
         }
 
         codeGeneratorC = sb.toString();
     }
+
 
     private void visitParDeclNode(ParDeclNode node) {
         StringBuilder sb = new StringBuilder();
