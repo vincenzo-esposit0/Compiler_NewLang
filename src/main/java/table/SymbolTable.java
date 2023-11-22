@@ -35,4 +35,12 @@ public class SymbolTable extends HashMap<String, SymbolRecord> {
     public void setFunctionName(String functionName) {
         this.functionName = functionName;
     }
+
+    @Override
+    public String toString() {
+        return "SymbolTable{" +
+                "scopeName='" + scopeName + '\'' +
+                ", functionName='" + functionName + '\'' + super.values().toString() +
+                '}';
+    }
 }

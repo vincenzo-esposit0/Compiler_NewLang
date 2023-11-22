@@ -1,7 +1,9 @@
 package esercitazione5;
 
 import nodes.*;
+import visitor.MyScopeVisitor;
 import visitor.MySyntaxTree;
+
 
 import java.io.File;
 import java.io.FileReader;
@@ -19,8 +21,13 @@ public class Main {
 
         ProgramNode programNode = (ProgramNode) p.debug_parse().value;
 
-        MySyntaxTree visitor = new MySyntaxTree();
-        System.out.println(programNode.accept(visitor));
+        //Stampa MyTreeVisitor
+        //MySyntaxTree visitor = new MySyntaxTree();
+        //System.out.println(programNode.accept(visitor));
+
+        //Stampa MyScopeVisitor
+        MyScopeVisitor myScopeVisitor = new MyScopeVisitor();
+        myScopeVisitor.visit(programNode);
 
     }
 }

@@ -87,4 +87,16 @@ public class SymbolRecord {
     public void setParInitialize(ParInitialize parInitialize) {
         this.parInitialize = parInitialize;
     }
+
+    @Override
+    public String toString() {
+        return "SymbolRecord{" +
+                "symbolName='" + symbolName + '\'' +
+                ", kind='" + kind + '\'' +
+                ", typeVar=" + typeVar +
+                ", parInitialize=" + parInitialize +
+                ", returnTypeFun=" + returnTypeFun +
+                ", pointer=" + pointer +
+                '}'+ "\n";
+    }
 }

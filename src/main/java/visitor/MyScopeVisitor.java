@@ -49,6 +49,8 @@ public class MyScopeVisitor implements MyVisitor{
         ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
         visitNodeList(funDeclListNode);
 
+        System.out.println(node.getSymbolTable().toString());
+
         stackScope.pop();
 
         node.setAstType(sym.VOID);
@@ -56,7 +58,7 @@ public class MyScopeVisitor implements MyVisitor{
 
     private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
         if (nodeList != null) {
-            for (int i = 0; i <= nodeList.size(); i++){
+            for (int i = 0; i < nodeList.size(); i++){
                 nodeList.get(i).accept(this);
             }
         }
@@ -119,9 +121,25 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
-        FunDeclNode funDeclNode = node.getFunDecl();
-        String nomeID = funDeclNode.getId().getNomeId();
-        int returnTypeCheck = node.getAstType();
+        FunDeclNode funDeclNode;
+
+        if(node.isMain()){
+            funDeclNode = node.getFunDecl();
+        } else{
+            funDeclNode = node;
+        }
+
+        String nomeID = "";
+
+        if(funDeclNode.getId() != null){
+            nomeID = funDeclNode.getId().getNomeId();
+        }
+
+        int returnTypeCheck = 0;
+
+        if(node.getAstType() != null){
+            returnTypeCheck = node.getAstType();
+        }
 
         SymbolTable symbolTableGlobal = stackScope.peek();
 
@@ -159,6 +177,7 @@ public class MyScopeVisitor implements MyVisitor{
         funDeclNode.setAstType(returnTypeCheck);
         node.setAstType(returnTypeCheck);
         funDeclNode.setSymbolTable(stackScope.peek());
+        System.out.println(funDeclNode.getSymbolTable().toString());
         stackScope.pop();
     }
 
@@ -192,13 +211,20 @@ public class MyScopeVisitor implements MyVisitor{
         symbolTable = new SymbolTable("IF");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
+
+        System.out.println(node.getSymbolTable().toString());
+
         node.getBody().accept(this);
+
         stackScope.pop();
 
         if(node.getElseSymbolTable() != null){
             symbolTable = new SymbolTable("ELSE");
             stackScope.push(symbolTable);
             node.setSymbolTable(symbolTable);
+
+            System.out.println(node.getSymbolTable().toString());
+
             node.getBody().accept(this);
             stackScope.pop();
         }
@@ -210,6 +236,9 @@ public class MyScopeVisitor implements MyVisitor{
         symbolTable = new SymbolTable("ELSE");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
+
+        System.out.println(node.getSymbolTable().toString());
+
         node.getBody().accept(this);
 
         node.setAstType(sym.VOID);
@@ -226,6 +255,9 @@ public class MyScopeVisitor implements MyVisitor{
         stackScope.peek().put(i, new SymbolRecord(i, "var", typeCheck));
 
         node.setSymbolTable(symbolTable);
+
+        System.out.println(node.getSymbolTable().toString());
+
         node.getBody().accept(this);
 
         node.setAstType(sym.VOID);
@@ -237,6 +269,9 @@ public class MyScopeVisitor implements MyVisitor{
         symbolTable = new SymbolTable("WHILE");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
+
+        System.out.println(node.getSymbolTable().toString());
+
         node.getBody().accept(this);
 
         node.setAstType(sym.VOID);

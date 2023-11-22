@@ -7,17 +7,11 @@ import java.util.ArrayList;
 public class FunDeclNode extends ASTNode{
 
     private boolean isMain;
-
     private FunDeclNode funDecl;
-
     private IdNode id;
-
     private ArrayList<ParDeclNode> parDeclList;
-
     private String typeOrVoid;
-
     private BodyNode body;
-
     private SymbolTable symbolTable;
 
     public FunDeclNode(String name, FunDeclNode funDecl) {
