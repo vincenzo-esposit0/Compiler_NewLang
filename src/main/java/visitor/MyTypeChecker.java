@@ -100,4 +100,6 @@ public class MyTypeChecker {
                 (operator1 == sym.REAL && operator2 == sym.INTEGER);
     }
 
+
+
 }

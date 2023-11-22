@@ -1,7 +1,9 @@
 package visitor;
 
 import esercitazione5.sym;
+import exceptions.IncompatibleNumberParamException;
 import exceptions.IncompatibleTypeException;
+import exceptions.NotFunctionException;
 import exceptions.VariableNotDeclaredException;
 import nodes.ASTNode;
 import nodes.*;
@@ -9,9 +11,10 @@ import table.SymbolRecord;
 import table.SymbolTable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Stack;
 
-public class MyTypeVisitor implements MyVisitor{
+public class MyTypeVisitor implements MyVisitor {
 
     private Stack<SymbolTable> stack;
 
@@ -22,57 +25,24 @@ public class MyTypeVisitor implements MyVisitor{
     @Override
     public String visit(ASTNode node) {
         switch (node.getClass().getSimpleName()) {
-            case "ProgramNode":
-                visitProgramNode((ProgramNode) node);
-                break;
-            case "BodyNode":
-                visitBodyNode((BodyNode) node);
-                break;
-            case "VarDeclNode":
-                visitVarDeclNode((VarDeclNode) node);
-                break;
-            case "FunDeclNode":
-                visitFunDeclNode((FunDeclNode) node);
-                break;
-            case "IfStatNode":
-                visitIfStatNode((IfStatNode) node);
-                break;
-            case "ForStatNode":
-                visitForStatNode((ForStatNode) node);
-                break;
-            case "WhileStatNode":
-                visitWhileStatNode((WhileStatNode) node);
-                break;
-            case "AssignStatNode":
-                visitAssignStatNode((AssignStatNode) node);
-                break;
-            case "BiVarExprNode":
-                visitBiVarExprNode((BiVarExprNode) node);
-                break;
-            case "UniVarExprNode":
-                visitUniVarExprNode((UniVarExprNode) node);
-                break;
-            case "ReadStatNode":
-                visitReadStatNode((ReadStatNode) node);
-                break;
-            case "WriteStatNode":
-                visitWriteStatNode((WriteStatNode) node);
-                break;
-            case "FunCallExprNode":
-                visitFunCallNode((FunCallNode) node);
-                break;
-            case "ConstNode":
-                visitConstNode((ConstNode) node);
-                break;
-            case "IdNode":
-                visitIdNode((IdNode) node);
-                break;
+            case "ProgramNode" -> visitProgramNode((ProgramNode) node);
+            case "BodyNode" -> visitBodyNode((BodyNode) node);
+            case "VarDeclNode" -> visitVarDeclNode((VarDeclNode) node);
+            case "FunDeclNode" -> visitFunDeclNode((FunDeclNode) node);
+            case "IfStatNode" -> visitIfStatNode((IfStatNode) node);
+            case "ForStatNode" -> visitForStatNode((ForStatNode) node);
+            case "WhileStatNode" -> visitWhileStatNode((WhileStatNode) node);
+            case "AssignStatNode" -> visitAssignStatNode((AssignStatNode) node);
+            case "BiVarExprNode" -> visitBiVarExprNode((BiVarExprNode) node);
+            case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
+            case "ReadStatNode" -> visitReadStatNode((ReadStatNode) node);
+            case "WriteStatNode" -> visitWriteStatNode((WriteStatNode) node);
+            case "FunCallExprNode" -> visitFunCallNode((FunCallNode) node);
+            case "ConstNode" -> visitConstNode((ConstNode) node);
+            case "IdNode" -> visitIdNode((IdNode) node);
         }
 
         return null;
-    }
-
-    private void visitFunCallNode(FunCallNode node) {
     }
 
     private void visitProgramNode(ProgramNode node) {
@@ -83,7 +53,7 @@ public class MyTypeVisitor implements MyVisitor{
 
         visitNodeList(varDeclList);
         visitNodeList(funDeclList);
-        
+
         stack.pop();
     }
 
@@ -95,18 +65,18 @@ public class MyTypeVisitor implements MyVisitor{
         ArrayList<IdInitNode> idInitList = node.getIdInitList();
         ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
 
-        if(varType.equals("VAR")){
-            for(IdInitNode element : idInitObblList){
+        if (varType.equals("VAR")) {
+            for (IdInitNode element : idInitObblList) {
                 element.getId().accept(this);
             }
         } else {
-            for(IdInitNode idElement : idInitList){
+            for (IdInitNode idElement : idInitList) {
                 ExprNode exprNode = idElement.getExpr();
                 idElement.getId().accept(this);
 
-                if(exprNode != null){
+                if (exprNode != null) {
                     exprNode.accept(this);
-                    idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(),typeChecker));
+                    idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(), typeChecker));
                 }
             }
         }
@@ -120,7 +90,7 @@ public class MyTypeVisitor implements MyVisitor{
         stack.push(funDecl.getSymbolTable());
 
         ArrayList<ParDeclNode> parDeclList = funDecl.getParDeclList();
-        if(parDeclList != null){
+        if (parDeclList != null) {
             for (ParDeclNode param : parDeclList) {
                 for (IdInitNode element : param.getIdList()) {
                     element.getId().accept(this);
@@ -150,12 +120,12 @@ public class MyTypeVisitor implements MyVisitor{
         ExprNode exprCondition = node.getExpr();
         exprCondition.accept(this);
 
-        if(exprCondition.getAstType() == sym.BOOL){
+        if (exprCondition.getAstType() == sym.BOOL) {
             BodyNode bodyNode = node.getBody();
             bodyNode.accept(this);
 
             BodyNode elseBodyNode = node.getElseStat().getBody();
-            if(elseBodyNode != null){
+            if (elseBodyNode != null) {
                 stack.push(node.getElseSymbolTable());
                 elseBodyNode.accept(this);
                 stack.pop();
@@ -177,10 +147,10 @@ public class MyTypeVisitor implements MyVisitor{
         intConst1.accept(this);
         intConst2.accept(this);
 
-        if(intConst1.getAstType() == sym.INTEGER && intConst2.getAstType() == sym.INTEGER){
+        if (intConst1.getAstType() == sym.INTEGER && intConst2.getAstType() == sym.INTEGER) {
             BodyNode bodyNode = node.getBody();
             bodyNode.accept(this);
-        } else{
+        } else {
             throw new IncompatibleTypeException("I tipi del for devono essere INTEGER");
         }
 
@@ -193,10 +163,10 @@ public class MyTypeVisitor implements MyVisitor{
         ExprNode conditionNode = node.getExpr();
         conditionNode.accept(this);
 
-        if(conditionNode.getAstType() == sym.BOOL){
+        if (conditionNode.getAstType() == sym.BOOL) {
             BodyNode bodyNode = node.getBody();
             bodyNode.accept(this);
-        }else{
+        } else {
             throw new IncompatibleTypeException("La condizione del while deve essere BOOL");
         }
 
@@ -219,8 +189,8 @@ public class MyTypeVisitor implements MyVisitor{
                 idInit.setAstType(assignedType);
             }
 
-           node.setAstType(sym.VOID);
-        }else {
+            node.setAstType(sym.VOID);
+        } else {
             if (exprList.size() == idList.size()) {
                 for (ExprNode exprNode : exprList) {
                     exprNode.accept(this);
@@ -251,19 +221,19 @@ public class MyTypeVisitor implements MyVisitor{
 
         int typeChecker = sym.error;
 
-        if(operation.equals("PLUS") || operation.equals("MINUS") || operation.equals("TIMES") || operation.equals("DIV") || operation.equals("POW")){
+        if (operation.equals("PLUS") || operation.equals("MINUS") || operation.equals("TIMES") || operation.equals("DIV") || operation.equals("POW")) {
             typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-        } else if(operation.equals("AND") || operation.equals("OR")){
+        } else if (operation.equals("AND") || operation.equals("OR")) {
             typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-        } else if(operation.equals("STR_CONCAT")){
+        } else if (operation.equals("STR_CONCAT")) {
             typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-        } else if(operation.equals("EQUALS") || operation.equals("NE") || operation.equals("LT") || operation.equals("LE") || operation.equals("GT") || operation.equals("GR")){
+        } else if (operation.equals("EQUALS") || operation.equals("NE") || operation.equals("LT") || operation.equals("LE") || operation.equals("GT") || operation.equals("GR")) {
             typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
         }
 
-        if(typeChecker != sym.error){
+        if (typeChecker != sym.error) {
             node.setAstType(typeChecker);
-        } else{
+        } else {
             throw new IncompatibleTypeException("Il tipo " + exprNode1.getAstType() + " e il tipo " + exprNode2.getAstType() + " non sono compatibili.");
         }
     }
@@ -276,15 +246,15 @@ public class MyTypeVisitor implements MyVisitor{
 
         int typeChecker = sym.error;
 
-        if(operation.equals("UMINUS")){
+        if (operation.equals("UMINUS")) {
             typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
-        } else if(operation.equals("NOT")){
+        } else if (operation.equals("NOT")) {
             typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
         }
 
-        if(typeChecker != sym.error){
+        if (typeChecker != sym.error) {
             node.setAstType(typeChecker);
-        } else{
+        } else {
             throw new IncompatibleTypeException("L'operazione " + operation + " non è compatibile con i tipi.");
         }
 
@@ -309,6 +279,52 @@ public class MyTypeVisitor implements MyVisitor{
         node.setAstType(sym.VOID);
     }
 
+    private void visitFunCallNode(FunCallNode node) {
+        String functionName = node.getName();
+        SymbolRecord functionSymbolRecord = getElementFromScope(functionName);
+
+        if (!functionSymbolRecord.getKind().equals("FUN"))
+            throw new NotFunctionException(functionName + " is not a function!");
+
+        ArrayList<Integer> parCallList = new ArrayList<>();
+        ArrayList<ExprNode> exprNodeList = node.getExprList();
+
+        if (exprNodeList != null) {
+            for (ExprNode expr : exprNodeList) {
+                expr.accept(this);
+                parCallList.add(expr.getAstType());
+            }
+        }
+
+        ArrayList<Integer> parFunList = functionSymbolRecord.getParInitialize().getParamsTypeList();
+
+        Collections.reverse(parCallList);
+
+        if (parCallList.size() == parFunList.size()) {
+            for (int i = 0; i < parCallList.size(); i++) {
+                if (!parCallList.get(i).equals(parFunList.get(i))) {
+                    throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
+                }
+            }
+        } else {
+            throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");
+        }
+
+        /**
+         * Nota: decidere se aggiungere il controllo se i parametri passati corrispondono ad OUT
+         **/
+
+        int type = functionSymbolRecord.getTypeVar();
+
+        if (type != sym.error) {
+            // Imposta il tipo della funzione nella chiamata e nel nodo stesso
+            node.getId().setAstType(type);
+            node.setAstType(type);
+        } else {
+            throw new IncompatibleTypeException("Incompatible type: " + type);
+        }
+    }
+
     private void visitConstNode(ConstNode node) {
         int typeChecking = MyTypeChecker.getInferenceType(node.getName());
 
@@ -324,7 +340,7 @@ public class MyTypeVisitor implements MyVisitor{
 
     private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
         if (nodeList != null) {
-            for (int i = 0; i <= nodeList.size(); i++){
+            for (int i = 0; i <= nodeList.size(); i++) {
                 nodeList.get(i).accept(this);
             }
         }
