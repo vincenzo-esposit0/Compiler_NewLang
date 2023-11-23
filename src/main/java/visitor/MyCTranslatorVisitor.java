@@ -2,6 +2,7 @@ package visitor;
 
 import esercitazione5.sym;
 import nodes.*;
+import table.SymbolRecord;
 import table.SymbolTable;
 
 import java.util.ArrayList;
@@ -20,10 +21,20 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         switch (node.getClass().getSimpleName()) {
             case "ProgramNode" -> visitProgramNode((ProgramNode) node);
-            case "VarDeclNode" -> visitVarDeclNode((VarDeclNode) node);
+            //case "VarDeclNode" -> visitVarDeclNode((VarDeclNode) node);
             case "FunDeclNode" -> visitFunDeclNode((FunDeclNode) node);
             case "BodyNode" -> visitBodyNode((BodyNode) node);
             case "ParDeclNode" -> visitParDeclNode((ParDeclNode) node);
+            case "FunCallNode" -> visitFunCallNode((FunCallNode) node);
+            case "FunCallExprNode" -> visitFunCallExprNode((FunCallExprNode) node);
+            case "FunCallStatNode" -> visitFunCallStatNode((FunCallStatNode) node);
+            case "IfStatNode" -> visitIfStatNode((IfStatNode) node);
+            case "ElseNode" -> visitElseNode((ElseNode) node);
+            case "ForStatNode" -> visitForStatNode((ForStatNode) node);
+            case "WhileStatNode" -> visitWhileStatNode((WhileStatNode) node);
+            case "ReadStatNode" -> visitReadStatNode((ReadStatNode) node);
+            case "WriteStatNode" -> visitWriteStatNode((WriteStatNode) node);
+            case "AssignStatNode" -> visitAssignStatNode((AssignStatNode) node);
 
         }
 
@@ -154,7 +165,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 else {
                     if(idElement.getExpr() != null) {
 
-                        sb.append("#define ").append(idElement.getId().getNomeId()).append(" (").append(typeC).append(" )");
+                        sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" (").append(" )");
                         sb.append(idElement.getExpr().accept(this));
                     } else {
                         sb.append(typeConverter(varType)).append(" ").append(idElement.getId().getNomeId()).append(";");
@@ -264,7 +275,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 for (ParDeclNode parElement : parDeclNodeList) {
                     sb.append(parElement.accept(this));
                 }
-                //sb.deleteCharAt(sb.length() - 1);
             }
             codeGeneratorC = code + sb + "){\n";
             codeGeneratorC += funDeclNode.getBody().accept(this);
@@ -316,7 +326,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = sb.toString();
     }
 
-
     private void visitParDeclNode(ParDeclNode node) {
         StringBuilder sb = new StringBuilder();
         String typeC = node.getTypeVar();
@@ -342,7 +351,144 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = sb.toString();
     }
 
+    private void visitFunCallNode(FunCallNode node) {
+        StringBuilder sb = new StringBuilder();
 
+        String nomeID = node.getId().getNomeId();
+        ArrayList<ExprNode> exprNodeList = node.getExprList();
+
+        SymbolRecord symbolRecord = lookup(nomeID);
+
+        System.out.println("--------->" + symbolRecord.toString());
+
+        codeGeneratorC += nomeID + "(";
+
+        String codeC = codeGeneratorC;
+    }
+
+    private void visitFunCallExprNode(FunCallExprNode node) {
+        FunCallNode funCallNode = node.getFunCall();
+
+        funCallNode.accept(this);
+    }
+
+    private void visitFunCallStatNode(FunCallStatNode node) {
+        FunCallNode funCallNode = node.getFunCall();
+
+        funCallNode.accept(this);
+    }
+
+    private void visitIfStatNode(IfStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        ExprNode exprNode = node.getExpr();
+        BodyNode bodyNode = node.getBody();
+
+        stackScope.push(node.getSymbolTable());
+
+        sb.append("if(").append(exprNode.accept(this)).append("){\n");
+        sb.append(bodyNode.accept(this)).append("}\n");
+
+        if(node.getElseStat() != null){
+            sb.append("else").append("){\n");
+            sb.append(node.getElseStat().accept(this)).append("}\n");
+        }
+
+        codeGeneratorC = sb.toString();
+        stackScope.pop();
+    }
+
+    private void visitElseNode(ElseNode node) {
+        StringBuilder sb = new StringBuilder();
+        BodyNode bodyNode = node.getBody();
+
+        stackScope.push(node.getSymbolTable());
+
+        sb.append(bodyNode.accept(this));
+
+        codeGeneratorC = sb.toString();
+        stackScope.pop();
+    }
+
+    private void visitForStatNode(ForStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        String intConst1 = node.getIntConst1().getValue();
+        String intConst2 = node.getIntConst2().getValue();
+        BodyNode bodyNode = node.getBody();
+        String id = node.getId().getNomeId();
+
+        stackScope.push(node.getSymbolTable());
+
+        sb.append("int ").append(id).append(";\n");
+        sb.append("for(").append(id).append(" = ").append(intConst1).append(";").append(" ").append(id).append(" <= ").append(intConst2).append(";").append(id).append("++").append("){\n");
+        sb.append(bodyNode.accept(this)).append("}\n");
+
+        codeGeneratorC = sb.toString();
+        stackScope.pop();
+    }
+
+    private void visitWhileStatNode(WhileStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        ExprNode exprNode = node.getExpr();
+        BodyNode bodyNode = node.getBody();
+
+        stackScope.push(node.getSymbolTable());
+
+        sb.append("while(").append(exprNode.accept(this)).append("){\n");
+        sb.append(bodyNode.accept(this)).append("}\n");
+
+        codeGeneratorC = sb.toString();
+        stackScope.pop();
+    }
+
+    private void visitReadStatNode(ReadStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        ArrayList<IdInitNode> idInitNodeList = node.getIdList();
+        ConstNode constNode = node.getStringConst();
+
+        if(constNode != null){
+            sb.append("printf(\"").append(constNode.getValue()).append("\");\n");
+        }
+
+        codeGeneratorC += sb.toString();
+
+        for(IdInitNode idElement: idInitNodeList){
+            if(idElement.getAstType() == sym.STRING){
+                sb.append("scanf(").append(formatOut(idElement.getId().getAstType())).append(",").append(idElement.getId().getNomeId()).append(");\n");
+            } else{
+                sb.append("scanf(").append(formatOut(idElement.getId().getAstType())).append(",&").append(idElement.getId().getNomeId()).append(");\n");
+            }
+        }
+
+        codeGeneratorC += sb.toString();
+    }
+
+    private void visitWriteStatNode(WriteStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        ArrayList<ExprNode> exprNodeList = node.getExprList();
+        String typeWrite = node.getTypeWrite();
+
+        Collections.reverse(exprNodeList);
+
+        for(ExprNode exprElement: exprNodeList){
+            sb.append("printf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );\n");
+        }
+
+        if(typeWrite == "WRITELN"){
+             sb.append("printf(\"\\n\");\n");
+        }
+
+        codeGeneratorC = sb.toString();
+    }
+
+    private void visitAssignStatNode(AssignStatNode node) {
+
+
+    }
 
 
     public String typeConverter(String typeConverter){
@@ -366,6 +512,32 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case sym.VOID -> "VOID";
             default -> "ERROR";
         };
+    }
+
+    private String formatOut(int type){
+        switch (type) {
+            case sym.INTEGER:
+                return "\"%d\"";
+            case sym.REAL:
+                return "\"%f\"";
+            case sym.BOOL, sym.STRING:
+                return "\"%s\"";
+            case sym.CHAR:
+                return "\"%c\"";
+            default:
+                return "ERROR";
+        }
+    }
+
+    public SymbolRecord lookup(String item){
+        SymbolRecord found = null;
+        for (SymbolTable current : stackScope){
+            found = current.get(item);
+            if(found != null)
+                break;
+        }
+
+        return found;
     }
 
 }
