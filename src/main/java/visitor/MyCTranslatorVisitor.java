@@ -359,6 +359,9 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         SymbolRecord symbolRecord = lookup(nomeID);
 
+        ArrayList<Integer> paramsTypeList = symbolRecord.getParInitialize().getParamsTypeList();
+        ArrayList<Boolean> paramsOutList = symbolRecord.getParInitialize().getParamsOutList();
+
         System.out.println("--------->" + symbolRecord.toString());
 
         codeGeneratorC += nomeID + "(";
@@ -475,20 +478,37 @@ public class MyCTranslatorVisitor implements MyVisitor {
         Collections.reverse(exprNodeList);
 
         for(ExprNode exprElement: exprNodeList){
-            sb.append("printf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );\n");
-        }
-
-        if(typeWrite == "WRITELN"){
-             sb.append("printf(\"\\n\");\n");
+            if(typeWrite == "WRITE"){
+                sb.append("printf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );");
+            } else {
+                sb.append("printf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );").append("\n");
+            }
         }
 
         codeGeneratorC = sb.toString();
     }
 
     private void visitAssignStatNode(AssignStatNode node) {
+        StringBuilder sb = new StringBuilder();
 
+        ArrayList<IdInitNode> idInitNodeList = node.getIdList();
+        ArrayList<ExprNode> exprNodeList = node.getExprList();
 
+        if(exprNodeList.size() == 1){
+            for(IdInitNode idElement: idInitNodeList){
+                sb.append(idElement.getId().accept(this)).append(" = ").append(exprNodeList.get(0).accept(this)).append(";\n");
+            }
+        } else {
+            for (int i = 0; i < idInitNodeList.size(); i++) {
+                sb.append(idInitNodeList.get(i).getId().getNomeId()).append(" = ");
+                sb.append(exprNodeList.get(i).accept(this)).append(";\n");
+            }
+        }
+
+        codeGeneratorC = sb.toString();
     }
+
+
 
 
     public String typeConverter(String typeConverter){
