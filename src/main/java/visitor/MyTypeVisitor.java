@@ -297,22 +297,27 @@ public class MyTypeVisitor implements MyVisitor {
         }
 
         ArrayList<Integer> parFunList = functionSymbolRecord.getParInitialize().getParamsTypeList();
+        ArrayList<Boolean> parFunListOut = functionSymbolRecord.getParInitialize().getParamsOutList();
 
         Collections.reverse(parCallList);
 
-        if (parCallList.size() == parFunList.size()) {
+        /**
+         * Controllo se la lista dei tipi e la lista degli out combacia con la lista di parametri della funzione chiamata
+         */
+
+        if (parCallList.size() == parFunList.size()  && parCallList.size() == parFunListOut.size()) {
             for (int i = 0; i < parCallList.size(); i++) {
                 if (!parCallList.get(i).equals(parFunList.get(i))) {
+                    throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
+                }
+
+                if (!parCallList.get(i).equals(parFunListOut.get(i))) {
                     throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
                 }
             }
         } else {
             throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");
         }
-
-        /**
-         * Nota: decidere se aggiungere il controllo se i parametri passati corrispondono ad OUT
-         **/
 
         int type = functionSymbolRecord.getTypeVar();
 
