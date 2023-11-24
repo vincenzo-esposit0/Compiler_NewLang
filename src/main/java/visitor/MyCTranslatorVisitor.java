@@ -21,7 +21,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         switch (node.getClass().getSimpleName()) {
             case "ProgramNode" -> visitProgramNode((ProgramNode) node);
-            //case "VarDeclNode" -> visitVarDeclNode((VarDeclNode) node);
+            case "VarDeclNode" -> visitVarDeclNode((VarDeclNode) node);
             case "FunDeclNode" -> visitFunDeclNode((FunDeclNode) node);
             case "BodyNode" -> visitBodyNode((BodyNode) node);
             case "ParDeclNode" -> visitParDeclNode((ParDeclNode) node);
@@ -39,7 +39,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
-
         }
 
         return codeGeneratorC;
@@ -49,9 +48,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
         StringBuilder sb = new StringBuilder();
 
         stackScope.push(node.getSymbolTable());
-        codeGeneratorC += "#include <stdio.h>\n#include <stdlib.h>\n#include <string.h>\n#include <math.h>\n#include <malloc.h>\n";
-        codeGeneratorC += "#define true 1\n";
-        codeGeneratorC += "#define false 0\n";
+
+        codeGeneratorC += includeLibraries();
 
         ArrayList<VarDeclNode> varDeclNodeList = node.getVarDeclList();
         ArrayList<FunDeclNode> funDeclNodeList = node.getFunDeclList();
@@ -94,36 +92,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         codeGeneratorC += sb.toString();
 
-        //Funzioni per convertire integer e double a string e la funzione concat
-        codeGeneratorC += """
-                char* intToString(int var){
-                    char *int_str = malloc(256);
-                    sprintf(int_str, "%d", var);
-                    return int_str;
-                }
-            
-                char* doubleToString(double var){
-                    char *double_str = malloc(256);
-                    sprintf(double_str, "%f", var);
-                    return double_str;
-                }
-            
-                char* boolToString(int var){
-                    if (var == 1){
-                        return "true";
-                    }
-                    if (var == 0){
-                        return "false";
-                    }
-                    return "";
-                }
-            
-                char* concat(char *s1, char* i) {
-                    char* s = malloc(256);
-                    sprintf(s, "%s%s", s1, i);
-                    return s;
-                }
-                """;
+        codeGeneratorC += converterFunctions();
 
         String code = codeGeneratorC;
         sb.setLength(0);
@@ -540,64 +509,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC += sb.toString();
     }
 
-    private String checkBiVarExpr(ExprNode expr1, ExprNode expr2, String opExpr) {
-
-        switch(opExpr){
-            case "EQUALS", "NE" -> {
-                if((expr1.getModeExpr().equals("ConstString") || expr1.getModeExpr().equals("ConstChar"))
-                        && (expr2.getModeExpr().equals("ConstString") || expr2.getModeExpr().equals("ConstChar"))){
-                    return "strcmp(" + expr1.accept(this)+ "," + expr2.accept(this) + ")";
-                } else {
-                    if(opExpr.equals("EQUALS")){
-                        return expr1.accept(this) + " == " + expr2.accept(this);
-                    } else {
-                        return expr1.accept(this) + " != " + expr2.accept(this);
-                    }
-                }
-            }
-            case "STR_CONCAT" -> {
-                return "concat(" + expr1.accept(this) + "," + expr2.accept(this) + ")";
-            }
-            case "POW" -> {
-                return "pow((float)(" + expr1.accept(this) + "), (float)(" + expr2.accept(this) + "))";
-            }
-            case "PLUS" -> {
-                return "(" + expr1.accept(this) + " + " + expr2.accept(this) + ")";
-            }
-            case "MINUS" -> {
-                return "(" + expr1.accept(this) + " - " + expr2.accept(this) + ")";
-            }
-            case "TIMES" -> {
-                return "(" + expr1.accept(this) + " * " + expr2.accept(this) + ")";
-            }
-            case "DIV" -> {
-                return "(" + expr1.accept(this) + " / " + expr2.accept(this) + ")";
-            }
-            case "GT" -> {
-                return "(" + expr1.accept(this) + " > " + expr2.accept(this) + ")";
-            }
-            case "GE" -> {
-                return "(" + expr1.accept(this) + " >= " + expr2.accept(this) + ")";
-            }
-            case "LT" -> {
-                return "(" + expr1.accept(this) + " < " + expr2.accept(this) + ")";
-            }
-            case "LE" -> {
-                return "(" + expr1.accept(this) + " <= " + expr2.accept(this) + ")";
-            }
-            case "AND" -> {
-                return "(" + expr1.accept(this) + " && " + expr2.accept(this) + ")";
-            }
-            case "OR" -> {
-                return "(" + expr1.accept(this) + " || " + expr2.accept(this) + ")";
-            }
-            default -> {
-                return "ERROR";
-            }
-        }
-
-    }
-
     private void visitUniVarExprNode(UniVarExprNode node) {
         StringBuilder sb = new StringBuilder();
 
@@ -657,22 +568,58 @@ public class MyCTranslatorVisitor implements MyVisitor {
     }
 
     private String formatOut(int type){
-        switch (type) {
-            case sym.INTEGER:
-                return "\"%d\"";
-            case sym.REAL:
-                return "\"%f\"";
-            case sym.BOOL, sym.STRING:
-                return "\"%s\"";
-            case sym.CHAR:
-                return "\"%c\"";
-            default:
-                return "ERROR";
-        }
+        return switch (type) {
+            case sym.INTEGER -> "\"%d\"";
+            case sym.REAL -> "\"%f\"";
+            case sym.BOOL, sym.STRING -> "\"%s\"";
+            case sym.CHAR -> "\"%c\"";
+            default -> "ERROR";
+        };
+    }
+
+    private String includeLibraries(){
+        return "#include <stdio.h>\n" +
+                "#include <stdlib.h>\n" +
+                "#include <string.h>\n" +
+                "#include <math.h>\n" +
+                "#include <malloc.h>\n";
+    }
+
+    private String converterFunctions(){
+        return """
+                char* intToString(int var){
+                    char *int_str = malloc(256);
+                    sprintf(int_str, "%d", var);
+                    return int_str;
+                }
+            
+                char* doubleToString(double var){
+                    char *double_str = malloc(256);
+                    sprintf(double_str, "%f", var);
+                    return double_str;
+                }
+            
+                char* boolToString(int var){
+                    if (var == 1){
+                        return "true";
+                    }
+                    if (var == 0){
+                        return "false";
+                    }
+                    return "";
+                }
+            
+                char* concat(char *s1, char* i) {
+                    char* s = malloc(256);
+                    sprintf(s, "%s%s", s1, i);
+                    return s;
+                }
+                """;
     }
 
     public SymbolRecord lookup(String item){
         SymbolRecord found = null;
+
         for (SymbolTable current : stackScope){
             found = current.get(item);
             if(found != null)
@@ -689,6 +636,64 @@ public class MyCTranslatorVisitor implements MyVisitor {
             default -> "ERROR";
         };
     }
+
+    private String checkBiVarExpr(ExprNode expr1, ExprNode expr2, String opExpr) {
+        switch(opExpr){
+            case "EQUALS", "NE" -> {
+                if((expr1.getModeExpr().equals("ConstString") || expr1.getModeExpr().equals("ConstChar"))
+                        && (expr2.getModeExpr().equals("ConstString") || expr2.getModeExpr().equals("ConstChar"))){
+                    return "strcmp(" + expr1.accept(this)+ "," + expr2.accept(this) + ")";
+                } else {
+                    if(opExpr.equals("EQUALS")){
+                        return expr1.accept(this) + " == " + expr2.accept(this);
+                    } else {
+                        return expr1.accept(this) + " != " + expr2.accept(this);
+                    }
+                }
+            }
+            case "STR_CONCAT" -> {
+                return "concat(" + expr1.accept(this) + "," + expr2.accept(this) + ")";
+            }
+            case "POW" -> {
+                return "pow((float)(" + expr1.accept(this) + "), (float)(" + expr2.accept(this) + "))";
+            }
+            case "PLUS" -> {
+                return "(" + expr1.accept(this) + " + " + expr2.accept(this) + ")";
+            }
+            case "MINUS" -> {
+                return "(" + expr1.accept(this) + " - " + expr2.accept(this) + ")";
+            }
+            case "TIMES" -> {
+                return "(" + expr1.accept(this) + " * " + expr2.accept(this) + ")";
+            }
+            case "DIV" -> {
+                return "(" + expr1.accept(this) + " / " + expr2.accept(this) + ")";
+            }
+            case "GT" -> {
+                return "(" + expr1.accept(this) + " > " + expr2.accept(this) + ")";
+            }
+            case "GE" -> {
+                return "(" + expr1.accept(this) + " >= " + expr2.accept(this) + ")";
+            }
+            case "LT" -> {
+                return "(" + expr1.accept(this) + " < " + expr2.accept(this) + ")";
+            }
+            case "LE" -> {
+                return "(" + expr1.accept(this) + " <= " + expr2.accept(this) + ")";
+            }
+            case "AND" -> {
+                return "(" + expr1.accept(this) + " && " + expr2.accept(this) + ")";
+            }
+            case "OR" -> {
+                return "(" + expr1.accept(this) + " || " + expr2.accept(this) + ")";
+            }
+            default -> {
+                return "ERROR";
+            }
+        }
+
+    }
+
 
 }
 
