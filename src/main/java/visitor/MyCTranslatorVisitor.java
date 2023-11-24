@@ -1,8 +1,6 @@
 package visitor;
 
 import esercitazione5.sym;
-import exceptions.IncompatibleNumberParamException;
-import exceptions.IncompatibleTypeException;
 import nodes.*;
 import table.SymbolRecord;
 import table.SymbolTable;
@@ -37,6 +35,10 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "ReadStatNode" -> visitReadStatNode((ReadStatNode) node);
             case "WriteStatNode" -> visitWriteStatNode((WriteStatNode) node);
             case "AssignStatNode" -> visitAssignStatNode((AssignStatNode) node);
+            case "BiVarExprNode" -> visitBiVarExprNode((BiVarExprNode) node);
+            case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
+            case "ConstNode" -> visitConstNode((ConstNode) node);
+            case "IdNode" -> visitIdNode((IdNode) node);
 
         }
 
@@ -526,6 +528,111 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = sb.toString();
     }
 
+    private void visitBiVarExprNode(BiVarExprNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        ExprNode expr1 = node.getExprNode1();
+        ExprNode expr2 = node.getExprNode2();
+        String opExpr = node.getModeExpr();
+
+        sb.append(checkBiVarExpr(expr1, expr2, opExpr));
+
+        codeGeneratorC += sb.toString();
+    }
+
+    private String checkBiVarExpr(ExprNode expr1, ExprNode expr2, String opExpr) {
+
+        switch(opExpr){
+            case "EQUALS", "NE" -> {
+                if((expr1.getModeExpr().equals("ConstString") || expr1.getModeExpr().equals("ConstChar"))
+                        && (expr2.getModeExpr().equals("ConstString") || expr2.getModeExpr().equals("ConstChar"))){
+                    return "strcmp(" + expr1.accept(this)+ "," + expr2.accept(this) + ")";
+                } else {
+                    if(opExpr.equals("EQUALS")){
+                        return expr1.accept(this) + " == " + expr2.accept(this);
+                    } else {
+                        return expr1.accept(this) + " != " + expr2.accept(this);
+                    }
+                }
+            }
+            case "STR_CONCAT" -> {
+                return "concat(" + expr1.accept(this) + "," + expr2.accept(this) + ")";
+            }
+            case "POW" -> {
+                return "pow((float)(" + expr1.accept(this) + "), (float)(" + expr2.accept(this) + "))";
+            }
+            case "PLUS" -> {
+                return "(" + expr1.accept(this) + " + " + expr2.accept(this) + ")";
+            }
+            case "MINUS" -> {
+                return "(" + expr1.accept(this) + " - " + expr2.accept(this) + ")";
+            }
+            case "TIMES" -> {
+                return "(" + expr1.accept(this) + " * " + expr2.accept(this) + ")";
+            }
+            case "DIV" -> {
+                return "(" + expr1.accept(this) + " / " + expr2.accept(this) + ")";
+            }
+            case "GT" -> {
+                return "(" + expr1.accept(this) + " > " + expr2.accept(this) + ")";
+            }
+            case "GE" -> {
+                return "(" + expr1.accept(this) + " >= " + expr2.accept(this) + ")";
+            }
+            case "LT" -> {
+                return "(" + expr1.accept(this) + " < " + expr2.accept(this) + ")";
+            }
+            case "LE" -> {
+                return "(" + expr1.accept(this) + " <= " + expr2.accept(this) + ")";
+            }
+            case "AND" -> {
+                return "(" + expr1.accept(this) + " && " + expr2.accept(this) + ")";
+            }
+            case "OR" -> {
+                return "(" + expr1.accept(this) + " || " + expr2.accept(this) + ")";
+            }
+            default -> {
+                return "ERROR";
+            }
+        }
+
+    }
+
+    private void visitUniVarExprNode(UniVarExprNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("(").append(checkUniVarExpr(node.getModeExpr())).append(node.getExprNode().accept(this)).append(")");
+
+        codeGeneratorC += sb.toString();
+    }
+
+    private void visitConstNode(ConstNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        if(node.getName().equals("STRING_CONST")) {
+            sb.append("\"").append(node.getValue()).append("\"");
+        } else if (node.getName().equals("CHAR_CONST")){
+            sb.append("'").append(node.getValue()).append("'");
+        } else {
+            sb.append(node.getValue());
+        }
+
+        codeGeneratorC += sb.toString();
+    }
+
+    private void visitIdNode(IdNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        String nomeID = node.getNomeId();
+        SymbolRecord symbolRecord = lookup(nomeID);
+
+        if(symbolRecord.isPointer()){
+            sb.append("*").append(nomeID);
+        }
+
+        codeGeneratorC += sb.toString();
+    }
+
     public String typeConverter(String typeConverter){
         return switch (typeConverter) {
             case "STRING" -> "char *";
@@ -573,6 +680,14 @@ public class MyCTranslatorVisitor implements MyVisitor {
         }
 
         return found;
+    }
+
+    private String checkUniVarExpr(String modeExpr) {
+        return switch (modeExpr) {
+            case "MINUS" -> " -";
+            case "NOT" -> " !" ;
+            default -> "ERROR";
+        };
     }
 
 }

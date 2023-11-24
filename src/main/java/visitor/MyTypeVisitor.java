@@ -281,7 +281,7 @@ public class MyTypeVisitor implements MyVisitor {
 
     private void visitFunCallNode(FunCallNode node) {
         String functionName = node.getName();
-        SymbolRecord functionSymbolRecord = getElementFromScope(functionName);
+        SymbolRecord functionSymbolRecord = lookup(functionName);
 
         if (!functionSymbolRecord.getKind().equals("FUN"))
             throw new NotFunctionException(functionName + " is not a function!");
@@ -338,7 +338,7 @@ public class MyTypeVisitor implements MyVisitor {
 
     void visitIdNode(IdNode node) {
         String nomeId = node.getNomeId();
-        SymbolRecord symbolRecord = getElementFromScope(nomeId);
+        SymbolRecord symbolRecord = lookup(nomeId);
         int typeVar = symbolRecord.getTypeVar();
         node.setAstType(typeVar);
     }
@@ -351,14 +351,16 @@ public class MyTypeVisitor implements MyVisitor {
         }
     }
 
-    SymbolRecord getElementFromScope(String nomeID) {
-        for (SymbolTable symbolTable : stack) {
-            if (symbolTable.containsKey(nomeID)) {
-                return symbolTable.get(nomeID);
+    public SymbolRecord lookup(String item){
+        SymbolRecord found = null;
+        for (SymbolTable current : stack){
+            found = current.get(item);
+            if(found != null) {
+                return found;
             }
         }
-        throw new VariableNotDeclaredException("Not Declared: " + nomeID);
-    }
 
+        throw new VariableNotDeclaredException("Not Declared: " + item);
+    }
 
 }
