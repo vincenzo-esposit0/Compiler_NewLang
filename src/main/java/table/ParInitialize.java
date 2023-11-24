@@ -36,4 +36,12 @@ public class ParInitialize {
     public void addParamsOutList(boolean out){
         this.paramsOutList.add(out);
     }
+
+    @Override
+    public String toString() {
+        return "ParInitialize{" +
+                "paramsTypeList=" + paramsTypeList +
+                ", paramsOutList=" + paramsOutList +
+                '}';
+    }
 }

@@ -1,6 +1,8 @@
 package visitor;
 
 import esercitazione5.sym;
+import exceptions.IncompatibleNumberParamException;
+import exceptions.IncompatibleTypeException;
 import nodes.*;
 import table.SymbolRecord;
 import table.SymbolTable;
@@ -357,28 +359,44 @@ public class MyCTranslatorVisitor implements MyVisitor {
         String nomeID = node.getId().getNomeId();
         ArrayList<ExprNode> exprNodeList = node.getExprList();
 
+        ArrayList<Integer> parCallList = new ArrayList<>();
+
+        if (exprNodeList != null) {
+            for (ExprNode exprElement : exprNodeList) {
+                exprElement.accept(this);
+                parCallList.add(exprElement.getAstType());
+            }
+        }
+
         SymbolRecord symbolRecord = lookup(nomeID);
 
         ArrayList<Integer> paramsTypeList = symbolRecord.getParInitialize().getParamsTypeList();
         ArrayList<Boolean> paramsOutList = symbolRecord.getParInitialize().getParamsOutList();
 
-        System.out.println("--------->" + symbolRecord.toString());
+        codeGeneratorC = nomeID + "(";
 
-        codeGeneratorC += nomeID + "(";
+        if (parCallList.size() == paramsTypeList.size()  && parCallList.size() == paramsOutList.size()) {
+            for (int i = 0; i < parCallList.size(); i++) {
+                if (parCallList.get(i).equals(paramsTypeList.get(i)) && paramsOutList.get(i)) {
+                    sb.append("&").append(exprNodeList.get(i).accept(this)).append(",");
+                }
+            }
+            sb.deleteCharAt(sb.length()-1);
+        }
 
-        String codeC = codeGeneratorC;
+        codeGeneratorC += sb.toString();
     }
 
     private void visitFunCallExprNode(FunCallExprNode node) {
         FunCallNode funCallNode = node.getFunCall();
 
-        funCallNode.accept(this);
+        codeGeneratorC += funCallNode.accept(this) + ")";
     }
 
     private void visitFunCallStatNode(FunCallStatNode node) {
         FunCallNode funCallNode = node.getFunCall();
 
-        funCallNode.accept(this);
+        codeGeneratorC += funCallNode.accept(this) + ");";
     }
 
     private void visitIfStatNode(IfStatNode node) {
@@ -507,9 +525,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         codeGeneratorC = sb.toString();
     }
-
-
-
 
     public String typeConverter(String typeConverter){
         return switch (typeConverter) {
