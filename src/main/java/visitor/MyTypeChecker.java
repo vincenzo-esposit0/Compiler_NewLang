@@ -6,12 +6,13 @@ import exceptions.IncompatibleTypeException;
 public class MyTypeChecker {
 
     public static int getInferenceType(String type) {
+        System.out.println("MyTypeChecker inside get inference type " + type);
         return switch (type) {
-            case "INTEGER", "INTEGER_CONST" -> sym.INTEGER;
-            case "REAL", "REAL_CONST" -> sym.REAL;
-            case "TRUE", "FALSE", "BOOL" -> sym.BOOL;
-            case "STRING", "STRING_CONST" -> sym.STRING;
-            case "CHAR", "CHAR_CONST" -> sym.CHAR;
+            case "INTEGER", "INTEGER_CONST", "ConstInteger" -> sym.INTEGER;
+            case "REAL", "REAL_CONST", "ConstReal" -> sym.REAL;
+            case "TRUE", "FALSE", "BOOL", "BOOLEAN" -> sym.BOOL;
+            case "STRING", "STRING_CONST", "ConstString" -> sym.STRING;
+            case "CHAR", "CHAR_CONST", "ConstChar" -> sym.CHAR;
             case "VOID" -> sym.VOID;
             default -> sym.error;
         };
@@ -40,6 +41,7 @@ public class MyTypeChecker {
     }
 
     public static int binaryOperations(String operation, int operator1, int operator2) {
+        System.out.println("binaryOperations: " + operation + " " + operator1 + " " + operator2);
         switch (operation){
             case "PLUS", "MINUS", "TIMES", "DIV", "POW" -> {
                 if (operator1 == sym.INTEGER && operator2 == sym.INTEGER) {

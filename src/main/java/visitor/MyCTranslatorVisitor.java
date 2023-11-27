@@ -114,12 +114,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
         stackScope.pop();
     }
 
-    private void visitVarDeclNode(VarDeclNode node) {
+    /*private void visitVarDeclNode(VarDeclNode node) {
         StringBuilder sb = new StringBuilder();
 
         String varType = node.getType();
 
         ArrayList<IdInitNode> idInitNodeList = node.getIdInitList();
+        ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
 
         //Controllo se il flag della variabili globali è TRUE
         if(varDeclGlobal){
@@ -133,9 +134,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                     //Assegna il typo dato dal converter
                     sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" = ");
                     sb.append(costante.accept(this)).append(";");
-                }
-                //Se la variabile non è di tipo VAR
-                else {
+                } else {
                     if(idElement.getExpr() != null) {
 
                         sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" (").append(" )");
@@ -148,9 +147,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
                 sb.append("\n");
             }
-        }
-        //Se il flag della variabili globali è FALSE
-        else {
+        } else {
             if(varType.equals("VAR")){
                 for(IdInitNode idElement: idInitNodeList){
                     String typeC = typeConverter(converterNumericToStringType(idElement.getId().getAstType()));
@@ -176,6 +173,77 @@ public class MyCTranslatorVisitor implements MyVisitor {
                     if (idElement.getExpr() != null) {
                         sb.append(" = ").append(idElement.getExpr().accept(this));
                     }
+                    sb.append(";\n");
+                }
+            }
+        }
+
+        codeGeneratorC += sb.toString();
+    }*/
+
+    private void visitVarDeclNode(VarDeclNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        String varType = node.getType();
+
+        ArrayList<IdInitNode> idInitList = node.getIdInitList();
+        ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
+
+        //Controllo se il flag della variabili globali è TRUE
+        if(varDeclGlobal){
+            //Se è di tipo VAR
+            if(varType.equals("VAR")){
+                for (IdInitNode elObbl: idInitObblList){
+                    genericVarElement(elObbl, sb);
+                }
+            } else {
+                for (IdInitNode el: idInitList){
+                    if(el.getExpr() != null) {
+                        sb.append(typeConverter(varType))
+                                .append(" ")
+                                .append(el.getId().getNomeId())
+                                .append(" = ")
+                                .append(el.getExpr().accept(this))
+                                .append(";\n");
+                    } else {
+                        sb.append(typeConverter(varType))
+                                .append(" ")
+                                .append(el.getId().getNomeId())
+                                .append(";\n");
+                    }
+                }
+            }
+        } else {
+            if(varType.equals("VAR")){
+                for(IdInitNode elObbl: idInitObblList){
+                    genericVarElement(elObbl, sb);
+                }
+            } else{
+                for(IdInitNode el: idInitList){
+                    //Se è una STRINGA viene trattato diversamente
+                    if(typeConverter(varType).equals("char *")){
+                        //Il typeConverter mi restituirà il tipo in C
+                        sb.append(typeConverter(varType))
+                                .append(el.getId().getNomeId());
+
+                        if (el.getExpr() != null) {
+                            sb.append(" = ")
+                                    .append(el.getExpr().accept(this));
+                        } else {
+                            sb.append(" = \"\"");
+                        }
+
+                    } else {
+                        sb.append(typeConverter(varType))
+                                .append(" ")
+                                .append(el.getId().getNomeId());
+
+                        if (el.getExpr() != null) {
+                            sb.append(" = ")
+                                    .append(el.getExpr().accept(this));
+                        }
+                    }
+
                     sb.append(";\n");
                 }
             }
@@ -336,6 +404,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
             for (ExprNode exprElement : exprNodeList) {
                 exprElement.accept(this);
                 parCallList.add(exprElement.getAstType());
+                System.out.println(exprElement.getAstType());
             }
         }
 
@@ -347,7 +416,9 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = nomeID + "(";
 
         if (parCallList.size() == paramsTypeList.size()  && parCallList.size() == paramsOutList.size()) {
+            System.out.println(parCallList);
             for (int i = 0; i < parCallList.size(); i++) {
+                System.out.println(parCallList.get(i));
                 if (parCallList.get(i).equals(paramsTypeList.get(i)) && paramsOutList.get(i)) {
                     sb.append("&").append(exprNodeList.get(i).accept(this)).append(",");
                 }
@@ -565,6 +636,18 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case sym.VOID -> "VOID";
             default -> "ERROR";
         };
+    }
+
+    private void genericVarElement (IdInitNode elObbl, StringBuilder sb){
+        String typeC = typeConverter(converterNumericToStringType(elObbl.getId().getAstType()));
+
+        //Dichiaro la variabile prendendo il tipo dal typeConverter
+        sb.append(typeC)
+                .append(" ")
+                .append(elObbl.getId().getNomeId())
+                .append(" = ")
+                .append(elObbl.getConstant().accept(this))
+                .append(";\n");
     }
 
     private String formatOut(int type){

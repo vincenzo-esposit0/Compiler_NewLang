@@ -1,33 +1,56 @@
 package esercitazione5;
 
-import nodes.*;
+import nodes.ProgramNode;
+import org.apache.commons.io.FilenameUtils;
+import visitor.MyCTranslatorVisitor;
 import visitor.MyScopeVisitor;
-import visitor.MySyntaxTree;
-
+import visitor.MyTypeVisitor;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Logger;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
-        String inPathFile = args[0];
 
-        //controllo sul file in input: vedere se il file è ".txt"
-        if (!(inPathFile.endsWith(".txt"))){
-            System.err.println("Dare in input un file .txt");
-            System.exit(1);
-        }
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
+
+    private static String cout = "C_out/";
+    private static String execdir = "executables/";
+
+    public static void main(String[] args) throws Exception {
+        String[] array = args[0].split("/");
+        String nomeFile = array[array.length-1];
+        String inPathFile = args[0];
+        String cGenerated = "test/c_out/"+nomeFile.substring(0,nomeFile.length()-4)+".c";
+
         parser p = new parser(new Yylex(new FileReader(new File(inPathFile))));
 
         ProgramNode programNode = (ProgramNode) p.debug_parse().value;
 
-        //Stampa MyTreeVisitor
-        //MySyntaxTree visitor = new MySyntaxTree();
-        //System.out.println(programNode.accept(visitor));
-
-        //Stampa MyScopeVisitor
         MyScopeVisitor myScopeVisitor = new MyScopeVisitor();
         myScopeVisitor.visit(programNode);
 
+        MyTypeVisitor myTypeVisitor = new MyTypeVisitor();
+        myTypeVisitor.visit(programNode);
+
+        MyCTranslatorVisitor cTranslatorVisitor = new MyCTranslatorVisitor();
+        String codeGeneratorC = cTranslatorVisitor.visit(programNode);
+        logger.info("C code generation done!");
+        fileGenerator(codeGeneratorC,cout+ cGenerated);
+
     }
+
+    private static void fileGenerator(String txt,String filePath) throws IOException {
+        File file = new File(cout + FilenameUtils.getName(filePath));
+        try(FileWriter fw = new FileWriter(file)) {
+            fw.write(txt);
+            fw.flush();
+        } catch (IOException e) {
+            logger.severe("Error generating file: ");
+            logger.severe(e.getMessage());
+        }
+    }
+
 }

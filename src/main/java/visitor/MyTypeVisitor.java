@@ -37,7 +37,9 @@ public class MyTypeVisitor implements MyVisitor {
             case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
             case "ReadStatNode" -> visitReadStatNode((ReadStatNode) node);
             case "WriteStatNode" -> visitWriteStatNode((WriteStatNode) node);
-            case "FunCallExprNode" -> visitFunCallNode((FunCallNode) node);
+            case "FunCallExprNode" -> visitFunCallExprNode((FunCallExprNode) node);
+            case "FunCallStatNode" -> visitFunCallStatNode((FunCallStatNode) node);
+            case "FunCallNode" -> visitFunCallNode((FunCallNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
         }
@@ -46,6 +48,8 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitProgramNode(ProgramNode node) {
+
+        System.out.println("MyTypeVisitor: inside visitProgramNode");
 
         stack.push(node.getSymbolTable());
         ArrayList<VarDeclNode> varDeclList = node.getVarDeclList();
@@ -212,9 +216,11 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitBiVarExprNode(BiVarExprNode node) {
-        String operation = node.getName();
+        String operation = node.getModeExpr();
+        System.out.println(operation);
         ExprNode exprNode1 = node.getExprNode1();
         ExprNode exprNode2 = node.getExprNode2();
+        System.out.println(exprNode2.getModeExpr() + " " + exprNode2.getAstType() + " " + exprNode2.getName());
 
         exprNode1.accept(this);
         exprNode2.accept(this);
@@ -234,7 +240,7 @@ public class MyTypeVisitor implements MyVisitor {
         if (typeChecker != sym.error) {
             node.setAstType(typeChecker);
         } else {
-            throw new IncompatibleTypeException("Il tipo " + exprNode1.getAstType() + " e il tipo " + exprNode2.getAstType() + " non sono compatibili.");
+            throw new IncompatibleTypeException("Il tipo " + exprNode1.getModeExpr() + " e il tipo " + exprNode2.getModeExpr() + " non sono compatibili.");
         }
     }
 
@@ -279,7 +285,25 @@ public class MyTypeVisitor implements MyVisitor {
         node.setAstType(sym.VOID);
     }
 
+    private void visitFunCallStatNode(FunCallStatNode node) {
+        System.out.println("MyTypeVisitor: inside visitFunCallStat");
+
+        FunCallNode funCallNode = node.getFunCall();
+
+        visitFunCallNode(funCallNode);
+    }
+
+    private void visitFunCallExprNode(FunCallExprNode node) {
+        System.out.println("MyTypeVisitor: inside visitFunCallExpr");
+
+        FunCallNode funCallNode = node.getFunCall();
+
+        visitFunCallNode(funCallNode);
+    }
+
     private void visitFunCallNode(FunCallNode node) {
+        System.out.println("MyTypeVisitor: inside visitFunCall");
+
         String functionName = node.getName();
         SymbolRecord functionSymbolRecord = lookup(functionName);
 
@@ -320,6 +344,7 @@ public class MyTypeVisitor implements MyVisitor {
         }
 
         int type = functionSymbolRecord.getTypeVar();
+        System.out.println("MyTypeVisitor: " + type);
 
         if (type != sym.error) {
             // Imposta il tipo della funzione nella chiamata e nel nodo stesso
@@ -331,7 +356,8 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitConstNode(ConstNode node) {
-        int typeChecking = MyTypeChecker.getInferenceType(node.getName());
+        int typeChecking = MyTypeChecker.getInferenceType(node.getModeExpr());
+        System.out.println("visitConstNode: " + typeChecking);
 
         node.setAstType(typeChecking);
     }
@@ -340,12 +366,15 @@ public class MyTypeVisitor implements MyVisitor {
         String nomeId = node.getNomeId();
         SymbolRecord symbolRecord = lookup(nomeId);
         int typeVar = symbolRecord.getTypeVar();
+        System.out.println("visitIdNode: " + typeVar);
         node.setAstType(typeVar);
     }
 
     private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
         if (nodeList != null) {
-            for (int i = 0; i <= nodeList.size(); i++) {
+            for (int i = 0; i < nodeList.size(); i++) {
+                System.out.println("inside visitNodeList " +nodeList.get(i).getName());
+
                 nodeList.get(i).accept(this);
             }
         }
