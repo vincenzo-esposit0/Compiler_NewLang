@@ -99,7 +99,9 @@ public class MyTypeChecker {
     public static boolean returnChecker(int operator1, int operator2) {
         return (operator1 == operator2) ||
                 (operator1 == sym.INTEGER && operator2 == sym.REAL) ||
-                (operator1 == sym.REAL && operator2 == sym.INTEGER);
+                (operator1 == sym.REAL && operator2 == sym.INTEGER) ||
+                (operator1 == sym.CHAR && operator2 == sym.STRING) ||
+                (operator1 == sym.STRING && operator2 == sym.CHAR);
     }
 
 

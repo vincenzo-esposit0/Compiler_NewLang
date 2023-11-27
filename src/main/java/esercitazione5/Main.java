@@ -15,9 +15,7 @@ import java.util.logging.Logger;
 public class Main {
 
     private static final Logger logger = Logger.getLogger(Main.class.getName());
-
-    private static String cout = "C_out/";
-    private static String execdir = "executables/";
+    private static String c_out = "test/c_out/";
 
     public static void main(String[] args) throws Exception {
         String[] array = args[0].split("/");
@@ -32,18 +30,18 @@ public class Main {
         MyScopeVisitor myScopeVisitor = new MyScopeVisitor();
         myScopeVisitor.visit(programNode);
 
-        MyTypeVisitor myTypeVisitor = new MyTypeVisitor();
-        myTypeVisitor.visit(programNode);
+        MyTypeVisitor typeCheckerVisitor = new MyTypeVisitor();
+        typeCheckerVisitor.visit(programNode);
 
         MyCTranslatorVisitor cTranslatorVisitor = new MyCTranslatorVisitor();
         String codeGeneratorC = cTranslatorVisitor.visit(programNode);
         logger.info("C code generation done!");
-        fileGenerator(codeGeneratorC,cout+ cGenerated);
+        fileGenerator(codeGeneratorC,c_out + cGenerated);
 
     }
 
     private static void fileGenerator(String txt,String filePath) throws IOException {
-        File file = new File(cout + FilenameUtils.getName(filePath));
+        File file = new File(c_out + FilenameUtils.getName(filePath));
         try(FileWriter fw = new FileWriter(file)) {
             fw.write(txt);
             fw.flush();

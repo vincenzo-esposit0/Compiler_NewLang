@@ -88,12 +88,21 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
-        FunDeclNode funDecl = node.getFunDecl();
-        funDecl.getId().setAstType(funDecl.getAstType());
+        FunDeclNode funDeclNode;
 
-        stack.push(funDecl.getSymbolTable());
+        if(node.isMain()){
+            funDeclNode = node.getFunDecl();
+        } else{
+            funDeclNode = node;
+        }
 
-        ArrayList<ParDeclNode> parDeclList = funDecl.getParDeclList();
+        if(funDeclNode != null){
+            funDeclNode.getId().setAstType(funDeclNode.getAstType());
+        }
+
+        stack.push(funDeclNode.getSymbolTable());
+
+        ArrayList<ParDeclNode> parDeclList = funDeclNode.getParDeclList();
         if (parDeclList != null) {
             for (ParDeclNode param : parDeclList) {
                 for (IdInitNode element : param.getIdList()) {
@@ -102,7 +111,7 @@ public class MyTypeVisitor implements MyVisitor {
             }
         }
 
-        BodyNode body = funDecl.getBody();
+        BodyNode body = funDeclNode.getBody();
         body.accept(this);
 
         stack.pop();
@@ -128,8 +137,9 @@ public class MyTypeVisitor implements MyVisitor {
             BodyNode bodyNode = node.getBody();
             bodyNode.accept(this);
 
-            BodyNode elseBodyNode = node.getElseStat().getBody();
-            if (elseBodyNode != null) {
+            if (node.getElseStat() != null) {
+                BodyNode elseBodyNode = node.getElseStat().getBody();
+
                 stack.push(node.getElseSymbolTable());
                 elseBodyNode.accept(this);
                 stack.pop();
@@ -304,7 +314,7 @@ public class MyTypeVisitor implements MyVisitor {
     private void visitFunCallNode(FunCallNode node) {
         System.out.println("MyTypeVisitor: inside visitFunCall");
 
-        String functionName = node.getName();
+        String functionName = node.getId().getNomeId();
         SymbolRecord functionSymbolRecord = lookup(functionName);
 
         if (!functionSymbolRecord.getKind().equals("FUN"))
@@ -331,13 +341,10 @@ public class MyTypeVisitor implements MyVisitor {
 
         if (parCallList.size() == parFunList.size()  && parCallList.size() == parFunListOut.size()) {
             for (int i = 0; i < parCallList.size(); i++) {
-                if (!parCallList.get(i).equals(parFunList.get(i))) {
+                if(!MyTypeChecker.returnChecker(parCallList.get(i), parFunList.get(i))){
                     throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
                 }
 
-                if (!parCallList.get(i).equals(parFunListOut.get(i))) {
-                    throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
-                }
             }
         } else {
             throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");

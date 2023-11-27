@@ -416,11 +416,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = nomeID + "(";
 
         if (parCallList.size() == paramsTypeList.size()  && parCallList.size() == paramsOutList.size()) {
-            System.out.println(parCallList);
+            System.out.println("->" + parCallList);
             for (int i = 0; i < parCallList.size(); i++) {
                 System.out.println(parCallList.get(i));
                 if (parCallList.get(i).equals(paramsTypeList.get(i)) && paramsOutList.get(i)) {
                     sb.append("&").append(exprNodeList.get(i).accept(this)).append(",");
+                } else{
+                    sb.append(exprNodeList.get(i).accept(this)).append(",");
                 }
             }
             sb.deleteCharAt(sb.length()-1);
