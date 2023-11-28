@@ -1,7 +1,7 @@
 package visitor;
 
-import esercitazione5.sym;
 import nodes.*;
+import esercitazione5.*;
 import table.SymbolRecord;
 import table.SymbolTable;
 
@@ -58,24 +58,28 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         //Definisco i prototipi delle funzioni
         for(FunDeclNode funElement: funDeclNodeList){
-            FunDeclNode funDecl = funElement.getFunDecl();
+            FunDeclNode funDecl;
+
+            if(funElement.isMain()){
+                funDecl = funElement.getFunDecl();
+            } else{
+                funDecl = funElement;
+            }
+
 
             if(funDecl != null){
                 //Intestazione della funzione
-                sb.append(converterNumericToStringType(funDecl.getAstType())).append(" ").append(funDecl.getId().getNomeId()).append("(");
+                sb.append(typeConverter(converterNumericToStringType(funDecl.getAstType())))
+                        .append(" ")
+                        .append(funDecl.getId().getNomeId())
+                        .append("(");
 
                 //Analisi dei parametri
                 if(funDecl.getParDeclList() != null){
                     for(ParDeclNode parElement: funDecl.getParDeclList()){
                         //Questo for mi serve per inserire nei prototipi i tipi che si aspetta di ottenere
                         for(IdInitNode idElement: parElement.getIdList()){
-
-                            //Verifica se il tipo convertito è STRING
-                            if(typeConverter(parElement.getTypeVar()).equals("char *")){
-                                sb.append("char *");
-                            } else {
-                                sb.append(parElement.getTypeVar());
-                            }
+                                sb.append(typeConverter(parElement.getTypeVar()));
 
                             if(parElement.getOut()){
                                 sb.append("*");
@@ -113,73 +117,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = code + sb;
         stackScope.pop();
     }
-
-    /*private void visitVarDeclNode(VarDeclNode node) {
-        StringBuilder sb = new StringBuilder();
-
-        String varType = node.getType();
-
-        ArrayList<IdInitNode> idInitNodeList = node.getIdInitList();
-        ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
-
-        //Controllo se il flag della variabili globali è TRUE
-        if(varDeclGlobal){
-            for(IdInitNode idElement : idInitNodeList){
-                String typeC = typeConverter(converterNumericToStringType(idElement.getId().getAstType()));
-
-                //Se è di tipo VAR
-                if(varType.equals("VAR")){
-                    ConstNode costante = idElement.getConstant();
-
-                    //Assegna il typo dato dal converter
-                    sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" = ");
-                    sb.append(costante.accept(this)).append(";");
-                } else {
-                    if(idElement.getExpr() != null) {
-
-                        sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" (").append(" )");
-                        sb.append(idElement.getExpr().accept(this));
-                    } else {
-                        sb.append(typeConverter(varType)).append(" ").append(idElement.getId().getNomeId()).append(";");
-
-                    }
-                }
-
-                sb.append("\n");
-            }
-        } else {
-            if(varType.equals("VAR")){
-                for(IdInitNode idElement: idInitNodeList){
-                    String typeC = typeConverter(converterNumericToStringType(idElement.getId().getAstType()));
-
-                    //Dichiaro la variabile prendendo il tipo dal typeConverter
-                    sb.append(typeC).append(" ").append(idElement.getId().getNomeId()).append(" = ").append(idElement.getConstant().accept(this)).append(";\n");
-                }
-            } else{
-                for(IdInitNode idElement: idInitNodeList){
-                    //Se è una STRINGA viene trattato diversamente
-                    if(typeConverter(varType).equals("char *")){
-                        //Il typeConverter mi restituirà il tipo in C
-                        sb.append(typeConverter(varType)).append(idElement.getId().getNomeId());
-
-                        if (idElement.getExpr() == null) {
-                            sb.append(" = \"\"");
-                        }
-
-                    } else {
-                        sb.append(typeConverter(varType)).append(" ").append(idElement.getId().getNomeId());
-                    }
-
-                    if (idElement.getExpr() != null) {
-                        sb.append(" = ").append(idElement.getExpr().accept(this));
-                    }
-                    sb.append(";\n");
-                }
-            }
-        }
-
-        codeGeneratorC += sb.toString();
-    }*/
 
     private void visitVarDeclNode(VarDeclNode node) {
         StringBuilder sb = new StringBuilder();
@@ -266,7 +203,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         stackScope.push(funDeclNode.getSymbolTable());
 
-        if(funDeclNode.isMain()){
+        if(node.isMain()){
             codeGeneratorC += "int main(int argc, char** argv){ \n";
             codeGeneratorC += funDeclNode.getId().getNomeId()+"(";
 
@@ -317,13 +254,14 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 for (ParDeclNode parElement : parDeclNodeList) {
                     sb.append(parElement.accept(this));
                 }
+                sb.deleteCharAt(sb.length() - 1);
             }
             codeGeneratorC = code + sb + "){\n";
             codeGeneratorC += funDeclNode.getBody().accept(this);
             codeGeneratorC += "}\n";
-
-            stackScope.pop();
         }
+
+        stackScope.pop();
     }
 
     private void visitBodyNode(BodyNode node) {
@@ -337,11 +275,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         // Separo le dichiarazioni di variabili in due liste: assegnate e non assegnate
         for (VarDeclNode varElement : varDeclNodeList) {
-            for (IdInitNode idElement : varElement.getIdInitList()) {
-                if (idElement.getExpr() == null) {
-                    varNotAssignedList.add(varElement);
-                } else {
-                    varAssignedList.add(varElement);
+            if(varElement.getIdInitList() != null){
+                for (IdInitNode idElement : varElement.getIdInitList()) {
+                    if (idElement.getExpr() == null) {
+                        varNotAssignedList.add(varElement);
+                    } else {
+                        varAssignedList.add(varElement);
+                    }
                 }
             }
         }
@@ -370,13 +310,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
     private void visitParDeclNode(ParDeclNode node) {
         StringBuilder sb = new StringBuilder();
-        String typeC = node.getTypeVar();
+        String typeC = typeConverter(node.getTypeVar());
 
         ArrayList<IdInitNode> idInitNodeList = node.getIdList();
 
         for(IdInitNode idElement: idInitNodeList){
             if(typeConverter(node.getTypeVar()).equals("char * ")){
-                sb.append(typeC);
+                sb.append(typeC).append(" ");
             } else {
                 sb.append(typeC).append(" ");
             }
@@ -387,8 +327,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
             sb.append(idElement.getId().getNomeId()).append(",");
         }
-
-        sb.deleteCharAt(sb.length() - 1);
 
         codeGeneratorC = sb.toString();
     }
@@ -405,7 +343,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
             for (ExprNode exprElement : exprNodeList) {
                 exprElement.accept(this);
                 parCallList.add(exprElement.getAstType());
-                System.out.println(exprElement.getAstType());
             }
         }
 
@@ -417,9 +354,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = nomeID + "(";
 
         if (parCallList.size() == paramsTypeList.size()  && parCallList.size() == paramsOutList.size()) {
-            System.out.println("->" + parCallList);
             for (int i = 0; i < parCallList.size(); i++) {
-                System.out.println(parCallList.get(i));
                 if (parCallList.get(i).equals(paramsTypeList.get(i)) && paramsOutList.get(i)) {
                     sb.append("&").append(exprNodeList.get(i).accept(this)).append(",");
                 } else{
@@ -523,9 +458,9 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         for(IdInitNode idElement: idInitNodeList){
             if(idElement.getAstType() == sym.STRING){
-                sb.append("scanf(").append(formatOut(idElement.getId().getAstType())).append(",").append(idElement.getId().getNomeId()).append(");\n");
+                sb.append("scanf(").append(formatOut(idElement.getAstType())).append(",").append(idElement.getId().getNomeId()).append(");\n");
             } else{
-                sb.append("scanf(").append(formatOut(idElement.getId().getAstType())).append(",&").append(idElement.getId().getNomeId()).append(");\n");
+                sb.append("scanf(").append(formatOut(idElement.getAstType())).append(",&").append(idElement.getId().getNomeId()).append(");\n");
             }
         }
 
@@ -580,7 +515,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         sb.append(checkBiVarExpr(expr1, expr2, opExpr));
 
-        codeGeneratorC += sb.toString();
+        codeGeneratorC = sb.toString();
     }
 
     private void visitUniVarExprNode(UniVarExprNode node) {
@@ -593,10 +528,9 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
     private void visitConstNode(ConstNode node) {
         StringBuilder sb = new StringBuilder();
-
-        if(node.getName().equals("STRING_CONST")) {
+        if(node.getModeExpr().equals("ConstString")) {
             sb.append("\"").append(node.getValue()).append("\"");
-        } else if (node.getName().equals("CHAR_CONST")){
+        } else if (node.getModeExpr().equals("ConstChar")){
             sb.append("'").append(node.getValue()).append("'");
         } else {
             sb.append(node.getValue());
@@ -609,10 +543,14 @@ public class MyCTranslatorVisitor implements MyVisitor {
         StringBuilder sb = new StringBuilder();
 
         String nomeID = node.getNomeId();
+
         SymbolRecord symbolRecord = lookup(nomeID);
 
         if(symbolRecord.isPointer()){
             sb.append("*").append(nomeID);
+        }
+        else{
+            sb.append(nomeID);
         }
 
         codeGeneratorC += sb.toString();
@@ -711,7 +649,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
             if(found != null)
                 break;
         }
-
+        Collections.reverse(stackScope);
         return found;
     }
 
@@ -726,8 +664,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
     private String checkBiVarExpr(ExprNode expr1, ExprNode expr2, String opExpr) {
         switch(opExpr){
             case "EQUALS", "NE" -> {
-                if((expr1.getModeExpr().equals("ConstString") || expr1.getModeExpr().equals("ConstChar"))
-                        && (expr2.getModeExpr().equals("ConstString") || expr2.getModeExpr().equals("ConstChar"))){
+                if((expr1.getAstType() == sym.STRING || expr1.getAstType() == sym.CHAR)
+                        && (expr2.getAstType() == sym.STRING || expr2.getAstType() == sym.CHAR)){
                     return "strcmp(" + expr1.accept(this)+ "," + expr2.accept(this) + ")";
                 } else {
                     if(opExpr.equals("EQUALS")){

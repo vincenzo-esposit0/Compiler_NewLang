@@ -215,8 +215,6 @@ IdList ::= ID:id {:
             ArrayList<IdInitNode> idList = new ArrayList<>();
             idList.add(new IdInitNode("IdList", new IdNode("Expr", "Id",(String) id), null, null));
             RESULT = idList;
-
-            System.out.println("inside list only id");
          :}
          | IdList:idList COMMA ID:id {:
             ((ArrayList<IdInitNode>)idList).add(new IdInitNode("IdList", new IdNode("Expr", "Id",(String) id), null, null));

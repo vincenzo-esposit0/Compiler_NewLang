@@ -49,8 +49,6 @@ public class MyScopeVisitor implements MyVisitor{
         ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
         visitNodeList(funDeclListNode);
 
-        System.out.println(node.getSymbolTable().toString());
-
         stackScope.pop();
 
         node.setAstType(sym.VOID);
@@ -90,7 +88,6 @@ public class MyScopeVisitor implements MyVisitor{
 
             for (IdInitNode idElement : idInitObblList) {
                 String nomeID = idElement.getId().getNomeId();
-                System.out.println("MyScopeVisitor: inside visitVarDeclNode --- FOR " + nomeID);
 
                 if (!stackScope.peek().containsKey(nomeID)) {
                     int typeCheck = MyTypeChecker.getInferenceType(idElement.getConstant().getModeExpr());
@@ -99,8 +96,6 @@ public class MyScopeVisitor implements MyVisitor{
 
                     node.setAstType(typeCheck);
                 } else {
-                    System.out.println("MyScopeVisitor: inside visitVarDeclNode --- FOR->ELSE is error");
-
                     node.setAstType(sym.error);
                     throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
                 }
@@ -179,7 +174,7 @@ public class MyScopeVisitor implements MyVisitor{
         funDeclNode.setAstType(returnTypeCheck);
         node.setAstType(returnTypeCheck);
         funDeclNode.setSymbolTable(stackScope.peek());
-        System.out.println("MyScopeVisitor end of visitFunDeclNode" + funDeclNode.getSymbolTable().toString());
+
         stackScope.pop();
     }
 
@@ -192,7 +187,7 @@ public class MyScopeVisitor implements MyVisitor{
             String nomeID = idElement.getId().getNomeId();
 
             if (!stackScope.peek().containsKey(nomeID)) {
-                if(node.getOut().equals(Boolean.TRUE)) {
+                if(node.getOut()) {
                     stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck, true));
                 } else {
                     stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
@@ -214,8 +209,6 @@ public class MyScopeVisitor implements MyVisitor{
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
-        System.out.println(node.getSymbolTable().toString());
-
         node.getBody().accept(this);
 
         stackScope.pop();
@@ -224,8 +217,6 @@ public class MyScopeVisitor implements MyVisitor{
             symbolTable = new SymbolTable("ELSE");
             stackScope.push(symbolTable);
             node.setSymbolTable(symbolTable);
-
-            System.out.println(node.getSymbolTable().toString());
 
             node.getBody().accept(this);
             stackScope.pop();
@@ -238,8 +229,6 @@ public class MyScopeVisitor implements MyVisitor{
         symbolTable = new SymbolTable("ELSE");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
-
-        System.out.println(node.getSymbolTable().toString());
 
         node.getBody().accept(this);
 
@@ -258,8 +247,6 @@ public class MyScopeVisitor implements MyVisitor{
 
         node.setSymbolTable(symbolTable);
 
-        System.out.println(node.getSymbolTable().toString());
-
         node.getBody().accept(this);
 
         node.setAstType(sym.VOID);
@@ -271,8 +258,6 @@ public class MyScopeVisitor implements MyVisitor{
         symbolTable = new SymbolTable("WHILE");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
-
-        System.out.println(node.getSymbolTable().toString());
 
         node.getBody().accept(this);
 
