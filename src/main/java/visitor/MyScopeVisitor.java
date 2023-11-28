@@ -85,7 +85,8 @@ public class MyScopeVisitor implements MyVisitor{
     private void visitVarDeclNode(VarDeclNode node) {
         ArrayList<IdInitNode> idInit = node.getIdInitList();
 
-        if(node.getType().equals("VAR") ) {
+        if(node.isVar()) {
+            System.out.println("MyScopeVisitor: inside visitVarDeclNode --- IF " + node.getType());
 
             for (IdInitNode idElement : idInit) {
                 String nomeID = idElement.getId().getNomeId();

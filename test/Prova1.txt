@@ -6,8 +6,9 @@ start: def NewLang() : void{
     char op << '+';
     integer result;
     if check = "si" then {
+        Operation(op1, op2, op);
         Stampa("Prova stampa");
-        result << Operation(op1, op2, op);
+        result << 2;
     }
 }
 

@@ -69,18 +69,22 @@ public class MyTypeVisitor implements MyVisitor {
         ArrayList<IdInitNode> idInitList = node.getIdInitList();
         ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
 
-        if (varType.equals("VAR")) {
-            for (IdInitNode element : idInitObblList) {
-                element.getId().accept(this);
+        if (node.isVar()) {
+            if(idInitObblList != null) {
+                for (IdInitNode element : idInitObblList) {
+                    element.getId().accept(this);
+                }
             }
         } else {
-            for (IdInitNode idElement : idInitList) {
-                ExprNode exprNode = idElement.getExpr();
-                idElement.getId().accept(this);
+            if (idInitList != null) {
+                for (IdInitNode idElement : idInitList) {
+                    ExprNode exprNode = idElement.getExpr();
+                    idElement.getId().accept(this);
 
-                if (exprNode != null) {
-                    exprNode.accept(this);
-                    idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(), typeChecker));
+                    if (exprNode != null) {
+                        exprNode.accept(this);
+                        idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(), typeChecker));
+                    }
                 }
             }
         }
@@ -279,7 +283,10 @@ public class MyTypeVisitor implements MyVisitor {
     private void visitReadStatNode(ReadStatNode node) {
         for (IdInitNode idElement : node.getIdList()) {
             ExprNode exprNode = idElement.getExpr();
-            exprNode.accept(this);
+
+            if(exprNode != null){
+                exprNode.accept(this);
+            }
 
             idElement.setAstType(sym.VOID);
         }
@@ -339,12 +346,13 @@ public class MyTypeVisitor implements MyVisitor {
          * Controllo se la lista dei tipi e la lista degli out combacia con la lista di parametri della funzione chiamata
          */
 
+        System.out.println("--> " + parCallList + " " + parFunList);
+
         if (parCallList.size() == parFunList.size()  && parCallList.size() == parFunListOut.size()) {
             for (int i = 0; i < parCallList.size(); i++) {
                 if(!MyTypeChecker.returnChecker(parCallList.get(i), parFunList.get(i))){
                     throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
                 }
-
             }
         } else {
             throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");
