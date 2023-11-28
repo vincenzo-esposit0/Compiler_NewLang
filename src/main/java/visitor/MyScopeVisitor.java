@@ -83,31 +83,32 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitVarDeclNode(VarDeclNode node) {
-        ArrayList<IdInitNode> idInit = node.getIdInitList();
+        ArrayList<IdInitNode> idInitList = node.getIdInitList();
+        ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
 
-        if(node.isVar()) {
-            System.out.println("MyScopeVisitor: inside visitVarDeclNode --- IF " + node.getType());
+        if(node.isVar() && idInitObblList != null) {
 
-            for (IdInitNode idElement : idInit) {
+            for (IdInitNode idElement : idInitObblList) {
                 String nomeID = idElement.getId().getNomeId();
+                System.out.println("MyScopeVisitor: inside visitVarDeclNode --- FOR " + nomeID);
 
                 if (!stackScope.peek().containsKey(nomeID)) {
-                    int typeCheck = MyTypeChecker.getInferenceType(idElement.getConstant().getName());
+                    int typeCheck = MyTypeChecker.getInferenceType(idElement.getConstant().getModeExpr());
 
                     stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
 
                     node.setAstType(typeCheck);
-                }
-                else {
+                } else {
+                    System.out.println("MyScopeVisitor: inside visitVarDeclNode --- FOR->ELSE is error");
+
                     node.setAstType(sym.error);
                     throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
                 }
             }
-        }
-        else {
+        } else if (!node.isVar() && idInitList != null){
             int typeCheck = MyTypeChecker.getInferenceType(node.getType());
 
-            for (IdInitNode idElement : idInit) {
+            for (IdInitNode idElement : idInitList) {
                 String nomeID = idElement.getId().getNomeId();
 
                 if (!stackScope.peek().containsKey(nomeID)) {
@@ -124,10 +125,14 @@ public class MyScopeVisitor implements MyVisitor{
     private void visitFunDeclNode(FunDeclNode node) {
         FunDeclNode funDeclNode;
 
+        int returnTypeCheck = 0;
+
         if(node.isMain()){
             funDeclNode = node.getFunDecl();
-        } else{
+            returnTypeCheck = MyTypeChecker.getInferenceType("VOID");
+        } else {
             funDeclNode = node;
+            returnTypeCheck = MyTypeChecker.getInferenceType(funDeclNode.getTypeOrVoid());
         }
 
         String nomeID = "";
@@ -136,11 +141,7 @@ public class MyScopeVisitor implements MyVisitor{
             nomeID = funDeclNode.getId().getNomeId();
         }
 
-        int returnTypeCheck = 0;
-
-        if(node.getAstType() != null){
-            returnTypeCheck = node.getAstType();
-        }
+        System.out.println("MyScopeVisitor: inside visitFunDeclNode check variable funDeclNode " + funDeclNode.getTypeOrVoid() + " " + funDeclNode.getName());
 
         SymbolTable symbolTableGlobal = stackScope.peek();
 
@@ -178,7 +179,7 @@ public class MyScopeVisitor implements MyVisitor{
         funDeclNode.setAstType(returnTypeCheck);
         node.setAstType(returnTypeCheck);
         funDeclNode.setSymbolTable(stackScope.peek());
-        System.out.println(funDeclNode.getSymbolTable().toString());
+        System.out.println("MyScopeVisitor end of visitFunDeclNode" + funDeclNode.getSymbolTable().toString());
         stackScope.pop();
     }
 

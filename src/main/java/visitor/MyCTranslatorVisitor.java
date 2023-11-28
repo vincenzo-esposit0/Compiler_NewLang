@@ -77,7 +77,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                                 sb.append(parElement.getTypeVar());
                             }
 
-                            if(parElement.getOut().equals("OUT")){
+                            if(parElement.getOut()){
                                 sb.append("*");
                             }
                             sb.append(",");
@@ -224,6 +224,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                     if(typeConverter(varType).equals("char *")){
                         //Il typeConverter mi restituirà il tipo in C
                         sb.append(typeConverter(varType))
+                                .append(" ")
                                 .append(el.getId().getNomeId());
 
                         if (el.getExpr() != null) {
@@ -374,7 +375,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<IdInitNode> idInitNodeList = node.getIdList();
 
         for(IdInitNode idElement: idInitNodeList){
-            if(typeConverter(node.getTypeVar()).equals("char *")){
+            if(typeConverter(node.getTypeVar()).equals("char * ")){
                 sb.append(typeC);
             } else {
                 sb.append(typeC).append(" ");

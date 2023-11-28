@@ -82,6 +82,7 @@ public class MyTypeChecker {
     }
 
     public static int AssignOperations(int operator1, int operator2) {
+        System.out.println("MyTypeChecker: inside assignOperations ---> op1 " + operator1 + " op2 " + operator2);
         if ((operator1 == sym.INTEGER && operator2 == sym.INTEGER) ||
                 (operator1 == sym.REAL && operator2 == sym.REAL) ||
                 (operator1 == sym.INTEGER && operator2 == sym.REAL) ||

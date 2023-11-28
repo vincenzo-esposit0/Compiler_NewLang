@@ -63,8 +63,13 @@ public class MyTypeVisitor implements MyVisitor {
 
     private void visitVarDeclNode(VarDeclNode node) {
 
-        String varType = node.getType();
-        int typeChecker = MyTypeChecker.getInferenceType(varType);
+        int typeChecker = 0;
+
+        if(node.getType() != null) {
+            String varType = node.getType();
+            typeChecker = MyTypeChecker.getInferenceType(varType);
+            System.out.println("MyTypeChecker: inside visit varDeclNode check typeChecker " + typeChecker);
+        }
 
         ArrayList<IdInitNode> idInitList = node.getIdInitList();
         ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
@@ -104,6 +109,7 @@ public class MyTypeVisitor implements MyVisitor {
             funDeclNode.getId().setAstType(funDeclNode.getAstType());
         }
 
+        assert funDeclNode != null;
         stack.push(funDeclNode.getSymbolTable());
 
         ArrayList<ParDeclNode> parDeclList = funDeclNode.getParDeclList();
@@ -197,6 +203,7 @@ public class MyTypeVisitor implements MyVisitor {
 
         if (exprList.size() == 1) {
             ExprNode exprNode = exprList.get(0);
+            System.out.println("MyTypeVisitor: inside visitAssignStatNode " + exprNode.getName() + " " + exprNode.getModeExpr() + " " + exprNode.getAstType());
             exprNode.accept(this);
 
             for (IdInitNode idInit : idList) {
@@ -239,17 +246,11 @@ public class MyTypeVisitor implements MyVisitor {
         exprNode1.accept(this);
         exprNode2.accept(this);
 
-        int typeChecker = sym.error;
-
-        if (operation.equals("PLUS") || operation.equals("MINUS") || operation.equals("TIMES") || operation.equals("DIV") || operation.equals("POW")) {
-            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-        } else if (operation.equals("AND") || operation.equals("OR")) {
-            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-        } else if (operation.equals("STR_CONCAT")) {
-            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-        } else if (operation.equals("EQUALS") || operation.equals("NE") || operation.equals("LT") || operation.equals("LE") || operation.equals("GT") || operation.equals("GR")) {
-            typeChecker = MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-        }
+        int typeChecker = switch (operation) {
+            case "PLUS", "MINUS", "TIMES", "DIV", "POW", "AND", "OR", "STR_CONCAT", "EQUALS", "NE", "LT", "LE", "GT", "GR" ->
+                    MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
+            default -> sym.error;
+        };
 
         if (typeChecker != sym.error) {
             node.setAstType(typeChecker);
@@ -319,9 +320,9 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitFunCallNode(FunCallNode node) {
-        System.out.println("MyTypeVisitor: inside visitFunCall");
-
         String functionName = node.getId().getNomeId();
+        System.out.println("MyTypeVisitor: inside visitFunCall " + functionName);
+
         SymbolRecord functionSymbolRecord = lookup(functionName);
 
         if (!functionSymbolRecord.getKind().equals("FUN"))
@@ -358,8 +359,8 @@ public class MyTypeVisitor implements MyVisitor {
             throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");
         }
 
-        int type = functionSymbolRecord.getTypeVar();
-        System.out.println("MyTypeVisitor: " + type);
+        int type = functionSymbolRecord.getReturnTypeFun();
+        System.out.println("MyTypeVisitor: stampa type " + type);
 
         if (type != sym.error) {
             // Imposta il tipo della funzione nella chiamata e nel nodo stesso
@@ -380,6 +381,8 @@ public class MyTypeVisitor implements MyVisitor {
     void visitIdNode(IdNode node) {
         String nomeId = node.getNomeId();
         SymbolRecord symbolRecord = lookup(nomeId);
+        System.out.println("visitIdNode: " + nomeId + " " + symbolRecord);
+
         int typeVar = symbolRecord.getTypeVar();
         System.out.println("visitIdNode: " + typeVar);
         node.setAstType(typeVar);
