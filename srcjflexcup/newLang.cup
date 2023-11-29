@@ -187,9 +187,9 @@ Stat ::= IfStat:ifStat
 	   | FunCallStat:funCallStat SEMI
         {: RESULT = (FunCallStatNode)funCallStat; :}
 	   | RETURN Expr:expr SEMI
-        {: RESULT = (ExprNode)expr; :}
+        {: RESULT = RESULT = new ReturnStatNode("RETURN",(ExprNode)expr); :}
 	   | RETURN SEMI
-        {: RESULT = new StatNode("Return"); :}
+        {: RESULT = RESULT = new ReturnStatNode("RETURN"); :}
 	   | /* empty */
         {: RESULT = null; :};
 

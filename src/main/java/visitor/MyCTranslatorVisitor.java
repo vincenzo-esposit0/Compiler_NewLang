@@ -35,6 +35,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "ReadStatNode" -> visitReadStatNode((ReadStatNode) node);
             case "WriteStatNode" -> visitWriteStatNode((WriteStatNode) node);
             case "AssignStatNode" -> visitAssignStatNode((AssignStatNode) node);
+            case "ReturnStatNode" -> visitReturnStatNode((ReturnStatNode) node);
             case "BiVarExprNode" -> visitBiVarExprNode((BiVarExprNode) node);
             case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
@@ -42,6 +43,16 @@ public class MyCTranslatorVisitor implements MyVisitor {
         }
 
         return codeGeneratorC;
+    }
+
+    private void visitReturnStatNode(ReturnStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("return ")
+                .append(node.getExpr().accept(this))
+                .append(";\n");
+
+        codeGeneratorC = sb.toString();
     }
 
     private void visitProgramNode(ProgramNode node) {
@@ -126,68 +137,70 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<IdInitNode> idInitList = node.getIdInitList();
         ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
 
-        //Controllo se il flag della variabili globali è TRUE
-        if(varDeclGlobal){
-            //Se è di tipo VAR
-            if(varType.equals("VAR")){
-                for (IdInitNode elObbl: idInitObblList){
-                    genericVarElement(elObbl, sb);
+        if(varType != null){
+            //Controllo se il flag della variabili globali è TRUE
+            if(varDeclGlobal){
+                //Se è di tipo VAR
+                if(varType.equals("VAR")){
+                    for (IdInitNode elObbl: idInitObblList){
+                        genericVarElement(elObbl, sb);
+                    }
+                } else {
+                    for (IdInitNode el: idInitList){
+                        if(el.getExpr() != null) {
+                            sb.append(typeConverter(varType))
+                                    .append(" ")
+                                    .append(el.getId().getNomeId())
+                                    .append(" = ")
+                                    .append(el.getExpr().accept(this))
+                                    .append(";\n");
+                        } else {
+                            sb.append(typeConverter(varType))
+                                    .append(" ")
+                                    .append(el.getId().getNomeId())
+                                    .append(";\n");
+                        }
+                    }
                 }
             } else {
-                for (IdInitNode el: idInitList){
-                    if(el.getExpr() != null) {
-                        sb.append(typeConverter(varType))
-                                .append(" ")
-                                .append(el.getId().getNomeId())
-                                .append(" = ")
-                                .append(el.getExpr().accept(this))
-                                .append(";\n");
-                    } else {
-                        sb.append(typeConverter(varType))
-                                .append(" ")
-                                .append(el.getId().getNomeId())
-                                .append(";\n");
+                if(varType.equals("VAR")){
+                    for(IdInitNode elObbl: idInitObblList){
+                        genericVarElement(elObbl, sb);
                     }
-                }
-            }
-        } else {
-            if(varType.equals("VAR")){
-                for(IdInitNode elObbl: idInitObblList){
-                    genericVarElement(elObbl, sb);
-                }
-            } else{
-                for(IdInitNode el: idInitList){
-                    //Se è una STRINGA viene trattato diversamente
-                    if(typeConverter(varType).equals("char *")){
-                        //Il typeConverter mi restituirà il tipo in C
-                        sb.append(typeConverter(varType))
-                                .append(" ")
-                                .append(el.getId().getNomeId());
+                } else{
+                    for(IdInitNode el: idInitList){
+                        //Se è una STRINGA viene trattato diversamente
+                        if(typeConverter(varType).equals("char*")){
+                            //Il typeConverter mi restituirà il tipo in C
+                            sb.append(typeConverter(varType))
+                                    .append(" ")
+                                    .append(el.getId().getNomeId());
 
-                        if (el.getExpr() != null) {
-                            sb.append(" = ")
-                                    .append(el.getExpr().accept(this));
+                            if (el.getExpr() != null) {
+                                sb.append(" = ")
+                                        .append(el.getExpr().accept(this));
+                            } else {
+                                sb.append(" = \"\"");
+                            }
+
                         } else {
-                            sb.append(" = \"\"");
+                            sb.append(typeConverter(varType))
+                                    .append(" ")
+                                    .append(el.getId().getNomeId());
+
+                            if (el.getExpr() != null) {
+                                sb.append(" = ")
+                                        .append(el.getExpr().accept(this));
+                            }
                         }
 
-                    } else {
-                        sb.append(typeConverter(varType))
-                                .append(" ")
-                                .append(el.getId().getNomeId());
-
-                        if (el.getExpr() != null) {
-                            sb.append(" = ")
-                                    .append(el.getExpr().accept(this));
-                        }
+                        sb.append(";\n");
                     }
-
-                    sb.append(";\n");
                 }
             }
         }
 
-        codeGeneratorC += sb.toString();
+        codeGeneratorC = sb.toString();
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
@@ -315,14 +328,12 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<IdInitNode> idInitNodeList = node.getIdList();
 
         for(IdInitNode idElement: idInitNodeList){
-            if(typeConverter(node.getTypeVar()).equals("char * ")){
-                sb.append(typeC).append(" ");
-            } else {
-                sb.append(typeC).append(" ");
-            }
+            sb.append(typeC);
 
             if(node.getOut()){
-                sb.append("*");
+                sb.append("* ");
+            } else {
+                sb.append(" ");
             }
 
             sb.append(idElement.getId().getNomeId()).append(",");
@@ -388,11 +399,11 @@ public class MyCTranslatorVisitor implements MyVisitor {
         stackScope.push(node.getSymbolTable());
 
         sb.append("if(").append(exprNode.accept(this)).append("){\n");
-        sb.append(bodyNode.accept(this)).append("}\n");
+        sb.append("\t").append(bodyNode.accept(this)).append("}\n");
 
         if(node.getElseStat() != null){
-            sb.append("else").append("){\n");
-            sb.append(node.getElseStat().accept(this)).append("}\n");
+            sb.append("else").append("{\n");
+            sb.append("\t").append(node.getElseStat().accept(this)).append("}\n");
         }
 
         codeGeneratorC = sb.toString();
@@ -421,9 +432,17 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         stackScope.push(node.getSymbolTable());
 
-        sb.append("int ").append(id).append(";\n");
-        sb.append("for(").append(id).append(" = ").append(intConst1).append(";").append(" ").append(id).append(" <= ").append(intConst2).append(";").append(id).append("++").append("){\n");
-        sb.append(bodyNode.accept(this)).append("}\n");
+        if(Integer.parseInt(intConst1) > Integer.parseInt(intConst2)) {
+            sb.append("\tint ").append(id).append(";\n");
+            sb.append("\tfor(").append(id).append(" = ").append(intConst1).append(";").append(" ").append(id).append(" >= ").append(intConst2).append(";").append(id).append("--").append("){\n");
+            sb.append("\t\t").append(bodyNode.accept(this));
+            sb.append("\t}\n");
+        } else {
+            sb.append("\tint ").append(id).append(";\n");
+            sb.append("\tfor(").append(id).append(" = ").append(intConst1).append(";").append(" ").append(id).append(" <= ").append(intConst2).append(";").append(id).append("++").append("){\n");
+            sb.append("\t\t").append(bodyNode.accept(this));
+            sb.append("\t}\n");
+        }
 
         codeGeneratorC = sb.toString();
         stackScope.pop();
@@ -451,16 +470,16 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ConstNode constNode = node.getStringConst();
 
         if(constNode != null){
-            sb.append("printf(\"").append(constNode.getValue()).append("\");\n");
+            sb.append("\tprintf(\"").append(constNode.getValue()).append("\");\n");
         }
 
         codeGeneratorC += sb.toString();
 
         for(IdInitNode idElement: idInitNodeList){
             if(idElement.getAstType() == sym.STRING){
-                sb.append("scanf(").append(formatOut(idElement.getAstType())).append(",").append(idElement.getId().getNomeId()).append(");\n");
+                sb.append("\tscanf(").append(formatOut(idElement.getAstType())).append(",").append(idElement.getId().getNomeId()).append(");\n");
             } else{
-                sb.append("scanf(").append(formatOut(idElement.getAstType())).append(",&").append(idElement.getId().getNomeId()).append(");\n");
+                sb.append("\tscanf(").append(formatOut(idElement.getAstType())).append(",&").append(idElement.getId().getNomeId()).append(");\n");
             }
         }
 
@@ -477,9 +496,9 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         for(ExprNode exprElement: exprNodeList){
             if(typeWrite == "WRITE"){
-                sb.append("printf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );");
+                sb.append("\tprintf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );");
             } else {
-                sb.append("printf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );").append("\n");
+                sb.append("\tprintf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );").append("\n");
             }
         }
 
@@ -558,7 +577,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
     public String typeConverter(String typeConverter){
         return switch (typeConverter) {
-            case "STRING" -> "char *";
+            case "STRING" -> "char*";
             case "REAL" -> "float" ;
             case "INTEGER", "BOOL" -> "int";
             case "CHAR" -> "char";
@@ -612,13 +631,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
     private String converterFunctions(){
         return """
                 char* intToString(int var){
-                    char *int_str = malloc(256);
+                    char* int_str = malloc(256);
                     sprintf(int_str, "%d", var);
                     return int_str;
                 }
             
                 char* doubleToString(double var){
-                    char *double_str = malloc(256);
+                    char* double_str = malloc(256);
                     sprintf(double_str, "%f", var);
                     return double_str;
                 }
@@ -633,7 +652,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                     return "";
                 }
             
-                char* concat(char *s1, char* i) {
+                char* concat(char* s1, char* i) {
                     char* s = malloc(256);
                     sprintf(s, "%s%s", s1, i);
                     return s;
@@ -649,7 +668,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
             if(found != null)
                 break;
         }
-        Collections.reverse(stackScope);
         return found;
     }
 
@@ -682,34 +700,34 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 return "pow((float)(" + expr1.accept(this) + "), (float)(" + expr2.accept(this) + "))";
             }
             case "PLUS" -> {
-                return "(" + expr1.accept(this) + " + " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " + " + expr2.accept(this);
             }
             case "MINUS" -> {
-                return "(" + expr1.accept(this) + " - " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " - " + expr2.accept(this);
             }
             case "TIMES" -> {
-                return "(" + expr1.accept(this) + " * " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " * " + expr2.accept(this);
             }
             case "DIV" -> {
-                return "(" + expr1.accept(this) + " / " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " / " + expr2.accept(this);
             }
             case "GT" -> {
-                return "(" + expr1.accept(this) + " > " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " > " + expr2.accept(this);
             }
             case "GE" -> {
-                return "(" + expr1.accept(this) + " >= " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " >= " + expr2.accept(this);
             }
             case "LT" -> {
-                return "(" + expr1.accept(this) + " < " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " < " + expr2.accept(this);
             }
             case "LE" -> {
-                return "(" + expr1.accept(this) + " <= " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " <= " + expr2.accept(this);
             }
             case "AND" -> {
-                return "(" + expr1.accept(this) + " && " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " && " + expr2.accept(this);
             }
             case "OR" -> {
-                return "(" + expr1.accept(this) + " || " + expr2.accept(this) + ")";
+                return expr1.accept(this) + " || " + expr2.accept(this);
             }
             default -> {
                 return "ERROR";

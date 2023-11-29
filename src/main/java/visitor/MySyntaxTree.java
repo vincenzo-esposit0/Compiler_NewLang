@@ -70,10 +70,9 @@ public class MySyntaxTree implements MyVisitor {
             case "FunCallNode" -> {
                 return visitFunCallNode((FunCallNode) node);
             }
-        }
-
-        if (node.getName().equals("Return")) {
-            return treeContent = "Return\n";
+            case "ReturnStatNode" -> {
+                return visitReturnStatNode((ReturnStatNode)node);
+            }
         }
 
         return treeContent;
@@ -434,6 +433,17 @@ public class MySyntaxTree implements MyVisitor {
         treeContent += "<Out>" + String.format("%s", node.getOut()) + "</Out>" + "\n";
 
         treeContent += String.format("</%s>", "ParDeclNode") + "\n";
+
+        return treeContent;
+    }
+
+    private String visitReturnStatNode(ReturnStatNode node) {
+        treeContent = String.format("<%s>", "ReturnStatNode") + "\n";
+
+        ExprNode exprNode = node.getExpr();
+        treeContent += "RETURN " + exprNode.accept(this);
+
+        treeContent += String.format("</%s>", "ReturnStatNode") + "\n";
 
         return treeContent;
     }
