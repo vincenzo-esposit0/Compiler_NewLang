@@ -27,4 +27,12 @@ public class IdInitNode extends ASTNode{
         return constant;
     }
 
+    @Override
+    public String toString() {
+        return "IdInitNode{" +
+                "id=" + id +
+                ", expr=" + expr +
+                ", constant=" + constant +
+                '}';
+    }
 }

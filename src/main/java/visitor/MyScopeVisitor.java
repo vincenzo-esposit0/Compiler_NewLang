@@ -1,8 +1,8 @@
 package visitor;
 
-import esercitazione5.sym;
 import exceptions.AlreadyDeclaredVariableException;
 import nodes.*;
+import esercitazione5.*;
 import table.ParInitialize;
 import table.SymbolRecord;
 import table.SymbolTable;

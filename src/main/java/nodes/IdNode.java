@@ -16,4 +16,11 @@ public class IdNode extends ExprNode{
     public void setNomeId(String nomeId) {
         this.nomeId = nomeId;
     }
+
+    @Override
+    public String toString() {
+        return "IdNode{" +
+                "nomeId='" + nomeId + '\'' +
+                '}';
+    }
 }

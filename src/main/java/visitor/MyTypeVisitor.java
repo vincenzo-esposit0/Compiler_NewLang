@@ -1,12 +1,12 @@
 package visitor;
 
-import esercitazione5.sym;
 import exceptions.IncompatibleNumberParamException;
 import exceptions.IncompatibleTypeException;
 import exceptions.NotFunctionException;
 import exceptions.VariableNotDeclaredException;
 import nodes.ASTNode;
 import nodes.*;
+import esercitazione5.*;
 import table.SymbolRecord;
 import table.SymbolTable;
 
@@ -283,7 +283,11 @@ public class MyTypeVisitor implements MyVisitor {
                 exprNode.accept(this);
             }
 
-            idElement.setAstType(sym.VOID);
+            SymbolRecord symbolRecord = lookup(idElement.getId().getNomeId());
+
+            if(symbolRecord != null){
+                idElement.setAstType(symbolRecord.getTypeVar());
+            }
         }
 
         node.setAstType(sym.VOID);
@@ -330,25 +334,35 @@ public class MyTypeVisitor implements MyVisitor {
                 expr.accept(this);
                 parCallList.add(expr.getAstType());
             }
+
+            Collections.reverse(exprNodeList);
+            Collections.reverse(parCallList);
         }
 
         ArrayList<Integer> parFunList = functionSymbolRecord.getParInitialize().getParamsTypeList();
         ArrayList<Boolean> parFunListOut = functionSymbolRecord.getParInitialize().getParamsOutList();
 
-        Collections.reverse(parCallList);
+        System.out.println(functionName);
+        System.out.println(parFunList.toString());
+        System.out.println(parFunListOut.toString());
+        System.out.println(parCallList.toString());
+        System.out.println(exprNodeList.toString());
 
         /**
          * Controllo se la lista dei tipi e la lista degli out combacia con la lista di parametri della funzione chiamata
          */
-        if (parCallList.size() == parFunList.size()  && parCallList.size() == parFunListOut.size()) {
+        if (parCallList.size() == parFunList.size() && parCallList.size() == parFunListOut.size()) {
             for (int i = 0; i < parCallList.size(); i++) {
-                if(!MyTypeChecker.returnChecker(parCallList.get(i), parFunList.get(i))){
+                if (!MyTypeChecker.returnChecker(parCallList.get(i), parFunList.get(i))) {
+                    System.out.println("Debug: Tipi non compatibili per il parametro " + i);
                     throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
                 }
             }
         } else {
+            System.out.println("Debug: Numero di parametri non compatibili");
             throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");
         }
+
 
         int type = functionSymbolRecord.getReturnTypeFun();
 
@@ -372,6 +386,7 @@ public class MyTypeVisitor implements MyVisitor {
         SymbolRecord symbolRecord = lookup(nomeId);
 
         int typeVar = symbolRecord.getTypeVar();
+
         node.setAstType(typeVar);
     }
 

@@ -114,6 +114,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         for(VarDeclNode varDecl : varDeclNodeList){
             if(varDecl != null){
+
+                System.out.println("Entra in VarDeclNode");
                 sb.append((varDecl).accept(this));
             }
         }
@@ -137,11 +139,12 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<IdInitNode> idInitList = node.getIdInitList();
         ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
 
-        if(varType != null){
+        if(varType != null || node.isVar()){
             //Controllo se il flag della variabili globali è TRUE
             if(varDeclGlobal){
+
                 //Se è di tipo VAR
-                if(varType.equals("VAR")){
+                if(node.isVar()){
                     for (IdInitNode elObbl: idInitObblList){
                         genericVarElement(elObbl, sb);
                     }
@@ -163,7 +166,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                     }
                 }
             } else {
-                if(varType.equals("VAR")){
+                if(node.isVar()){
                     for(IdInitNode elObbl: idInitObblList){
                         genericVarElement(elObbl, sb);
                     }
@@ -217,6 +220,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
         stackScope.push(funDeclNode.getSymbolTable());
 
         if(node.isMain()){
+            generateFunction(sb, funDeclNode);
+
             codeGeneratorC += "int main(int argc, char** argv){ \n";
             codeGeneratorC += funDeclNode.getId().getNomeId()+"(";
 
@@ -257,24 +262,31 @@ public class MyCTranslatorVisitor implements MyVisitor {
             codeGeneratorC += "return (EXIT_SUCCESS);\n}\n";
         }
         else {
-            codeGeneratorC += typeConverter(funDeclNode.getTypeOrVoid()) + " " + funDeclNode.getId().getNomeId() + "(";
-
-            ArrayList<ParDeclNode> parDeclNodeList = funDeclNode.getParDeclList();
-            String code = codeGeneratorC;
-            sb.setLength(0);
-
-            if (parDeclNodeList != null) {
-                for (ParDeclNode parElement : parDeclNodeList) {
-                    sb.append(parElement.accept(this));
-                }
-                sb.deleteCharAt(sb.length() - 1);
-            }
-            codeGeneratorC = code + sb + "){\n";
-            codeGeneratorC += funDeclNode.getBody().accept(this);
-            codeGeneratorC += "}\n";
+            generateFunction(sb, funDeclNode);
         }
 
         stackScope.pop();
+    }
+
+    private void generateFunction(StringBuilder sb, FunDeclNode funDeclNode) {
+        codeGeneratorC += typeConverter(funDeclNode.getTypeOrVoid()) + " " + funDeclNode.getId().getNomeId() + "(";
+
+        ArrayList<ParDeclNode> parDeclNodeList = funDeclNode.getParDeclList();
+        String code = codeGeneratorC;
+        sb.setLength(0);
+
+        //Generazione dei parametri
+        if (parDeclNodeList != null) {
+            for (ParDeclNode parElement : parDeclNodeList) {
+                sb.append(parElement.accept(this));
+            }
+            sb.deleteCharAt(sb.length() - 1);
+        }
+
+        codeGeneratorC = code + sb + "){\n";
+        System.out.println("----> " + funDeclNode.getBody().getVarDeclList().size());
+        codeGeneratorC += funDeclNode.getBody().accept(this);
+        codeGeneratorC += "}\n";
     }
 
     private void visitBodyNode(BodyNode node) {
@@ -288,18 +300,32 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         // Separo le dichiarazioni di variabili in due liste: assegnate e non assegnate
         for (VarDeclNode varElement : varDeclNodeList) {
-            if(varElement.getIdInitList() != null){
+            if (varElement.getIdInitList() != null) {
                 for (IdInitNode idElement : varElement.getIdInitList()) {
                     if (idElement.getExpr() == null) {
-                        varNotAssignedList.add(varElement);
+                        if (!varNotAssignedList.contains(varElement)) {
+                            varNotAssignedList.add(varElement);
+                        }
                     } else {
+                        if (!varAssignedList.contains(varElement)) {
+                            varAssignedList.add(varElement);
+                        }
+                    }
+                }
+            }
+
+            if (varElement.getIdInitObblList() != null) {
+                for (IdInitNode idElement : varElement.getIdInitObblList()) {
+                    if (!varAssignedList.contains(varElement)) {
                         varAssignedList.add(varElement);
                     }
                 }
             }
+
+            Collections.reverse(varAssignedList);
         }
 
-        // Unisco le due liste mantenendo l'ordine delle variabili non assegnate prima di quelle assegnate
+        //Unisco le due liste mantenendo l'ordine delle variabili non assegnate prima di quelle assegnate
         varNotAssignedList.addAll(varAssignedList);
         varDeclNodeList.clear();
         varDeclNodeList.addAll(varNotAssignedList);
@@ -311,6 +337,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
             }
         }
 
+        Collections.reverse(statNodeList);
         // Itero sulla lista delle istruzioni e genero il codice
         for (StatNode statElement : statNodeList) {
             if (statElement != null) {
@@ -346,8 +373,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
         StringBuilder sb = new StringBuilder();
 
         String nomeID = node.getId().getNomeId();
-        ArrayList<ExprNode> exprNodeList = node.getExprList();
 
+        ArrayList<ExprNode> exprNodeList = node.getExprList();
         ArrayList<Integer> parCallList = new ArrayList<>();
 
         if (exprNodeList != null) {
@@ -355,6 +382,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 exprElement.accept(this);
                 parCallList.add(exprElement.getAstType());
             }
+
         }
 
         SymbolRecord symbolRecord = lookup(nomeID);
@@ -362,32 +390,42 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<Integer> paramsTypeList = symbolRecord.getParInitialize().getParamsTypeList();
         ArrayList<Boolean> paramsOutList = symbolRecord.getParInitialize().getParamsOutList();
 
-        codeGeneratorC = nomeID + "(";
-
-        if (parCallList.size() == paramsTypeList.size()  && parCallList.size() == paramsOutList.size()) {
+        if (parCallList.size() == paramsTypeList.size() && parCallList.size() == paramsOutList.size()) {
             for (int i = 0; i < parCallList.size(); i++) {
                 if (parCallList.get(i).equals(paramsTypeList.get(i)) && paramsOutList.get(i)) {
                     sb.append("&").append(exprNodeList.get(i).accept(this)).append(",");
-                } else{
+                } else {
                     sb.append(exprNodeList.get(i).accept(this)).append(",");
                 }
             }
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
         }
 
-        codeGeneratorC += sb.toString();
+
+        codeGeneratorC = sb.toString();
     }
 
     private void visitFunCallExprNode(FunCallExprNode node) {
         FunCallNode funCallNode = node.getFunCall();
 
-        codeGeneratorC += funCallNode.accept(this) + ")";
+        String nomeID = node.getFunCall().getId().getNomeId();
+
+        SymbolRecord symbolRecord = lookup(nomeID);
+
+        if(symbolRecord != null){
+            codeGeneratorC += nomeID + "(" + funCallNode.accept(this) + ")";
+        }
     }
 
     private void visitFunCallStatNode(FunCallStatNode node) {
         FunCallNode funCallNode = node.getFunCall();
+        String nomeID = node.getFunCall().getId().getNomeId();
 
-        codeGeneratorC += funCallNode.accept(this) + ");";
+        SymbolRecord symbolRecord = lookup(nomeID);
+
+        if(symbolRecord != null){
+            codeGeneratorC += nomeID + "(" + funCallNode.accept(this) + "); \n";
+        }
     }
 
     private void visitIfStatNode(IfStatNode node) {
@@ -469,21 +507,32 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<IdInitNode> idInitNodeList = node.getIdList();
         ConstNode constNode = node.getStringConst();
 
-        if(constNode != null){
+        //Stampa il valore della const nel caso di a <-- "inserisci un intero:";
+        if (constNode != null) {
             sb.append("\tprintf(\"").append(constNode.getValue()).append("\");\n");
         }
+
 
         codeGeneratorC += sb.toString();
 
         for(IdInitNode idElement: idInitNodeList){
+
             if(idElement.getAstType() == sym.STRING){
-                sb.append("\tscanf(").append(formatOut(idElement.getAstType())).append(",").append(idElement.getId().getNomeId()).append(");\n");
+                sb.append("\tscanf(")
+                        .append(formatOut(idElement.getAstType()))
+                        .append(",")
+                        .append(idElement.getId().getNomeId())
+                        .append(");\n");
             } else{
-                sb.append("\tscanf(").append(formatOut(idElement.getAstType())).append(",&").append(idElement.getId().getNomeId()).append(");\n");
+                sb.append("\tscanf(")
+                        .append(formatOut(idElement.getAstType()))
+                        .append(",&")
+                        .append(idElement.getId().getNomeId())
+                        .append(");\n");
             }
         }
 
-        codeGeneratorC += sb.toString();
+        codeGeneratorC = sb.toString();
     }
 
     private void visitWriteStatNode(WriteStatNode node) {
@@ -496,9 +545,18 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         for(ExprNode exprElement: exprNodeList){
             if(typeWrite == "WRITE"){
-                sb.append("\tprintf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );");
-            } else {
-                sb.append("\tprintf(").append(formatOut(exprElement.getAstType())).append(",").append(exprElement.accept(this)).append(" );").append("\n");
+                sb.append("\tprintf(")
+                        .append(formatOut(exprElement.getAstType()))
+                        .append(",")
+                        .append(exprElement.accept(this))
+                        .append(" );");
+            } else if(typeWrite == "WRITELN"){
+                sb.append("\tprintf(")
+                        .append(formatOut(exprElement.getAstType()))
+                        .append(",")
+                        .append(exprElement.accept(this))
+                        .append(" );")
+                        .append("\n");
             }
         }
 

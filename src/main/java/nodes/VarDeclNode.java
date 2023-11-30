@@ -41,5 +41,13 @@ public class VarDeclNode extends ASTNode{
         return idInitObblList;
     }
 
-
+    @Override
+    public String toString() {
+        return "VarDeclNode{" +
+                "isVar=" + isVar +
+                ", type='" + type + '\'' +
+                ", idInitList=" + idInitList +
+                ", idInitObblList=" + idInitObblList +
+                '}';
+    }
 }

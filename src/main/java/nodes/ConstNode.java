@@ -16,4 +16,11 @@ public class ConstNode extends ExprNode{
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "ConstNode{" +
+                "value='" + value + '\'' +
+                '}';
+    }
 }
