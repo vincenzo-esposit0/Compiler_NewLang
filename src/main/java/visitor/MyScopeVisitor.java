@@ -178,7 +178,6 @@ public class MyScopeVisitor implements MyVisitor{
         stackScope.pop();
     }
 
-
     private void visitParDeclNode(ParDeclNode node) {
         ArrayList<IdInitNode> idInitNodeList = node.getIdList();
         int typeCheck = MyTypeChecker.getInferenceType(node.getTypeVar());
@@ -202,7 +201,6 @@ public class MyScopeVisitor implements MyVisitor{
 
         node.setAstType(typeCheck);
     }
-
 
     private void visitIfStatNode(IfStatNode node) {
         symbolTable = new SymbolTable("IF");

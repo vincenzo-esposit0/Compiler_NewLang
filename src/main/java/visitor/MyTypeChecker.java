@@ -19,7 +19,7 @@ public class MyTypeChecker {
 
     public static int unaryOperations(String operation, int operator) {
         switch (operation) {
-            case "UMINUS" -> {
+            case "MINUS" -> {
                 if (operator == sym.INTEGER) {
                     return sym.INTEGER;
                 } else if (operator == sym.REAL) {

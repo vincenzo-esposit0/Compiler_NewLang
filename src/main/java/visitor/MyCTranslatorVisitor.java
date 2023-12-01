@@ -341,6 +341,11 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<Integer> paramsTypeList = symbolRecord.getParInitialize().getParamsTypeList();
         ArrayList<Boolean> paramsOutList = symbolRecord.getParInitialize().getParamsOutList();
 
+        System.out.println(nomeID);
+        System.out.println(parCallList);
+        System.out.println(paramsTypeList);
+        System.out.println(paramsOutList);
+
         if (parCallList.size() == paramsTypeList.size() && parCallList.size() == paramsOutList.size()) {
             for (int i = 0; i < parCallList.size(); i++) {
                 if (parCallList.get(i).equals(paramsTypeList.get(i)) && paramsOutList.get(i)) {

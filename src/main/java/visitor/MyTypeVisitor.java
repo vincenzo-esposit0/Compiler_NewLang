@@ -240,22 +240,11 @@ public class MyTypeVisitor implements MyVisitor {
         exprNode1.accept(this);
         exprNode2.accept(this);
 
-        System.out.println("Debug: Operation: " + operation);
-
-        exprNode1.accept(this);
-        System.out.println("Debug: exprNode1 type: " + exprNode1.getAstType());
-
-        exprNode2.accept(this);
-        System.out.println("Debug: exprNode2 type: " + exprNode2.getAstType());
-
-
         int typeChecker = switch (operation) {
             case "PLUS", "MINUS", "TIMES", "DIV", "POW", "AND", "OR", "STR_CONCAT", "EQUALS", "NE", "LT", "LE", "GT", "GR" ->
                    MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
             default -> sym.error;
         };
-
-        System.out.println("-----> "+ typeChecker);
 
         if (typeChecker != sym.error) {
             node.setAstType(typeChecker);
@@ -265,14 +254,14 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitUniVarExprNode(UniVarExprNode node) {
-        String operation = node.getName();
+        String operation = node.getModeExpr();
         ExprNode exprNode = node.getExprNode();
 
         exprNode.accept(this);
 
         int typeChecker = sym.error;
 
-        if (operation.equals("UMINUS")) {
+        if (operation.equals("MINUS")) {
             typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
         } else if (operation.equals("NOT")) {
             typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
@@ -283,7 +272,6 @@ public class MyTypeVisitor implements MyVisitor {
         } else {
             throw new IncompatibleTypeException("L'operazione " + operation + " non è compatibile con i tipi.");
         }
-
     }
 
     private void visitReadStatNode(ReadStatNode node) {
@@ -353,24 +341,16 @@ public class MyTypeVisitor implements MyVisitor {
         ArrayList<Integer> parFunList = functionSymbolRecord.getParInitialize().getParamsTypeList();
         ArrayList<Boolean> parFunListOut = functionSymbolRecord.getParInitialize().getParamsOutList();
 
-        System.out.println(functionName);
-        System.out.println(parFunList.toString());
-        System.out.println(parFunListOut.toString());
-        System.out.println(parCallList.toString());
-        System.out.println(exprNodeList.toString());
-
         /**
          * Controllo se la lista dei tipi e la lista degli out combacia con la lista di parametri della funzione chiamata
          */
         if (parCallList.size() == parFunList.size() && parCallList.size() == parFunListOut.size()) {
             for (int i = 0; i < parCallList.size(); i++) {
                 if (!MyTypeChecker.returnChecker(parCallList.get(i), parFunList.get(i))) {
-                    System.out.println("Debug: Tipi non compatibili per il parametro " + i);
                     throw new IncompatibleTypeException("I tipi dei parametri della chiamata a funzione " + functionName + " non coincidono con la firma della funzione");
                 }
             }
         } else {
-            System.out.println("Debug: Numero di parametri non compatibili");
             throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");
         }
 
