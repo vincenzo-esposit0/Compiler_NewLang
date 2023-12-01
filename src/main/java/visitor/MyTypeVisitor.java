@@ -240,11 +240,22 @@ public class MyTypeVisitor implements MyVisitor {
         exprNode1.accept(this);
         exprNode2.accept(this);
 
+        System.out.println("Debug: Operation: " + operation);
+
+        exprNode1.accept(this);
+        System.out.println("Debug: exprNode1 type: " + exprNode1.getAstType());
+
+        exprNode2.accept(this);
+        System.out.println("Debug: exprNode2 type: " + exprNode2.getAstType());
+
+
         int typeChecker = switch (operation) {
             case "PLUS", "MINUS", "TIMES", "DIV", "POW", "AND", "OR", "STR_CONCAT", "EQUALS", "NE", "LT", "LE", "GT", "GR" ->
-                    MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
+                   MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
             default -> sym.error;
         };
+
+        System.out.println("-----> "+ typeChecker);
 
         if (typeChecker != sym.error) {
             node.setAstType(typeChecker);

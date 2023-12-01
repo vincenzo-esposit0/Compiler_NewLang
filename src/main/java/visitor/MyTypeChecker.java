@@ -54,7 +54,7 @@ public class MyTypeChecker {
                 return sym.error;
             }
             case "STR_CONCAT" -> {
-                if (operator1 == sym.VOID && operator2 == sym.VOID) {
+                if (operator1 != sym.VOID && operator2 != sym.VOID) {
                     return sym.STRING;
                 }
                 return sym.error;

@@ -45,16 +45,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
         return codeGeneratorC;
     }
 
-    private void visitReturnStatNode(ReturnStatNode node) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("return ")
-                .append(node.getExpr().accept(this))
-                .append(";\n");
-
-        codeGeneratorC = sb.toString();
-    }
-
     private void visitProgramNode(ProgramNode node) {
         StringBuilder sb = new StringBuilder();
 
@@ -222,6 +212,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
         if(node.isMain()){
             generateFunction(sb, funDeclNode);
 
+            sb.setLength(0);
+
             codeGeneratorC += "int main(int argc, char** argv){ \n";
             codeGeneratorC += funDeclNode.getId().getNomeId()+"(";
 
@@ -230,33 +222,14 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 for (ParDeclNode parDeclNode : funDeclNode.getParDeclList()) {
                     int sizeParInput = parDeclNode.getIdList().size();
 
-                    for(int i=0;i<sizeParInput;i++){
-                        if (parDeclNode.getAstType() == sym.INTEGER) {
-                            sb.append('0');
-                        }
-                        else if (parDeclNode.getAstType() == sym.REAL) {
-                            sb.append("0.0");
-                        }
-                        else if (parDeclNode.getAstType() == sym.STRING) {
-                            if(parDeclNode.getOut().equals("OUT")){
-                                sb.append("argv");
-                            }
-                            else{
-                                sb.append("\"\"");
-                            }
-                        }
-                        else if (parDeclNode.getAstType() == sym.CHAR) {
-                            sb.append("''");
-                        }
-                        else if (parDeclNode.getAstType() == sym.BOOL) {
-                            sb.append("false");
-                        }
+                    for (int i = 0; i < sizeParInput; i++) {
+                        mainDefaultValueGen(sb, parDeclNode);
 
-                        sb.append(',');
+                        if (i < sizeParInput - 1) {
+                            sb.append(',');
+                        }
                     }
                 }
-                //Toglie l'ultima virgola aggiunta
-                sb.deleteCharAt(sb.length()-1);
             }
             codeGeneratorC += sb + ");\n";
             codeGeneratorC += "return (EXIT_SUCCESS);\n}\n";
@@ -266,27 +239,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
         }
 
         stackScope.pop();
-    }
-
-    private void generateFunction(StringBuilder sb, FunDeclNode funDeclNode) {
-        codeGeneratorC += typeConverter(funDeclNode.getTypeOrVoid()) + " " + funDeclNode.getId().getNomeId() + "(";
-
-        ArrayList<ParDeclNode> parDeclNodeList = funDeclNode.getParDeclList();
-        String code = codeGeneratorC;
-        sb.setLength(0);
-
-        //Generazione dei parametri
-        if (parDeclNodeList != null) {
-            for (ParDeclNode parElement : parDeclNodeList) {
-                sb.append(parElement.accept(this));
-            }
-            sb.deleteCharAt(sb.length() - 1);
-        }
-
-        codeGeneratorC = code + sb + "){\n";
-        System.out.println("----> " + funDeclNode.getBody().getVarDeclList().size());
-        codeGeneratorC += funDeclNode.getBody().accept(this);
-        codeGeneratorC += "}\n";
     }
 
     private void visitBodyNode(BodyNode node) {
@@ -382,7 +334,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 exprElement.accept(this);
                 parCallList.add(exprElement.getAstType());
             }
-
         }
 
         SymbolRecord symbolRecord = lookup(nomeID);
@@ -400,7 +351,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
             }
             sb.deleteCharAt(sb.length() - 1);
         }
-
 
         codeGeneratorC = sb.toString();
     }
@@ -512,12 +462,17 @@ public class MyCTranslatorVisitor implements MyVisitor {
             sb.append("\tprintf(\"").append(constNode.getValue()).append("\");\n");
         }
 
-
         codeGeneratorC += sb.toString();
 
         for(IdInitNode idElement: idInitNodeList){
 
             if(idElement.getAstType() == sym.STRING){
+                //Prima di prendere da input le stringhe dichiaro una malloc(256)
+                sb.append(idElement.getId().getNomeId())
+                        .append(" = ")
+                        .append("malloc(256)")
+                        .append("; \n");
+
                 sb.append("\tscanf(")
                         .append(formatOut(idElement.getAstType()))
                         .append(",")
@@ -579,6 +534,16 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 sb.append(exprNodeList.get(i).accept(this)).append(";\n");
             }
         }
+
+        codeGeneratorC = sb.toString();
+    }
+
+    private void visitReturnStatNode(ReturnStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("return ")
+                .append(node.getExpr().accept(this))
+                .append(";\n");
 
         codeGeneratorC = sb.toString();
     }
@@ -742,7 +707,12 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "EQUALS", "NE" -> {
                 if((expr1.getAstType() == sym.STRING || expr1.getAstType() == sym.CHAR)
                         && (expr2.getAstType() == sym.STRING || expr2.getAstType() == sym.CHAR)){
-                    return "strcmp(" + expr1.accept(this)+ "," + expr2.accept(this) + ")";
+                    if(opExpr.equals("EQUALS")){
+                        return "!strcmp(" + expr1.accept(this)+ "," + expr2.accept(this) + ")";
+                    }
+                    else{
+                        return "strcmp(" + expr1.accept(this)+ "," + expr2.accept(this) + ")";
+                    }
                 } else {
                     if(opExpr.equals("EQUALS")){
                         return expr1.accept(this) + " == " + expr2.accept(this);
@@ -752,7 +722,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 }
             }
             case "STR_CONCAT" -> {
-                return "concat(" + expr1.accept(this) + "," + expr2.accept(this) + ")";
+                return "concat(" + strconcatService(expr1) + "," + strconcatService(expr2) + ")";
             }
             case "POW" -> {
                 return "pow((float)(" + expr1.accept(this) + "), (float)(" + expr2.accept(this) + "))";
@@ -792,6 +762,47 @@ public class MyCTranslatorVisitor implements MyVisitor {
             }
         }
 
+    }
+
+    private String strconcatService(ExprNode exprNode){
+        return switch (converterNumericToStringType(exprNode.getAstType())) {
+            case "INTEGER" -> "intToString(" + exprNode.accept(this) + ")";
+            case "REAL" -> "doubleToString(" + exprNode.accept(this) + ")";
+            case "BOOL" -> "boolToString(" + exprNode.accept(this) + ")";
+            default -> exprNode.accept(this);
+        };
+    }
+
+    private static void mainDefaultValueGen(StringBuilder sb, ParDeclNode parDeclNode) {
+        switch (parDeclNode.getAstType()) {
+            case sym.INTEGER -> sb.append('0');
+            case sym.REAL -> sb.append("0.0");
+            case sym.STRING -> sb.append("\"\"");
+            case sym.CHAR -> sb.append("''");
+            case sym.BOOL -> sb.append("false");
+
+            default -> throw new UnsupportedOperationException("Tipo non supportato: " + parDeclNode.getAstType());
+        }
+    }
+
+    private void generateFunction(StringBuilder sb, FunDeclNode funDeclNode) {
+        codeGeneratorC += typeConverter(funDeclNode.getTypeOrVoid()) + " " + funDeclNode.getId().getNomeId() + "(";
+
+        ArrayList<ParDeclNode> parDeclNodeList = funDeclNode.getParDeclList();
+        String code = codeGeneratorC;
+        sb.setLength(0);
+
+        //Generazione dei parametri
+        if (parDeclNodeList != null) {
+            for (ParDeclNode parElement : parDeclNodeList) {
+                sb.append(parElement.accept(this));
+            }
+            sb.deleteCharAt(sb.length() - 1);
+        }
+
+        codeGeneratorC = code + sb + "){\n";
+        codeGeneratorC += funDeclNode.getBody().accept(this);
+        codeGeneratorC += "}\n";
     }
 
 

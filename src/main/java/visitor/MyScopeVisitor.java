@@ -49,6 +49,8 @@ public class MyScopeVisitor implements MyVisitor{
         ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
         visitNodeList(funDeclListNode);
 
+        System.out.println(stackScope.toString());
+
         stackScope.pop();
 
         node.setAstType(sym.VOID);
@@ -136,15 +138,13 @@ public class MyScopeVisitor implements MyVisitor{
             nomeID = funDeclNode.getId().getNomeId();
         }
 
-        System.out.println("MyScopeVisitor: inside visitFunDeclNode check variable funDeclNode " + funDeclNode.getTypeOrVoid() + " " + funDeclNode.getName());
-
         SymbolTable symbolTableGlobal = stackScope.peek();
 
         if(!stackScope.peek().containsKey(nomeID)){
             symbolTable = new SymbolTable("FUN", nomeID);
             stackScope.push(symbolTable);
 
-            ArrayList<ParDeclNode> parDeclList = node.getParDeclList();
+            ArrayList<ParDeclNode> parDeclList = funDeclNode.getParDeclList();
 
             ArrayList<Integer> parTypesList = new ArrayList<>();
             ArrayList<Boolean> parOutList = new ArrayList<>();
