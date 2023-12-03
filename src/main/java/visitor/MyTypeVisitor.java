@@ -33,6 +33,7 @@ public class MyTypeVisitor implements MyVisitor {
             case "ForStatNode" -> visitForStatNode((ForStatNode) node);
             case "WhileStatNode" -> visitWhileStatNode((WhileStatNode) node);
             case "AssignStatNode" -> visitAssignStatNode((AssignStatNode) node);
+            case "ReturnStatNode" -> visitReturnStatNode((ReturnStatNode) node);
             case "BiVarExprNode" -> visitBiVarExprNode((BiVarExprNode) node);
             case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
             case "ReadStatNode" -> visitReadStatNode((ReadStatNode) node);
@@ -230,6 +231,16 @@ public class MyTypeVisitor implements MyVisitor {
 
             node.setAstType(sym.VOID);
         }
+    }
+
+    private void visitReturnStatNode(ReturnStatNode node) {
+
+        ExprNode exprNode = node.getExpr();
+
+        if(exprNode != null){
+            exprNode.accept(this);
+        }
+
     }
 
     private void visitBiVarExprNode(BiVarExprNode node) {

@@ -49,8 +49,6 @@ public class MyScopeVisitor implements MyVisitor{
         ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
         visitNodeList(funDeclListNode);
 
-        System.out.println(stackScope.toString());
-
         stackScope.pop();
 
         node.setAstType(sym.VOID);
@@ -126,7 +124,7 @@ public class MyScopeVisitor implements MyVisitor{
 
         if(node.isMain()){
             funDeclNode = node.getFunDecl();
-            returnTypeCheck = MyTypeChecker.getInferenceType("VOID");
+            returnTypeCheck = MyTypeChecker.getInferenceType(funDeclNode.getTypeOrVoid());
         } else {
             funDeclNode = node;
             returnTypeCheck = MyTypeChecker.getInferenceType(funDeclNode.getTypeOrVoid());

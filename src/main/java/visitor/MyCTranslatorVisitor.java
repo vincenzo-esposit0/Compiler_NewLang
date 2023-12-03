@@ -104,8 +104,6 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         for(VarDeclNode varDecl : varDeclNodeList){
             if(varDecl != null){
-
-                System.out.println("Entra in VarDeclNode");
                 sb.append((varDecl).accept(this));
             }
         }
@@ -247,20 +245,35 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<VarDeclNode> varDeclNodeList = node.getVarDeclList();
         ArrayList<StatNode> statNodeList = node.getStatList();
 
+        //array contenenti la lista di varElement finale per assigned e not assigned
         ArrayList<VarDeclNode> varNotAssignedList = new ArrayList<>();
         ArrayList<VarDeclNode> varAssignedList = new ArrayList<>();
 
         // Separo le dichiarazioni di variabili in due liste: assegnate e non assegnate
         for (VarDeclNode varElement : varDeclNodeList) {
             if (varElement.getIdInitList() != null) {
-                for (IdInitNode idElement : varElement.getIdInitList()) {
+                //liste temporanee per tenere traccia di tutti gli elementi presenti in varElement
+                ArrayList<IdInitNode> notAssignedList = new ArrayList<>();
+                ArrayList<IdInitNode> assignedList = new ArrayList<>();
+
+                for (int i = 0; i < varElement.getIdInitList().size(); i++) {
+                    IdInitNode idElement = varElement.getIdInitList().get(i);
                     if (idElement.getExpr() == null) {
-                        if (!varNotAssignedList.contains(varElement)) {
-                            varNotAssignedList.add(varElement);
-                        }
+                        notAssignedList.add(idElement);
                     } else {
-                        if (!varAssignedList.contains(varElement)) {
-                            varAssignedList.add(varElement);
+                        assignedList.add(idElement);
+                    }
+
+                    //controllo dell'ultimo elemento di varElement in modo da riempire le liste di assigned e notAssigned
+                    if (i == varElement.getIdInitList().size() - 1) {
+                        if(!notAssignedList.isEmpty()) {
+                            VarDeclNode newVarNotAssigned = new VarDeclNode(varElement.getName(), varElement.getType(), new ArrayList<>(notAssignedList));
+                            varNotAssignedList.add(newVarNotAssigned);
+                        }
+
+                        if (!assignedList.isEmpty()) {
+                            VarDeclNode newVarAssigned = new VarDeclNode(varElement.getName(), varElement.getType(), new ArrayList<>(assignedList));
+                            varAssignedList.add(0, newVarAssigned);
                         }
                     }
                 }
@@ -274,8 +287,10 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 }
             }
 
-            Collections.reverse(varAssignedList);
         }
+
+        Collections.reverse(varNotAssignedList);
+        Collections.reverse(varAssignedList);
 
         //Unisco le due liste mantenendo l'ordine delle variabili non assegnate prima di quelle assegnate
         varNotAssignedList.addAll(varAssignedList);
@@ -341,12 +356,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<Integer> paramsTypeList = symbolRecord.getParInitialize().getParamsTypeList();
         ArrayList<Boolean> paramsOutList = symbolRecord.getParInitialize().getParamsOutList();
 
-        System.out.println(nomeID);
-        System.out.println(parCallList);
-        System.out.println(paramsTypeList);
-        System.out.println(paramsOutList);
-
-        if (parCallList.size() == paramsTypeList.size() && parCallList.size() == paramsOutList.size()) {
+        if (parCallList.size() == paramsTypeList.size() && parCallList.size() == paramsOutList.size() && !parCallList.isEmpty()) {
             for (int i = 0; i < parCallList.size(); i++) {
                 if (parCallList.get(i).equals(paramsTypeList.get(i)) && paramsOutList.get(i)) {
                     sb.append("&").append(exprNodeList.get(i).accept(this)).append(",");
@@ -504,13 +514,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
         Collections.reverse(exprNodeList);
 
         for(ExprNode exprElement: exprNodeList){
-            if(typeWrite == "WRITE"){
+            if(typeWrite.equals("WRITE")){
                 sb.append("\tprintf(")
                         .append(formatOut(exprElement.getAstType()))
                         .append(",")
                         .append(exprElement.accept(this))
                         .append(" );");
-            } else if(typeWrite == "WRITELN"){
+            } else if(typeWrite.equals("WRITELN")){
                 sb.append("\tprintf(")
                         .append(formatOut(exprElement.getAstType()))
                         .append(",")
@@ -529,6 +539,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
         ArrayList<IdInitNode> idInitNodeList = node.getIdList();
         ArrayList<ExprNode> exprNodeList = node.getExprList();
 
+        Collections.reverse(exprNodeList);
+
         if(exprNodeList.size() == 1){
             for(IdInitNode idElement: idInitNodeList){
                 sb.append(idElement.getId().accept(this)).append(" = ").append(exprNodeList.get(0).accept(this)).append(";\n");
@@ -546,11 +558,13 @@ public class MyCTranslatorVisitor implements MyVisitor {
     private void visitReturnStatNode(ReturnStatNode node) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("return ")
-                .append(node.getExpr().accept(this))
-                .append(";\n");
+        if(node.getExpr() != null) {
+            sb.append("return ")
+                    .append(node.getExpr().accept(this))
+                    .append(";\n");
 
-        codeGeneratorC = sb.toString();
+            codeGeneratorC = sb.toString();
+        }
     }
 
     private void visitBiVarExprNode(BiVarExprNode node) {
@@ -568,9 +582,9 @@ public class MyCTranslatorVisitor implements MyVisitor {
     private void visitUniVarExprNode(UniVarExprNode node) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append("(").append(checkUniVarExpr(node.getModeExpr())).append(node.getExprNode().accept(this)).append(")");
+        sb.append(checkUniVarExpr(node.getModeExpr())).append(node.getExprNode().accept(this));
 
-        codeGeneratorC += sb.toString();
+        codeGeneratorC = sb.toString();
     }
 
     private void visitConstNode(ConstNode node) {
@@ -701,7 +715,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
     private String checkUniVarExpr(String modeExpr) {
         return switch (modeExpr) {
-            case "MINUS" -> " -";
+            case "MINUS" -> "-";
             case "NOT" -> " !" ;
             default -> "ERROR";
         };

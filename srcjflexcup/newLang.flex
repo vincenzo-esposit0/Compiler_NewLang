@@ -77,6 +77,7 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
     "^"  { return new Symbol(sym.POW) ; }
     "&"  { return new Symbol(sym.STR_CONCAT) ; }
     "="  { return new Symbol(sym.EQUALS) ; }
+    "<>" { return new Symbol(sym.NE) ; }
     "!="  { return new Symbol(sym.NE) ; }
     "<"  { return new Symbol(sym.LT) ; }
     "<=" { return new Symbol(sym.LE) ; }
