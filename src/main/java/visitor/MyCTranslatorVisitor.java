@@ -666,8 +666,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
         return "#include <stdio.h>\n" +
                 "#include <stdlib.h>\n" +
                 "#include <string.h>\n" +
-                "#include <math.h>\n" +
-                "#include <malloc.h>\n";
+                "#include <math.h>\n";
+                //"#include <malloc.h>\n";
     }
 
     private String converterFunctions(){
@@ -824,9 +824,4 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC += "}\n";
     }
 
-
 }
-
-
-
-

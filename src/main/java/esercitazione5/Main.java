@@ -16,12 +16,15 @@ public class Main {
 
     private static final Logger logger = Logger.getLogger(Main.class.getName());
     private static String c_out = "test/c_out/";
+    private static String exec_dir = "test/exec/";
 
     public static void main(String[] args) throws Exception {
         String[] array = args[0].split("/");
         String nomeFile = array[array.length-1];
+        String nameFileWithoutExtension = nomeFile.substring(0,nomeFile.length()-4);
+
         String inPathFile = args[0];
-        String cGenerated = "test/c_out/"+nomeFile.substring(0,nomeFile.length()-4)+".c";
+        String cGenerated = "test/c_out/"+ nameFileWithoutExtension +".c";
 
         parser p = new parser(new Yylex(new FileReader(new File(inPathFile))));
 
@@ -30,6 +33,7 @@ public class Main {
         MyScopeVisitor myScopeVisitor = new MyScopeVisitor();
         myScopeVisitor.visit(programNode);
 
+
         MyTypeVisitor typeCheckerVisitor = new MyTypeVisitor();
         typeCheckerVisitor.visit(programNode);
 
@@ -37,6 +41,41 @@ public class Main {
         String codeGeneratorC = cTranslatorVisitor.visit(programNode);
         logger.info("C code generation done!");
         fileGenerator(codeGeneratorC,c_out + cGenerated);
+
+        //Codice per compilare il file c in eseguibile
+        Runtime rt = Runtime.getRuntime();
+        String cCompilerCmd = "gcc -o " + exec_dir + nameFileWithoutExtension + " " + c_out + nameFileWithoutExtension + ".c" + " -lm";
+        try {
+            Process compileProcess = rt.exec(cCompilerCmd);
+            int exitCode = compileProcess.waitFor();
+            if (exitCode == 0) {
+                logger.info("GCC compilation completed successfully");
+            } else {
+                logger.severe("Something went wrong while compiling with GCC");
+            }
+        } catch (IOException e) {
+            logger.severe("Error executing GCC build command");
+            logger.severe(e.getMessage());
+        } catch (InterruptedException e) {
+            logger.info("Interrupted while waiting for the build to finish.");
+            logger.severe(e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+
+        /**
+        try {
+            String[] path = new String[] {"/usr/bin/open", "-a", exec_dir + nameFileWithoutExtension};
+            Process process = new ProcessBuilder(path).start();
+
+            int exitCode = process.waitFor();
+            if (exitCode != 0) {
+                logger.severe("Error executing command. Exit code: " + exitCode);
+            }
+        } catch (IOException | InterruptedException e) {
+            logger.severe("Error executing command");
+            logger.severe(e.getMessage());
+        }
+         */
 
     }
 
