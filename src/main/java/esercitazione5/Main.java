@@ -42,7 +42,7 @@ public class Main {
         fileGenerator(codeGeneratorC,c_out + cGenerated);
 
         //Codice per compilare il file c in eseguibile
-        Runtime rt = Runtime.getRuntime();
+        /*Runtime rt = Runtime.getRuntime();
         String cCompilerCmd = "gcc -o " + exec_dir + nameFileWithoutExtension + " " + c_out + nameFileWithoutExtension + ".c" + " -lm";
         try {
             Process compileProcess = rt.exec(cCompilerCmd);
@@ -59,7 +59,7 @@ public class Main {
             logger.info("Interrupted while waiting for the build to finish.");
             logger.severe(e.getMessage());
             Thread.currentThread().interrupt();
-        }
+        }*/
 
         /**
         try {
