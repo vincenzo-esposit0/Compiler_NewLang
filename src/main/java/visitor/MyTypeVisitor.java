@@ -66,55 +66,25 @@ public class MyTypeVisitor implements MyVisitor {
             typeChecker = MyTypeChecker.getInferenceType(varType);
         }
 
-        ArrayList<IdInitNode> idInitList = node.getIdInitList();
-        ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
-
         if (node.isVar()) {
-            if(idInitObblList != null) {
-                for (IdInitNode element : idInitObblList) {
-                    element.getId().accept(this);
-                }
-            }
+            processVariableDeclaration(node.getIdInitObblList());
         } else {
-            if (idInitList != null) {
-                for (IdInitNode idElement : idInitList) {
-                    ExprNode exprNode = idElement.getExpr();
-                    idElement.getId().accept(this);
-
-                    if (exprNode != null) {
-                        exprNode.accept(this);
-                        idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(), typeChecker));
-                    }
-                }
-            }
+            processVariableAssignment(node.getIdInitList(), typeChecker);
         }
-
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
-        FunDeclNode funDeclNode;
+        //Se il node è main assegna node.getFunDecl(); altrimenti assegna node.
+        FunDeclNode funDeclNode = node.isMain() ? node.getFunDecl() : node;
 
-        if(node.isMain()){
-            funDeclNode = node.getFunDecl();
-        } else{
-            funDeclNode = node;
-        }
-
-        if(funDeclNode != null){
+        if (funDeclNode != null) {
             funDeclNode.getId().setAstType(funDeclNode.getAstType());
         }
 
         assert funDeclNode != null;
         stack.push(funDeclNode.getSymbolTable());
 
-        ArrayList<ParDeclNode> parDeclList = funDeclNode.getParDeclList();
-        if (parDeclList != null) {
-            for (ParDeclNode param : parDeclList) {
-                for (IdInitNode element : param.getIdList()) {
-                    element.getId().accept(this);
-                }
-            }
-        }
+        processParameterDeclarations(funDeclNode);
 
         BodyNode body = funDeclNode.getBody();
         body.accept(this);
@@ -362,6 +332,19 @@ public class MyTypeVisitor implements MyVisitor {
             throw new IncompatibleNumberParamException("Il numero di parametri passati alla chiamata della funzione " + functionName + " non coincide con la firma della funzione");
         }
 
+        /**
+         * Controllo se exprElement nella posizione i è out e controllo se è istanza di IdNode;
+         * Se non è istanza di IdNode potrebbe significare che è un BiVarExprNode
+         */
+        if (exprNodeList != null) {
+            for (int i = 0; i < exprNodeList.size(); i++) {
+                ExprNode exprElement = exprNodeList.get(i);
+
+                if (parFunListOut.get(i) && !(exprElement instanceof IdNode)) {
+                    throw new IncompatibleParamException("Errore nel passaggio del parametro per riferimento per la funzione: " + functionName);
+                }
+            }
+        }
 
         int type = functionSymbolRecord.getReturnTypeFun();
 
@@ -393,6 +376,39 @@ public class MyTypeVisitor implements MyVisitor {
         if (nodeList != null) {
             for (int i = 0; i < nodeList.size(); i++) {
                 nodeList.get(i).accept(this);
+            }
+        }
+    }
+
+    private void processVariableDeclaration(ArrayList<IdInitNode> idInitObblList) {
+        if (idInitObblList != null) {
+            for (IdInitNode element : idInitObblList) {
+                element.getId().accept(this);
+            }
+        }
+    }
+
+    private void processVariableAssignment(ArrayList<IdInitNode> idInitList, int typeChecker) {
+        if (idInitList != null) {
+            for (IdInitNode idElement : idInitList) {
+                ExprNode exprNode = idElement.getExpr();
+                idElement.getId().accept(this);
+
+                if (exprNode != null) {
+                    exprNode.accept(this);
+                    idElement.setAstType(MyTypeChecker.AssignOperations(exprNode.getAstType(), typeChecker));
+                }
+            }
+        }
+    }
+
+    private void processParameterDeclarations(FunDeclNode funDeclNode) {
+        ArrayList<ParDeclNode> parDeclList = funDeclNode.getParDeclList();
+        if (parDeclList != null) {
+            for (ParDeclNode param : parDeclList) {
+                for (IdInitNode element : param.getIdList()) {
+                    element.getId().accept(this);
+                }
             }
         }
     }
