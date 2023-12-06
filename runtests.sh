@@ -9,7 +9,7 @@ fi
 
 RESULT=0
 
-OUTPUTDIR="test_files/c_out"
+OUTPUTDIR="tests/c_out"
 mkdir -p $OUTPUTDIR
 
 for TESTDIR in tests/*
