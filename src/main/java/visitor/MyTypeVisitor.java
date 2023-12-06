@@ -1,9 +1,6 @@
 package visitor;
 
-import exceptions.IncompatibleNumberParamException;
-import exceptions.IncompatibleTypeException;
-import exceptions.NotFunctionException;
-import exceptions.VariableNotDeclaredException;
+import exceptions.*;
 import nodes.ASTNode;
 import nodes.*;
 import esercitazione5.*;
@@ -403,13 +400,14 @@ public class MyTypeVisitor implements MyVisitor {
     public SymbolRecord lookup(String item){
         SymbolRecord found = null;
         for (SymbolTable current : stack){
-            found = current.get(item);
-            if(found != null) {
-                return found;
+            if(current != null){
+                found = current.get(item);
+                if (found != null) {
+                    return found;
+                }
             }
         }
-
-        throw new VariableNotDeclaredException("Not Declared: " + item);
+        throw new MissingItemException("Item " + item + " non presente.");
     }
 
 }

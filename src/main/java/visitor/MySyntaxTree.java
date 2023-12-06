@@ -250,7 +250,6 @@ public class MySyntaxTree implements MyVisitor {
         ArrayList<StatNode> statList = node.getStatList();
         for (StatNode stat : statList) {
             if (stat != null) {
-                System.out.println(stat.getName());
                 if(stat.getName().equals("Expr")){
                     treeContent += "Return\n";
                     treeContent += stat.accept(this);

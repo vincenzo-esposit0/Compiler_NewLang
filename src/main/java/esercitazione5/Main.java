@@ -15,13 +15,13 @@ import java.util.logging.Logger;
 public class Main {
 
     private static final Logger logger = Logger.getLogger(Main.class.getName());
-    private static String c_out = "test/c_out/";
+    private static String c_out = "tests/c_out/";
 
     public static void main(String[] args) throws Exception {
         String[] array = args[0].split("/");
         String nomeFile = array[array.length-1];
         String inPathFile = args[0];
-        String cGenerated = "test/c_out/"+nomeFile.substring(0,nomeFile.length()-4)+".c";
+        String cGenerated = "tests/c_out/"+nomeFile.substring(0,nomeFile.length()-4)+".c";
 
         parser p = new parser(new Yylex(new FileReader(new File(inPathFile))));
 

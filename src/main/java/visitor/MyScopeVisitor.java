@@ -110,7 +110,7 @@ public class MyScopeVisitor implements MyVisitor{
                     stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
                 }
                 else {
-                    throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
+                    throw new AlreadyDeclaredVariableException("L'identificativo è gia presente all'interno dello scope: " + nomeID);
                 }
             }
             node.setAstType(typeCheck);
@@ -166,7 +166,7 @@ public class MyScopeVisitor implements MyVisitor{
             funDeclNode.getBody().accept(this);
 
         } else {
-            throw new AlreadyDeclaredVariableException("Identifier of function is already declared within the scope: " + nomeID);
+            throw new AlreadyDeclaredVariableException("La funzione ha un identificativo già dichiarato all'interno dello scope: " + nomeID);
         }
 
         funDeclNode.setAstType(returnTypeCheck);

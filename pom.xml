@@ -36,6 +36,14 @@
     <sourceDirectory> src/main/java </sourceDirectory>
     <plugins>
         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+                <mainClass>esercitazione5.Main</mainClass>
+            </configuration>
+        </plugin>
+        <plugin>
             <groupId>de.jflex</groupId>
             <artifactId>jflex-maven-plugin</artifactId>
             <version>1.9.1</version>
