@@ -70,7 +70,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
             if(funDecl != null){
                 //Intestazione della funzione
-                sb.append(typeConverter(converterNumericToStringType(funDecl.getAstType())))
+                sb.append(typeConverter(numericToString(funDecl.getAstType())))
                         .append(" ")
                         .append(funDecl.getId().getNomeId())
                         .append("(");
@@ -216,19 +216,8 @@ public class MyCTranslatorVisitor implements MyVisitor {
             codeGeneratorC += funDeclNode.getId().getNomeId()+"(";
 
             //Generazione dei parametri della funzione
-            if(funDeclNode.getParDeclList() != null){
-                for (ParDeclNode parDeclNode : funDeclNode.getParDeclList()) {
-                    int sizeParInput = parDeclNode.getIdList().size();
+            paramGeneration(sb, funDeclNode);
 
-                    for (int i = 0; i < sizeParInput; i++) {
-                        mainDefaultValueGen(sb, parDeclNode);
-
-                        if (i < sizeParInput - 1) {
-                            sb.append(',');
-                        }
-                    }
-                }
-            }
             codeGeneratorC += sb + ");\n";
             codeGeneratorC += "return (EXIT_SUCCESS);\n}\n";
         }
@@ -628,7 +617,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
         };
     }
 
-    private String converterNumericToStringType(int numericType){
+    private String numericToString(int numericType){
         return switch (numericType) {
             case sym.INTEGER -> "INTEGER";
             case sym.REAL -> "REAL" ;
@@ -641,7 +630,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
     }
 
     private void genericVarElement (IdInitNode elObbl, StringBuilder sb){
-        String typeC = typeConverter(converterNumericToStringType(elObbl.getId().getAstType()));
+        String typeC = typeConverter(numericToString(elObbl.getId().getAstType()));
 
         //Dichiaro la variabile prendendo il tipo dal typeConverter
         sb.append(typeC)
@@ -784,7 +773,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
     }
 
     private String strconcatService(ExprNode exprNode){
-        return switch (converterNumericToStringType(exprNode.getAstType())) {
+        return switch (numericToString(exprNode.getAstType())) {
             case "INTEGER" -> "intToString(" + exprNode.accept(this) + ")";
             case "REAL" -> "doubleToString(" + exprNode.accept(this) + ")";
             case "BOOL" -> "boolToString(" + exprNode.accept(this) + ")";
@@ -822,6 +811,22 @@ public class MyCTranslatorVisitor implements MyVisitor {
         codeGeneratorC = code + sb + "){\n";
         codeGeneratorC += funDeclNode.getBody().accept(this);
         codeGeneratorC += "}\n";
+    }
+
+    private static void paramGeneration(StringBuilder sb, FunDeclNode funDeclNode) {
+        if(funDeclNode.getParDeclList() != null){
+            for (ParDeclNode parDeclNode : funDeclNode.getParDeclList()) {
+                int sizeParInput = parDeclNode.getIdList().size();
+
+                for (int i = 0; i < sizeParInput; i++) {
+                    mainDefaultValueGen(sb, parDeclNode);
+
+                    if (i < sizeParInput - 1) {
+                        sb.append(',');
+                    }
+                }
+            }
+        }
     }
 
 }

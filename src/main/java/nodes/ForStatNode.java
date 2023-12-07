@@ -35,22 +35,6 @@ public class ForStatNode extends StatNode{
         return body;
     }
 
-    public void setId(IdNode id) {
-        this.id = id;
-    }
-
-    public void setIntConst1(ConstNode intConst1) {
-        this.intConst1 = intConst1;
-    }
-
-    public void setIntConst2(ConstNode intConst2) {
-        this.intConst2 = intConst2;
-    }
-
-    public void setBody(BodyNode body) {
-        this.body = body;
-    }
-
     public SymbolTable getSymbolTable() {
         return symbolTable;
     }

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
 void stampa(char*);
 float sommac(int,int,float,char**);
 void esercizio();

@@ -28,13 +28,14 @@ public class Main {
 
         parser p = new parser(new Yylex(new FileReader(new File(inPathFile))));
 
-        ProgramNode programNode = (ProgramNode) p.debug_parse().value;
+        ProgramNode programNode = (ProgramNode) p.parse().value;
 
         MyScopeVisitor myScopeVisitor = new MyScopeVisitor();
         myScopeVisitor.visit(programNode);
 
         MyTypeVisitor typeCheckerVisitor = new MyTypeVisitor();
         typeCheckerVisitor.visit(programNode);
+        logger.info("Semantic analysis done!");
 
         MyCTranslatorVisitor cTranslatorVisitor = new MyCTranslatorVisitor();
         String codeGeneratorC = cTranslatorVisitor.visit(programNode);
@@ -42,7 +43,9 @@ public class Main {
         fileGenerator(codeGeneratorC,c_out + cGenerated);
 
         //Codice per compilare il file c in eseguibile
-        /*Runtime rt = Runtime.getRuntime();
+        /**
+        logger.info("Starting C compiler...");
+        Runtime rt = Runtime.getRuntime();
         String cCompilerCmd = "gcc -o " + exec_dir + nameFileWithoutExtension + " " + c_out + nameFileWithoutExtension + ".c" + " -lm";
         try {
             Process compileProcess = rt.exec(cCompilerCmd);

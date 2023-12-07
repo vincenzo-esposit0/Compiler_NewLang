@@ -14,8 +14,6 @@ public class MyScopeVisitor implements MyVisitor{
 
     private Stack<SymbolTable> stackScope;
 
-    private SymbolTable symbolTable;
-
     public MyScopeVisitor() {
         this.stackScope = new Stack<SymbolTable>();
     }
@@ -38,10 +36,9 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitProgramNode(ProgramNode node) {
-        symbolTable = new SymbolTable("Global");
+        SymbolTable symbolTable = new SymbolTable("Global");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
-
 
         ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
         visitNodeList(varDeclListNode);
@@ -54,120 +51,59 @@ public class MyScopeVisitor implements MyVisitor{
         node.setAstType(sym.VOID);
     }
 
-    private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
-        if (nodeList != null) {
-            for (int i = 0; i < nodeList.size(); i++){
-                nodeList.get(i).accept(this);
-            }
-        }
-    }
-
     private void visitBodyNode(BodyNode node) {
         ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
-        for (VarDeclNode varDecl : varDeclListNode) {
-            if (varDecl != null) {
-                varDecl.accept(this);
-            }
-        }
-
         ArrayList<StatNode> statList = node.getStatList();
-        for (StatNode stat : statList) {
-            if (stat != null) {
-                stat.accept(this);
-            }
-        }
+
+        visitNodeList(varDeclListNode);
+        visitNodeList(statList);
 
         node.setAstType(sym.VOID);
     }
 
     private void visitVarDeclNode(VarDeclNode node) {
-        ArrayList<IdInitNode> idInitList = node.getIdInitList();
-        ArrayList<IdInitNode> idInitObblList = node.getIdInitObblList();
+        //Se la variabile è VAR assegno la lista IdInitObblList altrimenti assegno IdInitList
+        ArrayList<IdInitNode> idInitList = node.isVar() ? node.getIdInitObblList() : node.getIdInitList();
 
-        if(node.isVar() && idInitObblList != null) {
-
-            for (IdInitNode idElement : idInitObblList) {
-                String nomeID = idElement.getId().getNomeId();
-
-                if (!stackScope.peek().containsKey(nomeID)) {
-                    int typeCheck = MyTypeChecker.getInferenceType(idElement.getConstant().getModeExpr());
-
-                    stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
-
-                    node.setAstType(typeCheck);
-                } else {
-                    node.setAstType(sym.error);
-                    throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
-                }
-            }
-        } else if (!node.isVar() && idInitList != null){
-            int typeCheck = MyTypeChecker.getInferenceType(node.getType());
+        if (idInitList != null) {
+            //Se la variabile è VAR assegno il tipo ottenuto dal ModeExpr, altrimenti prendo il tipo del nodo passato
+            int typeCheck = node.isVar() ? MyTypeChecker.getInferenceType(idInitList.get(0).getConstant().getModeExpr()) :
+                    MyTypeChecker.getInferenceType(node.getType());
 
             for (IdInitNode idElement : idInitList) {
                 String nomeID = idElement.getId().getNomeId();
 
-                if (!stackScope.peek().containsKey(nomeID)) {
-                    stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
-                }
-                else {
+                if (stackScope.peek().containsKey(nomeID)) {
                     throw new AlreadyDeclaredVariableException("L'identificativo è gia presente all'interno dello scope: " + nomeID);
                 }
+
+                stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
             }
+
             node.setAstType(typeCheck);
         }
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
-        FunDeclNode funDeclNode;
+        FunDeclNode funDeclNode = node.isMain() ? node.getFunDecl() : node;
 
-        int returnTypeCheck = 0;
-
-        if(node.isMain()){
-            funDeclNode = node.getFunDecl();
-            returnTypeCheck = MyTypeChecker.getInferenceType(funDeclNode.getTypeOrVoid());
-        } else {
-            funDeclNode = node;
-            returnTypeCheck = MyTypeChecker.getInferenceType(funDeclNode.getTypeOrVoid());
-        }
-
-        String nomeID = "";
-
-        if(funDeclNode.getId() != null){
-            nomeID = funDeclNode.getId().getNomeId();
-        }
-
+        int returnTypeCheck = MyTypeChecker.getInferenceType(funDeclNode.getTypeOrVoid());
+        String nomeID = funDeclNode.getId() != null ? funDeclNode.getId().getNomeId() : "";
         SymbolTable symbolTableGlobal = stackScope.peek();
 
-        if(!stackScope.peek().containsKey(nomeID)){
-            symbolTable = new SymbolTable("FUN", nomeID);
-            stackScope.push(symbolTable);
-
-            ArrayList<ParDeclNode> parDeclList = funDeclNode.getParDeclList();
-
-            ArrayList<Integer> parTypesList = new ArrayList<>();
-            ArrayList<Boolean> parOutList = new ArrayList<>();
-
-            ParInitialize parInitialize = new ParInitialize(parTypesList, parOutList);
-
-            if (parDeclList != null) {
-                for (ParDeclNode parElement : parDeclList) {
-                    parElement.accept(this);
-                    for (int i = 0; i < parElement.getIdList().size(); i++) {
-                        int parTypeCheck = MyTypeChecker.getInferenceType(parElement.getTypeVar());
-
-                        parInitialize.addParamsTypeList(parTypeCheck);
-                        parInitialize.addParamsOutList(parElement.getOut());
-                    }
-                }
-            }
-
-            symbolTableGlobal.put(nomeID, new SymbolRecord(nomeID, "FUN", parInitialize, returnTypeCheck));
-
-            funDeclNode.getBody().accept(this);
-
-        } else {
-            throw new AlreadyDeclaredVariableException("La funzione ha un identificativo già dichiarato all'interno dello scope: " + nomeID);
+        if (stackScope.peek().containsKey(nomeID)) {
+            throw new AlreadyDeclaredVariableException("La funzione" + nomeID + " ha un identificativo già dichiarato all'interno dello scope.");
         }
+
+        SymbolTable symbolTable = new SymbolTable("FUN", nomeID);
+        stackScope.push(symbolTable);
+
+        ParInitialize parInitialize = processParameterDeclarations(funDeclNode);
+
+        // Aggiunge la funzione alla tabella dei simboli globale
+        symbolTableGlobal.put(nomeID, new SymbolRecord(nomeID, "FUN", parInitialize, returnTypeCheck));
+
+        funDeclNode.getBody().accept(this);
 
         funDeclNode.setAstType(returnTypeCheck);
         node.setAstType(returnTypeCheck);
@@ -177,23 +113,16 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitParDeclNode(ParDeclNode node) {
-        ArrayList<IdInitNode> idInitNodeList = node.getIdList();
         int typeCheck = MyTypeChecker.getInferenceType(node.getTypeVar());
 
-        for(IdInitNode idElement: idInitNodeList){
+        for (IdInitNode idElement : node.getIdList()) {
             String nomeID = idElement.getId().getNomeId();
 
-            if (!stackScope.peek().containsKey(nomeID)) {
-                if(node.getOut()) {
-                    stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck, true));
-                } else {
-                    stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck));
-                }
-            }
-            else {
-                throw new AlreadyDeclaredVariableException("Identifier is already declared within the scope: " + nomeID);
+            if (stackScope.peek().containsKey(nomeID)) {
+                throw new AlreadyDeclaredVariableException("L'identificativo è già presente all'interno dello scope: " + nomeID);
             }
 
+            stackScope.peek().put(nomeID, new SymbolRecord(nomeID, "var", typeCheck, node.getOut()));
             idElement.setAstType(sym.VOID);
         }
 
@@ -201,7 +130,7 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitIfStatNode(IfStatNode node) {
-        symbolTable = new SymbolTable("IF");
+        SymbolTable symbolTable = new SymbolTable("IF");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
@@ -209,20 +138,15 @@ public class MyScopeVisitor implements MyVisitor{
 
         stackScope.pop();
 
-        if(node.getElseSymbolTable() != null){
-            symbolTable = new SymbolTable("ELSE");
-            stackScope.push(symbolTable);
-            node.setSymbolTable(symbolTable);
-
-            node.getBody().accept(this);
-            stackScope.pop();
+        if(node.getElseStat() != null){
+            node.getElseStat().accept(this);
         }
 
         node.setAstType(sym.VOID);
     }
 
     private void visitElseNode(ElseNode node) {
-        symbolTable = new SymbolTable("ELSE");
+        SymbolTable symbolTable = new SymbolTable("ELSE");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
@@ -234,12 +158,12 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitForStatNode(ForStatNode node) {
-        symbolTable = new SymbolTable("FOR");
+        SymbolTable symbolTable = new SymbolTable("FOR");
         stackScope.push(symbolTable);
 
-        String i = node.getId().getNomeId();
+        String loopVar = node.getId().getNomeId();
         int typeCheck = sym.INTEGER;
-        stackScope.peek().put(i, new SymbolRecord(i, "var", typeCheck));
+        stackScope.peek().put(loopVar, new SymbolRecord(loopVar, "var", typeCheck));
 
         node.setSymbolTable(symbolTable);
 
@@ -251,7 +175,7 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitWhileStatNode(WhileStatNode node) {
-        symbolTable = new SymbolTable("WHILE");
+        SymbolTable symbolTable = new SymbolTable("WHILE");
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
@@ -260,6 +184,36 @@ public class MyScopeVisitor implements MyVisitor{
         node.setAstType(sym.VOID);
 
         stackScope.pop();
+    }
+
+    private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
+        if (nodeList != null) {
+            for (int i = 0; i < nodeList.size(); i++){
+                nodeList.get(i).accept(this);
+            }
+        }
+    }
+
+    private ParInitialize processParameterDeclarations(FunDeclNode funDeclNode) {
+        ArrayList<Integer> parTypesList = new ArrayList<>();
+        ArrayList<Boolean> parOutList = new ArrayList<>();
+        ParInitialize parInitialize = new ParInitialize(parTypesList, parOutList);
+
+        ArrayList<ParDeclNode> parDeclList = funDeclNode.getParDeclList();
+        if (parDeclList != null) {
+            for (ParDeclNode parElement : parDeclList) {
+                parElement.accept(this);
+
+                for (int i = 0; i < parElement.getIdList().size(); i++) {
+                    int parTypeCheck = MyTypeChecker.getInferenceType(parElement.getTypeVar());
+
+                    parInitialize.addParamsTypeList(parTypeCheck);
+                    parInitialize.addParamsOutList(parElement.getOut());
+                }
+            }
+        }
+
+        return parInitialize;
     }
 
 }

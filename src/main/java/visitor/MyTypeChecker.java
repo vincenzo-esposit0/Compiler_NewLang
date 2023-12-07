@@ -1,7 +1,6 @@
 package visitor;
 
-import esercitazione5.*;
-import exceptions.IncompatibleTypeException;
+import esercitazione5.sym;
 
 public class MyTypeChecker {
 
@@ -18,25 +17,13 @@ public class MyTypeChecker {
     }
 
     public static int unaryOperations(String operation, int operator) {
-        switch (operation) {
-            case "MINUS" -> {
-                if (operator == sym.INTEGER) {
-                    return sym.INTEGER;
-                } else if (operator == sym.REAL) {
-                    return sym.REAL;
-                }
-                return sym.error;
-            }
-            case "NOT" -> {
-                if (operator == sym.BOOL) {
-                    return sym.BOOL;
-                }
-                return sym.error;
-            }
-            default -> {
-                return sym.error;
-            }
-        }
+        return switch (operation) {
+            case "MINUS" -> (operator == sym.INTEGER) ? sym.INTEGER :
+                    (operator == sym.REAL) ? sym.REAL :
+                            sym.error;
+            case "NOT" -> (operator == sym.BOOL) ? sym.BOOL : sym.error;
+            default -> sym.error;
+        };
     }
 
     public static int binaryOperations(String operation, int operator1, int operator2) {

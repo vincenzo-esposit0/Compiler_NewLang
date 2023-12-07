@@ -58,7 +58,6 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitVarDeclNode(VarDeclNode node) {
-
         int typeChecker = 0;
 
         if(node.getType() != null) {
@@ -74,22 +73,21 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitFunDeclNode(FunDeclNode node) {
-        //Se il node è main assegna node.getFunDecl(); altrimenti assegna node.
         FunDeclNode funDeclNode = node.isMain() ? node.getFunDecl() : node;
 
         if (funDeclNode != null) {
             funDeclNode.getId().setAstType(funDeclNode.getAstType());
         }
 
-        assert funDeclNode != null;
-        stack.push(funDeclNode.getSymbolTable());
+        SymbolTable symbolTable = funDeclNode.getSymbolTable();
+        stack.push(symbolTable);
 
         processParameterDeclarations(funDeclNode);
 
         System.out.println("Fundecl " + funDeclNode.getId().getNomeId());
 
-        if(!funDeclNode.getTypeOrVoid().equals("VOID") && !returnStatIsPresent(funDeclNode.getBody().getStatList())){
-            throw new MissingReturnException("La funzione non presenta return");
+        if (!funDeclNode.getTypeOrVoid().equals("VOID") && !returnStatIsPresent(funDeclNode.getBody().getStatList())) {
+            throw new MissingReturnException("La funzione " + funDeclNode.getId().getNomeId() + " non presenta return.");
         } else {
             BodyNode body = funDeclNode.getBody();
             body.accept(this);
@@ -98,23 +96,13 @@ public class MyTypeVisitor implements MyVisitor {
         stack.pop();
     }
 
-    private boolean returnStatIsPresent(ArrayList<StatNode> statList){
-        for(StatNode stat : statList){
-            if(stat instanceof ReturnStatNode) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     private void visitBodyNode(BodyNode node) {
-
         ArrayList<VarDeclNode> varDeclList = node.getVarDeclList();
         ArrayList<StatNode> statList = node.getStatList();
 
         visitNodeList(varDeclList);
         visitNodeList(statList);
-
     }
 
     private void visitIfStatNode(IfStatNode node) {
@@ -124,19 +112,23 @@ public class MyTypeVisitor implements MyVisitor {
         ExprNode exprCondition = node.getExpr();
         exprCondition.accept(this);
 
-        if (exprCondition.getAstType() == sym.BOOL) {
-            BodyNode bodyNode = node.getBody();
-            bodyNode.accept(this);
+        // Verifica che l'espressione condizionale sia di tipo BOOL
+        if (exprCondition.getAstType() != sym.BOOL) {
+            throw new IncompatibleTypeException("La condizione dell'if deve essere di tipo BOOL");
+        }
 
-            if (node.getElseStat() != null) {
-                BodyNode elseBodyNode = node.getElseStat().getBody();
+        BodyNode bodyNode = node.getBody();
+        bodyNode.accept(this);
 
-                stack.push(node.getElseSymbolTable());
-                elseBodyNode.accept(this);
-                stack.pop();
-            }
-        } else {
-            throw new IncompatibleTypeException("La condizione dell'if deve essere un BOOL");
+        // Analisi del corpo dell'istruzione ELSE, se presente
+        ElseNode elseStat = node.getElseStat();
+        if (elseStat != null) {
+            BodyNode elseBodyNode = elseStat.getBody();
+
+            stack.push(elseStat.getSymbolTable());
+            elseBodyNode.accept(this);
+
+            stack.pop();
         }
 
         stack.pop();
@@ -153,8 +145,7 @@ public class MyTypeVisitor implements MyVisitor {
         intConst2.accept(this);
 
         if (intConst1.getAstType() == sym.INTEGER && intConst2.getAstType() == sym.INTEGER) {
-            BodyNode bodyNode = node.getBody();
-            bodyNode.accept(this);
+            node.getBody().accept(this);
         } else {
             throw new IncompatibleTypeException("I tipi del for devono essere INTEGER");
         }
@@ -168,12 +159,13 @@ public class MyTypeVisitor implements MyVisitor {
         ExprNode conditionNode = node.getExpr();
         conditionNode.accept(this);
 
-        if (conditionNode.getAstType() == sym.BOOL) {
-            BodyNode bodyNode = node.getBody();
-            bodyNode.accept(this);
-        } else {
-            throw new IncompatibleTypeException("La condizione del while deve essere BOOL");
+        // Verifica che l'espressione condizionale sia di tipo BOOL
+        if (conditionNode.getAstType() != sym.BOOL) {
+            throw new IncompatibleTypeException("La condizione del while deve essere di tipo BOOL");
         }
+
+        BodyNode bodyNode = node.getBody();
+        bodyNode.accept(this);
 
         stack.pop();
     }
@@ -182,38 +174,24 @@ public class MyTypeVisitor implements MyVisitor {
         ArrayList<IdInitNode> idList = node.getIdList();
         ArrayList<ExprNode> exprList = node.getExprList();
 
-        if (exprList.size() == 1) {
-            ExprNode exprNode = exprList.get(0);
-            exprNode.accept(this);
-
-            for (IdInitNode idInit : idList) {
-                IdNode idNode = idInit.getId();
-                idNode.accept(this);
-
-                int assignedType = MyTypeChecker.AssignOperations(exprNode.getAstType(), idNode.getAstType());
-                idInit.setAstType(assignedType);
-            }
-
-            node.setAstType(sym.VOID);
-        } else {
-            if (exprList.size() == idList.size()) {
-                for (ExprNode exprNode : exprList) {
-                    exprNode.accept(this);
-
-                    for (IdInitNode idInit : idList) {
-                        IdNode idNode = idInit.getId();
-                        idNode.accept(this);
-
-                        int assignedType = MyTypeChecker.AssignOperations(exprNode.getAstType(), idNode.getAstType());
-                        idInit.setAstType(assignedType);
-                    }
-                }
-            } else {
-                throw new Error("Il numero di variabili non coincide con il numero di espressioni da assegnare.");
-            }
-
-            node.setAstType(sym.VOID);
+        // Controlla se il numero di espressioni coincide con il numero di variabili
+        if (exprList.size() != idList.size()) {
+            throw new IncompatibleAssignVarException("Il numero di variabili non coincide con il numero di espressioni da assegnare.");
         }
+
+        for (int i = 0; i < exprList.size(); i++) {
+            ExprNode exprNode = exprList.get(i);
+            IdInitNode idInit = idList.get(i);
+
+            exprNode.accept(this);
+            idInit.getId().accept(this);
+
+            // Esegue l'operazione di assegnamento e imposta il tipo assegnato per l'identificatore
+            int assignedType = MyTypeChecker.AssignOperations(exprNode.getAstType(), idInit.getId().getAstType());
+            idInit.setAstType(assignedType);
+        }
+
+        node.setAstType(sym.VOID);
     }
 
     private void visitReturnStatNode(ReturnStatNode node) {
@@ -262,12 +240,10 @@ public class MyTypeVisitor implements MyVisitor {
         exprNode1.accept(this);
         exprNode2.accept(this);
 
-        int typeChecker = switch (operation) {
-            case "PLUS", "MINUS", "TIMES", "DIV", "POW", "AND", "OR", "STR_CONCAT", "EQUALS", "NE", "LT", "LE", "GT", "GR" ->
-                   MyTypeChecker.binaryOperations(operation, exprNode1.getAstType(), exprNode2.getAstType());
-            default -> sym.error;
-        };
+        // Effettua il controllo del tipo
+        int typeChecker = getTypeCheckerResult(operation, exprNode1.getAstType(), exprNode2.getAstType());
 
+        // Imposta il tipo AST del nodo BiVarExprNode se il tipo è valido
         if (typeChecker != sym.error) {
             node.setAstType(typeChecker);
         } else {
@@ -281,14 +257,10 @@ public class MyTypeVisitor implements MyVisitor {
 
         exprNode.accept(this);
 
-        int typeChecker = sym.error;
+        // Effettua il controllo del tipo
+        int typeChecker = getTypeCheckerResult(operation, exprNode.getAstType());
 
-        if (operation.equals("MINUS")) {
-            typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
-        } else if (operation.equals("NOT")) {
-            typeChecker = MyTypeChecker.unaryOperations(operation, exprNode.getAstType());
-        }
-
+        // Imposta il tipo AST del nodo UniVarExprNode se il tipo è valido
         if (typeChecker != sym.error) {
             node.setAstType(typeChecker);
         } else {
@@ -305,7 +277,6 @@ public class MyTypeVisitor implements MyVisitor {
             }
 
             SymbolRecord symbolRecord = lookup(idElement.getId().getNomeId());
-
             if(symbolRecord != null){
                 idElement.setAstType(symbolRecord.getTypeVar());
             }
@@ -455,6 +426,33 @@ public class MyTypeVisitor implements MyVisitor {
                 }
             }
         }
+    }
+
+    private boolean returnStatIsPresent(ArrayList<StatNode> statList){
+        for(StatNode stat : statList){
+            if(stat instanceof ReturnStatNode) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int getTypeCheckerResult(String operation, int type1, int type2) {
+        return switch (operation) {
+            case "PLUS", "MINUS", "TIMES", "DIV", "POW", "AND", "OR", "STR_CONCAT", "EQUALS", "NE", "LT", "LE", "GT", "GR" ->
+                    MyTypeChecker.binaryOperations(operation, type1, type2);
+            default ->
+                    sym.error;
+        };
+    }
+
+    private int getTypeCheckerResult(String operation, int type) {
+        return switch (operation) {
+            case "MINUS", "NOT" ->
+                    MyTypeChecker.unaryOperations(operation, type);
+            default ->
+                    sym.error;
+        };
     }
 
     public SymbolRecord lookup(String item){

@@ -17,16 +17,8 @@ public class ParInitialize {
         return paramsTypeList;
     }
 
-    public void setParamsTypeList(ArrayList<Integer> paramsTypeList) {
-        this.paramsTypeList = paramsTypeList;
-    }
-
     public ArrayList<Boolean> getParamsOutList() {
         return paramsOutList;
-    }
-
-    public void setParamsOutList(ArrayList<Boolean> paramsOutList) {
-        this.paramsOutList = paramsOutList;
     }
 
     public void addParamsTypeList(int parTypeCheck){

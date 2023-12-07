@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
 void stampa(char*);
 float sommac(int,int,float,char**);
 void esercizio();
@@ -59,7 +58,7 @@ return result;
 void esercizio(){
 char* taglia = "";
 int a = 1;
-float b = 2.2;
+int b = 2.2;
 int x = 3;
 int ans = 0;
 float risultato = sommac(a,x,b,&taglia);
@@ -73,7 +72,7 @@ while(ans == 1){
 	printf("inserisci un intero:");
 	scanf("%d",&a);
 	printf("inserisci un reale:");
-	scanf("%f",&b);
+	scanf("%d",&b);
 risultato = sommac(a,x,b,&taglia);
 stampa("la somma  incrementata  è "); 
 	printf("%s",taglia );

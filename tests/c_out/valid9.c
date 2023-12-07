@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
 float succ_fibonacci(float);
 float potenza(float,float);
 float divisione(float,float);

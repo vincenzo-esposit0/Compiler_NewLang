@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
 void esempio();
 float sommac(int,int,float,char**);
 void stampa(char*);
@@ -38,11 +37,11 @@ void esempio(){
 char* taglia = "";
 char* ans1 = "";
 int a = 1;
-float b = 2.2;
+int b = 2.2;
 int x = 3;
 char* ans = "no";
 float risultato = sommac(a,x,b,&taglia);
-stampa(concat(concat(concat(concat(concat(concat(concat("la somma di ",intToString(a))," e "),doubleToString(b))," incrementata di "),intToString(c))," è "),taglia)); 
+stampa(concat(concat(concat(concat(concat(concat(concat("la somma di ",intToString(a))," e "),intToString(b))," incrementata di "),intToString(c))," è "),taglia)); 
 stampa(concat("ed è pari a ",doubleToString(risultato))); 
 	printf("%s","vuoi continuare? (si/no) - inserisci due volte la risposta" );
 ans = malloc(256); 
@@ -53,9 +52,9 @@ while(!strcmp(ans,"si")){
 	printf("inserisci un intero:");
 	scanf("%d",&a);
 	printf("inserisci un reale:");
-	scanf("%f",&b);
+	scanf("%d",&b);
 risultato = sommac(a,x,b,&taglia);
-stampa(concat(concat(concat(concat(concat(concat(concat("la somma di ",intToString(a))," e "),doubleToString(b))," incrementata di "),intToString(c))," è "),taglia)); 
+stampa(concat(concat(concat(concat(concat(concat(concat("la somma di ",intToString(a))," e "),intToString(b))," incrementata di "),intToString(c))," è "),taglia)); 
 stampa(concat(" ed è pari a ",doubleToString(risultato))); 
 	printf("vuoi continuare? (si/no):");
 ans = malloc(256); 

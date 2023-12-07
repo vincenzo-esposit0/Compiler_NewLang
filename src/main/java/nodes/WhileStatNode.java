@@ -24,14 +24,6 @@ public class WhileStatNode extends StatNode{
         return body;
     }
 
-    public void setExpr(ExprNode expr) {
-        this.expr = expr;
-    }
-
-    public void setBody(BodyNode body) {
-        this.body = body;
-    }
-
     public SymbolTable getSymbolTable() {
         return symbolTable;
     }

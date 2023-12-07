@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
 void esempio();
 int succ_fibonacci(int);
 float potenza(float,float);

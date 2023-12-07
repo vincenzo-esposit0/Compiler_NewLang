@@ -20,20 +20,8 @@ public class SymbolTable extends HashMap<String, SymbolRecord> {
         this.functionName = functionName;
     }
 
-    public String getScopeName() {
-        return scopeName;
-    }
-
-    public void setScopeName(String scopeName) {
-        this.scopeName = scopeName;
-    }
-
     public String getFunctionName() {
         return functionName;
-    }
-
-    public void setFunctionName(String functionName) {
-        this.functionName = functionName;
     }
 
     @Override
