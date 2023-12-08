@@ -43,25 +43,26 @@ char* ans = "no";
 float risultato = sommac(a,x,b,&taglia);
 stampa(concat(concat(concat(concat(concat(concat(concat("la somma di ",intToString(a))," e "),intToString(b))," incrementata di "),intToString(c))," è "),taglia)); 
 stampa(concat("ed è pari a ",doubleToString(risultato))); 
-	printf("%s","vuoi continuare? (si/no) - inserisci due volte la risposta" );
-ans = malloc(256); 
+	printf("%s\n","vuoi continuare? (si/no) - inserisci due volte la risposta");
+ans = malloc(256);
 	scanf("%s",ans);
-ans1 = malloc(256); 
+ans1 = malloc(256);
 	scanf("%s",ans1);
 while(!strcmp(ans,"si")){
-	printf("inserisci un intero:");
+	printf("inserisci un intero:\n");
 	scanf("%d",&a);
-	printf("inserisci un reale:");
+	printf("inserisci un reale:\n");
 	scanf("%d",&b);
 risultato = sommac(a,x,b,&taglia);
 stampa(concat(concat(concat(concat(concat(concat(concat("la somma di ",intToString(a))," e "),intToString(b))," incrementata di "),intToString(c))," è "),taglia)); 
 stampa(concat(" ed è pari a ",doubleToString(risultato))); 
-	printf("vuoi continuare? (si/no):");
-ans = malloc(256); 
+	printf("vuoi continuare? (si/no):\n");
+ans = malloc(256);
 	scanf("%s",ans);
 }
-	printf("%s","" );
-	printf("%s","ciao" );}
+	printf("%s\n","");
+	printf("%s\n","ciao");
+}
 int main(int argc, char** argv){ 
 esempio();
 return (EXIT_SUCCESS);
@@ -84,7 +85,7 @@ int i;
 int a = i;
 	int x;
 	for(x = 4; x >= 1;x--){
-			printf("%s","" );
+			printf("%s\n","");
 	}
-	printf("%s",messaggio );
+	printf("%s\n",messaggio);
 }

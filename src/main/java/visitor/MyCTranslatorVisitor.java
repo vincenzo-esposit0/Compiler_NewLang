@@ -463,7 +463,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         //Stampa il valore della const nel caso di a <-- "inserisci un intero:";
         if (constNode != null) {
-            sb.append("\tprintf(\"").append(constNode.getValue()).append("\");\n");
+            sb.append("\tprintf(\"").append(constNode.getValue()).append("\\n\");").append("\n");
         }
 
         codeGeneratorC += sb.toString();
@@ -475,16 +475,16 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 sb.append(idElement.getId().getNomeId())
                         .append(" = ")
                         .append("malloc(256)")
-                        .append("; \n");
+                        .append(";\n");
 
                 sb.append("\tscanf(")
-                        .append(formatOut(idElement.getAstType()))
+                        .append(formatOut(idElement.getAstType(), "scanf"))
                         .append(",")
                         .append(idElement.getId().getNomeId())
                         .append(");\n");
             } else{
                 sb.append("\tscanf(")
-                        .append(formatOut(idElement.getAstType()))
+                        .append(formatOut(idElement.getAstType(), "scanf"))
                         .append(",&")
                         .append(idElement.getId().getNomeId())
                         .append(");\n");
@@ -505,17 +505,16 @@ public class MyCTranslatorVisitor implements MyVisitor {
         for(ExprNode exprElement: exprNodeList){
             if(typeWrite.equals("WRITE")){
                 sb.append("\tprintf(")
-                        .append(formatOut(exprElement.getAstType()))
+                        .append(formatOut(exprElement.getAstType(), "printf"))
                         .append(",")
                         .append(exprElement.accept(this))
-                        .append(" );");
+                        .append(");\n");
             } else if(typeWrite.equals("WRITELN")){
                 sb.append("\tprintf(")
-                        .append(formatOut(exprElement.getAstType()))
+                        .append(formatOut(exprElement.getAstType(), "printf"))
                         .append(",")
                         .append(exprElement.accept(this))
-                        .append(" );")
-                        .append("\n");
+                        .append(");\n");
             }
         }
 
@@ -641,14 +640,25 @@ public class MyCTranslatorVisitor implements MyVisitor {
                 .append(";\n");
     }
 
-    private String formatOut(int type){
-        return switch (type) {
-            case sym.INTEGER -> "\"%d\"";
-            case sym.REAL -> "\"%f\"";
-            case sym.BOOL, sym.STRING -> "\"%s\"";
-            case sym.CHAR -> "\"%c\"";
-            default -> "ERROR";
-        };
+    private String formatOut(int type, String mode){
+        if(mode.equals("printf")){
+            return switch (type) {
+                case sym.INTEGER -> "\"%d\\n\"";
+                case sym.REAL -> "\"%f\\n\"";
+                case sym.BOOL, sym.STRING -> "\"%s\\n\"";
+                case sym.CHAR -> "\"%c\\n\"";
+                default -> "ERROR";
+            };
+        } else {
+            return switch (type) {
+                case sym.INTEGER -> "\"%d\"";
+                case sym.REAL -> "\"%f\"";
+                case sym.BOOL, sym.STRING -> "\"%s\"";
+                case sym.CHAR -> "\"%c\"";
+                default -> "ERROR";
+            };
+        }
+
     }
 
     private String includeLibraries(){

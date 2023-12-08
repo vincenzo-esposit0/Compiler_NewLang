@@ -84,8 +84,6 @@ public class MyTypeVisitor implements MyVisitor {
 
         processParameterDeclarations(funDeclNode);
 
-        System.out.println("Fundecl " + funDeclNode.getId().getNomeId());
-
         if (!funDeclNode.getTypeOrVoid().equals("VOID") && !returnStatIsPresent(funDeclNode.getBody().getStatList())) {
             throw new MissingReturnException("La funzione " + funDeclNode.getId().getNomeId() + " non presenta return.");
         } else {
@@ -107,7 +105,6 @@ public class MyTypeVisitor implements MyVisitor {
 
     private void visitIfStatNode(IfStatNode node) {
         stack.push(node.getSymbolTable());
-        System.out.println("ifstat " + node.getSymbolTable());
 
         ExprNode exprCondition = node.getExpr();
         exprCondition.accept(this);
@@ -195,39 +192,36 @@ public class MyTypeVisitor implements MyVisitor {
     }
 
     private void visitReturnStatNode(ReturnStatNode node) {
-        System.out.println("return ricorrenza");
         int returnTypeFun = 0;
         if(stack.peek() != null){
-            System.out.println(stack.peek());
             String functionName = stack.peek().getFunctionName();
 
             if (functionName != null) {
                 SymbolRecord symbolRecord = lookup(functionName);
                 if(symbolRecord != null) {
-                    System.out.println("return symbolRecord " + symbolRecord);
                     returnTypeFun = symbolRecord.getReturnTypeFun();
-                    System.out.println("return returntypefun " + returnTypeFun);
                 }
             }
         }
 
         ExprNode exprNode = node.getExpr();
 
-        System.out.println("return -----> " + returnTypeFun + " " + exprNode);
-
         //controllo il tipo di ritorno della funzione se expr è presente oppure no
-        //non è VOID e l'espressione è presente
-        if((returnTypeFun != 0 && returnTypeFun != 12) && exprNode != null){
-            exprNode.accept(this);
-            if(!MyTypeChecker.returnChecker(returnTypeFun, exprNode.getAstType())) {
-                throw new IncompatibleTypeException("I tipi non combaciano con i ritorni delle funzioni");
+        if((returnTypeFun != 0 && returnTypeFun != 12)){
+            //se expr è presente controllo che i tipi di ritorno combacino
+            if(exprNode != null){
+                exprNode.accept(this);
+                if(!MyTypeChecker.returnChecker(returnTypeFun, exprNode.getAstType())) {
+                    throw new IncompatibleTypeException("Il tipo di ritorno non combacia con il tipo di ritorno della funzione");
+                }
+            } else {
+                throw new ReturnException("Il tipo di ritorno è " + returnTypeFun + " ma non sono presenti espressioni");
             }
-            //non è VOID e l'espressione è null, deve dare errore
-        } else if ((returnTypeFun != 0 && returnTypeFun != 12) && exprNode == null) {
-            throw new ReturnException("Il tipo di ritorno è " + returnTypeFun + " ma non sono presenti espressioni");
-            //è VOID e l'espressione è null, deve proseguire
-        } else if (returnTypeFun == 12 && exprNode == null){
-            return;
+            //caso in cui è VOID
+        } else if (returnTypeFun == 12) {
+            if (exprNode != null) {
+                throw new ReturnException("Il tipo di ritorno è " + returnTypeFun + " ma sono presenti espressioni");
+            }
         }
 
     }

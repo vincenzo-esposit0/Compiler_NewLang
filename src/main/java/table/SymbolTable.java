@@ -20,6 +20,10 @@ public class SymbolTable extends HashMap<String, SymbolRecord> {
         this.functionName = functionName;
     }
 
+    public String getScopeName() {
+        return scopeName;
+    }
+
     public String getFunctionName() {
         return functionName;
     }

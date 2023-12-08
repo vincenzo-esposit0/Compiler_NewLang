@@ -92,7 +92,7 @@ public class MyScopeVisitor implements MyVisitor{
         SymbolTable symbolTableGlobal = stackScope.peek();
 
         if (stackScope.peek().containsKey(nomeID)) {
-            throw new AlreadyDeclaredVariableException("La funzione" + nomeID + " ha un identificativo già dichiarato all'interno dello scope.");
+            throw new AlreadyDeclaredVariableException("La funzione " + nomeID + " ha un identificativo già dichiarato all'interno dello scope.");
         }
 
         SymbolTable symbolTable = new SymbolTable("FUN", nomeID);
@@ -130,7 +130,10 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitIfStatNode(IfStatNode node) {
-        SymbolTable symbolTable = new SymbolTable("IF");
+        SymbolTable symbolTable;
+        String lastScopeFunName = stackScope.peek().getFunctionName();
+
+        symbolTable = new SymbolTable("IF", lastScopeFunName);
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
@@ -146,7 +149,10 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitElseNode(ElseNode node) {
-        SymbolTable symbolTable = new SymbolTable("ELSE");
+        SymbolTable symbolTable;
+        String lastScopeFunName = stackScope.peek().getFunctionName();
+
+        symbolTable = new SymbolTable("ELSE", lastScopeFunName);
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
@@ -158,7 +164,10 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitForStatNode(ForStatNode node) {
-        SymbolTable symbolTable = new SymbolTable("FOR");
+        SymbolTable symbolTable;
+        String lastScopeFunName = stackScope.peek().getFunctionName();
+
+        symbolTable = new SymbolTable("FOR", lastScopeFunName);
         stackScope.push(symbolTable);
 
         String loopVar = node.getId().getNomeId();
@@ -175,7 +184,10 @@ public class MyScopeVisitor implements MyVisitor{
     }
 
     private void visitWhileStatNode(WhileStatNode node) {
-        SymbolTable symbolTable = new SymbolTable("WHILE");
+        SymbolTable symbolTable;
+        String lastScopeFunName = stackScope.peek().getFunctionName();
+
+        symbolTable = new SymbolTable("WHILE", lastScopeFunName);
         stackScope.push(symbolTable);
         node.setSymbolTable(symbolTable);
 
