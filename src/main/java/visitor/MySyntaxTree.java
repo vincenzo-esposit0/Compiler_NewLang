@@ -82,18 +82,10 @@ public class MySyntaxTree implements MyVisitor {
         treeContent = String.format("<%s>", node.getName()) + "\n";
 
         ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
-        for (VarDeclNode varDecl : varDeclListNode) {
-            if (varDecl != null) {
-                treeContent += varDecl.accept(this);
-            }
-        }
+        visitNodeList(varDeclListNode);
 
         ArrayList<FunDeclNode> funDeclListNode = node.getFunDeclList();
-        for (FunDeclNode funDecl : funDeclListNode) {
-            if (funDecl != null) {
-                treeContent += funDecl.accept(this);
-            }
-        }
+        visitNodeList(funDeclListNode);
 
         treeContent += String.format("</%s>", node.getName()) + "\n";
 
@@ -102,23 +94,13 @@ public class MySyntaxTree implements MyVisitor {
 
     private String visitVarDeclNode(VarDeclNode node) {
         treeContent = String.format("<%s>", "VarDecl") + "\n";
+
         ArrayList<IdInitNode> idInit = node.getIdInitList();
-        if(idInit != null){
-            for (IdInitNode idElement : idInit) {
-                if (idElement != null) {
-                    treeContent += idElement.accept(this);
-                }
-            }
-        }
+        visitNodeList(idInit);
 
         ArrayList<IdInitNode> idInitObbl = node.getIdInitObblList();
-        if(idInitObbl != null){
-            for (IdInitNode idElement : idInitObbl) {
-                if (idElement != null) {
-                    treeContent += idElement.accept(this);
-                }
-            }
-        }
+        visitNodeList(idInitObbl);
+
         treeContent += String.format("</%s>", "VarDecl") + "\n";
 
         return treeContent;
@@ -220,11 +202,7 @@ public class MySyntaxTree implements MyVisitor {
             treeContent += idNode.accept(this);
 
             ArrayList<ParDeclNode> parDeclList = node.getParDeclList();
-            if(parDeclList != null){
-                for(ParDeclNode parDecl : parDeclList ){
-                    treeContent += parDecl.accept(this);
-                }
-            }
+            visitNodeList(parDeclList);
 
             treeContent += "<ReturnType>" + String.format("%s", node.getTypeOrVoid()) + "</ReturnType>" + "\n";
 
@@ -241,11 +219,7 @@ public class MySyntaxTree implements MyVisitor {
         treeContent = String.format("<%s>", "Body") + "\n";
 
         ArrayList<VarDeclNode> varDeclListNode = node.getVarDeclList();
-        for (VarDeclNode varDecl : varDeclListNode) {
-            if (varDecl != null) {
-                treeContent += varDecl.accept(this);
-            }
-        }
+        visitNodeList(varDeclListNode);
 
         ArrayList<StatNode> statList = node.getStatList();
         for (StatNode stat : statList) {
@@ -333,18 +307,10 @@ public class MySyntaxTree implements MyVisitor {
         treeContent = String.format("<%s>", "AssignStat") + "\n";
 
         ArrayList<IdInitNode> idList = node.getIdList();
-        for (IdInitNode idElement : idList) {
-            if (idElement != null) {
-                treeContent += idElement.accept(this);
-            }
-        }
+        visitNodeList(idList);
 
         ArrayList<ExprNode> exprNode = node.getExprList();
-        for (ExprNode expr : exprNode) {
-            if (expr != null) {
-                treeContent += expr.accept(this);
-            }
-        }
+        visitNodeList(exprNode);
 
         treeContent += String.format("</%s>", "AssignStat") + "\n";
 
@@ -366,11 +332,7 @@ public class MySyntaxTree implements MyVisitor {
         treeContent = String.format("<%s>", "ReadStat") + "\n";
 
         ArrayList<IdInitNode> idList = node.getIdList();
-        for (IdInitNode idElement : idList) {
-            if (idElement != null) {
-                treeContent += idElement.accept(this);
-            }
-        }
+        visitNodeList(idList);
 
         ConstNode stringConst = node.getStringConst();
         treeContent += stringConst.accept(this);
@@ -384,11 +346,7 @@ public class MySyntaxTree implements MyVisitor {
         treeContent = String.format("<%s>", "WriteStat") + "\n";
 
         ArrayList<ExprNode> exprNode = node.getExprList();
-        for (ExprNode expr : exprNode) {
-            if (expr != null) {
-                treeContent += expr.accept(this);
-            }
-        }
+        visitNodeList(exprNode);
 
         String typeWrite = node.getTypeWrite();
         treeContent += String.format("%s", typeWrite);
@@ -405,11 +363,7 @@ public class MySyntaxTree implements MyVisitor {
         treeContent += id.accept(this);
 
         ArrayList<ExprNode> exprNode = node.getExprList();
-        for (ExprNode expr : exprNode) {
-            if (expr != null) {
-                treeContent += expr.accept(this);
-            }
-        }
+        visitNodeList(exprNode);
 
         treeContent += String.format("</%s>", "FunCall") + "\n";
         return treeContent;
@@ -421,13 +375,7 @@ public class MySyntaxTree implements MyVisitor {
         treeContent += "<Type>" + String.format("%s", node.getTypeVar()) + "</Type>" + "\n";
 
         ArrayList<IdInitNode> idList = node.getIdList();
-        if(idList != null){
-            for (IdInitNode idElement : idList) {
-                if (idElement != null) {
-                    treeContent += idElement.accept(this);
-                }
-            }
-        }
+        visitNodeList(idList);
 
         treeContent += "<Out>" + String.format("%s", node.getOut()) + "</Out>" + "\n";
 
@@ -445,6 +393,16 @@ public class MySyntaxTree implements MyVisitor {
         treeContent += String.format("</%s>", "ReturnStatNode") + "\n";
 
         return treeContent;
+    }
+
+    private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {
+        if (nodeList != null) {
+            for (int i = 0; i < nodeList.size(); i++){
+                if(nodeList.get(i) != null){
+                    treeContent += nodeList.get(i).accept(this);
+                }
+            }
+        }
     }
 
 }

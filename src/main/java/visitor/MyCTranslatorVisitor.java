@@ -104,7 +104,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         for(VarDeclNode varDecl : varDeclNodeList){
             if(varDecl != null){
-                sb.append((varDecl).accept(this));
+                sb.append(varDecl.accept(this));
             }
         }
 

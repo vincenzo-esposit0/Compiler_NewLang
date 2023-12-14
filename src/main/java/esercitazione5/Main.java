@@ -4,6 +4,7 @@ import nodes.ProgramNode;
 import org.apache.commons.io.FilenameUtils;
 import visitor.MyCTranslatorVisitor;
 import visitor.MyScopeVisitor;
+import visitor.MySyntaxTree;
 import visitor.MyTypeVisitor;
 
 import java.io.File;
@@ -15,8 +16,8 @@ import java.util.logging.Logger;
 public class Main {
 
     private static final Logger logger = Logger.getLogger(Main.class.getName());
-    private static String c_out = "tests/c_out/";
-    private static String exec_dir = "tests/exec/";
+    private static String c_out = "test_files/c_out/";
+    private static String exec_dir = "test_files/exec/";
 
     public static void main(String[] args) throws Exception {
         String[] array = args[0].split("/");
@@ -24,11 +25,15 @@ public class Main {
         String nameFileWithoutExtension = nomeFile.substring(0,nomeFile.length()-4);
 
         String inPathFile = args[0];
-        String cGenerated = "tests/c_out/"+nomeFile.substring(0,nomeFile.length()-4)+".c";
+        String cGenerated = "test_files/c_out/"+nomeFile.substring(0,nomeFile.length()-4)+".c";
 
         parser p = new parser(new Yylex(new FileReader(new File(inPathFile))));
 
         ProgramNode programNode = (ProgramNode) p.parse().value;
+
+        MySyntaxTree tree = new MySyntaxTree();
+
+        System.out.println(tree.visit(programNode));
 
         MyScopeVisitor myScopeVisitor = new MyScopeVisitor();
         myScopeVisitor.visit(programNode);
@@ -43,7 +48,6 @@ public class Main {
         fileGenerator(codeGeneratorC,c_out + cGenerated);
 
         //Codice per compilare il file c in eseguibile
-        /**
         logger.info("Starting C compiler...");
         Runtime rt = Runtime.getRuntime();
         String cCompilerCmd = "gcc -o " + exec_dir + nameFileWithoutExtension + " " + c_out + nameFileWithoutExtension + ".c" + " -lm";
@@ -62,7 +66,7 @@ public class Main {
             logger.info("Interrupted while waiting for the build to finish.");
             logger.severe(e.getMessage());
             Thread.currentThread().interrupt();
-        }*/
+        }
 
         /**
         try {
