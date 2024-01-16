@@ -40,6 +40,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
+            case "InitForStatNode" -> visitInitForStatNode((InitForStatNode) node);
         }
 
         return codeGeneratorC;
@@ -450,6 +451,34 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         sb.append("while(").append(exprNode.accept(this)).append("){\n");
         sb.append(bodyNode.accept(this)).append("}\n");
+
+        codeGeneratorC = sb.toString();
+        stackScope.pop();
+    }
+
+    private void visitInitForStatNode(InitForStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        VarDeclNode varDeclNode = node.getVarDeclNode();
+        ArrayList<StatNode> statList = node.getStatList();
+        ExprNode cond = node.getCond();
+        ArrayList<AssignStatNode> loopList = node.getLoopList();
+
+        stackScope.push(node.getSymbolTable());
+
+        sb.append("{ \n");
+
+        sb.append(varDeclNode.accept(this)).append("\n");
+
+        sb.append("do{ \n");
+        for(StatNode statEl: statList){
+            sb.append(statEl.accept(this));
+        }
+
+        for(AssignStatNode assignEl: loopList){
+            sb.append(assignEl.accept(this));
+        }
+        sb.append("} while(").append(cond.accept(this)).append("); \n");
 
         codeGeneratorC = sb.toString();
         stackScope.pop();

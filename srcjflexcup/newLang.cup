@@ -5,7 +5,8 @@ terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
          DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, WRITE, WRITELN, READ,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
          TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT,
-         EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
+         EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT,
+         INIT, DO, STEP;
 
 terminal String ID, STRING_CONST;
 terminal String INTEGER_CONST;
@@ -42,6 +43,10 @@ nonterminal FunCallExprNode FunCallExpr;
 nonterminal FunCallNode FunCall;
 nonterminal ArrayList<ExprNode> ExprList;
 nonterminal ExprNode Expr;
+nonterminal VarDeclNode VarDeclNotSemi;
+nonterminal InitForStatNode InitForStatNode;
+nonterminal ArrayList<AssignStatNode> AssignStatList;
+
 
 // **************** Specifica precedence ****************
 
@@ -186,6 +191,8 @@ Stat ::= IfStat:ifStat
         {: RESULT = (WhileStatNode)whileStat; :}
 	   | FunCallStat:funCallStat SEMI
         {: RESULT = (FunCallStatNode)funCallStat; :}
+        | InitForStatNode:initForStatNode SEMI
+        {: RESULT = (InitForStatNode)initForStatNode; :}
 	   | RETURN Expr:expr SEMI
         {: RESULT = new ReturnStatNode("RETURN",(ExprNode)expr); :}
 	   | RETURN SEMI
@@ -279,3 +286,21 @@ Expr ::= TRUE {: RESULT = new ConstNode("Expr", "BOOLEAN", "TRUE"); :}
 	   | MINUS Expr:expr1 {: RESULT = new UniVarExprNode("Expr", "MINUS", expr1); :}
 	   | NOT Expr:expr1 {: RESULT = new UniVarExprNode("Expr", "NOT", expr1); :}
 	   | LPAR Expr:expr1 RPAR {: RESULT = expr1; :};
+
+//Aggiunta modifica init-do-for-step
+VarDeclNotSemi ::= Type:type IdInitList:idInitList {: RESULT = new VarDeclNode("VarDecl", type, (ArrayList<IdInitNode>)idInitList); :}
+          | VAR IdInitObblList:idInitObblList {: RESULT = new VarDeclNode("VarDecl", (ArrayList<IdInitNode>)idInitObblList); :}
+          |/* empty */ {: RESULT=null;:};
+
+AssignStatList ::= AssignStat:assign {:
+                ArrayList<AssignStatNode> assignList = new ArrayList<>();
+                assignList.add(assign);
+                RESULT = assignList;
+           :}
+	       | AssignStat:assign SEMI AssignStatList:assignStatList {:
+                ((ArrayList<AssignStatNode>)assignStatList).add(assign);
+                RESULT = assignStatList;
+	       :};
+
+InitForStatNode ::= INIT LPAR VarDeclNotSemi:varDecl RPAR DO LBRACK StatList:statList RBRACK FOR LPAR Expr:expr RPAR STEP LPAR AssignStatList:assignStatList RPAR
+{: RESULT = new InitForStatNode("InitForStatNode", (VarDeclNode)varDecl, (ArrayList<StatNode>)statList, (ExprNode)expr, (ArrayList<AssignStatNode>)assignStatList); :};

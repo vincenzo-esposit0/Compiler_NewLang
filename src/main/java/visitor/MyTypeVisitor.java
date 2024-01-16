@@ -40,6 +40,7 @@ public class MyTypeVisitor implements MyVisitor {
             case "FunCallNode" -> visitFunCallNode((FunCallNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
+            case "InitForStatNode" -> visitInitForStatNode((InitForStatNode) node);
         }
 
         return null;
@@ -163,6 +164,22 @@ public class MyTypeVisitor implements MyVisitor {
 
         BodyNode bodyNode = node.getBody();
         bodyNode.accept(this);
+
+        stack.pop();
+    }
+
+    private void visitInitForStatNode(InitForStatNode node) {
+        stack.push(node.getSymbolTable());
+
+        node.getVarDeclNode().accept(this);
+        visitNodeList(node.getStatList());
+        node.getCond().accept(this);
+
+        if (node.getCond().getAstType() != sym.BOOL) {
+            throw new IncompatibleTypeException("La condizione del while deve essere di tipo BOOL");
+        }
+
+        visitNodeList(node.getLoopList());
 
         stack.pop();
     }

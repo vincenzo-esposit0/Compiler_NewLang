@@ -30,6 +30,7 @@ public class MyScopeVisitor implements MyVisitor{
             case "ElseNode" -> visitElseNode((ElseNode) node);
             case "ForStatNode" -> visitForStatNode((ForStatNode) node);
             case "WhileStatNode" -> visitWhileStatNode((WhileStatNode) node);
+            case "InitForStatNode" -> visitInitForStatNode((InitForStatNode) node);
         }
 
         return null;
@@ -192,6 +193,24 @@ public class MyScopeVisitor implements MyVisitor{
         node.setSymbolTable(symbolTable);
 
         node.getBody().accept(this);
+
+        node.setAstType(sym.VOID);
+
+        stackScope.pop();
+    }
+
+    private void visitInitForStatNode(InitForStatNode node) {
+        SymbolTable symbolTable;
+        String lastScopeFunName = stackScope.peek().getFunctionName();
+
+        symbolTable = new SymbolTable("INIT-FOR", lastScopeFunName);
+        stackScope.push(symbolTable);
+        node.setSymbolTable(symbolTable);
+
+        node.getVarDeclNode().accept(this);
+        visitNodeList(node.getStatList());
+        node.getCond().accept(this);
+        visitNodeList(node.getLoopList());
 
         node.setAstType(sym.VOID);
 

@@ -1,0 +1,17 @@
+start:
+def esercizio() : void {  || funzione principale
+
+
+    var a << 1, b << 2.2, x << 3;
+
+    init(integer i << 1, j << 1)
+        do {
+            ("ciao,") -->;
+            (i)-->;
+            (",") -->;
+            (j)-->!;
+        }
+        for(i < 20 and j >-20)
+        step(i<<i+1 ; j<<j-1);
+
+}
