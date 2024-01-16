@@ -31,10 +31,6 @@ public class Main {
 
         ProgramNode programNode = (ProgramNode) p.parse().value;
 
-        MySyntaxTree tree = new MySyntaxTree();
-
-        System.out.println(tree.visit(programNode));
-
         MyScopeVisitor myScopeVisitor = new MyScopeVisitor();
         myScopeVisitor.visit(programNode);
 
