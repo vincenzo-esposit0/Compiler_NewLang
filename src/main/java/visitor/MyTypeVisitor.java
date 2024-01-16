@@ -40,6 +40,7 @@ public class MyTypeVisitor implements MyVisitor {
             case "FunCallNode" -> visitFunCallNode((FunCallNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
+            case "SwitchStatNode" -> visitSwitchStatNode((SwitchStatNode) node);
         }
 
         return null;
@@ -165,6 +166,32 @@ public class MyTypeVisitor implements MyVisitor {
         bodyNode.accept(this);
 
         stack.pop();
+    }
+
+    private void visitSwitchStatNode(SwitchStatNode node) {
+        IdNode idNode = node.getId();
+        ArrayList<BodySwitch> bodySwitchList = node.getBodySwitchList();
+
+        idNode.accept(this);
+
+        if(idNode.getAstType() != sym.INTEGER){
+            throw new IncompatibleTypeException("Il tipo di IdNode non è INTEGER");
+        }
+
+        for(BodySwitch bodyEl: bodySwitchList){
+            bodyEl.getConstNode().accept(this);
+            visitNodeList(bodyEl.getStatList());
+
+            if(bodyEl.getConstNode().getAstType() != sym.INTEGER){
+                throw new IncompatibleTypeException("Il tipo doveva essere una costante: " + bodyEl.getConstNode());
+            }
+
+            if(bodyEl.getConstNode().getAstType() != idNode.getAstType()){
+                throw new IncompatibleTypeException("I tipi sono diversi");
+            }
+        }
+
+        node.setAstType(sym.VOID);
     }
 
     private void visitAssignStatNode(AssignStatNode node) {

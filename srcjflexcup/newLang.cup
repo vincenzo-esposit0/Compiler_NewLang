@@ -5,7 +5,8 @@ terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
          DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, WRITE, WRITELN, READ,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
          TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT,
-         EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
+         EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT,
+         SWITCH, END, STOP;
 
 terminal String ID, STRING_CONST;
 terminal String INTEGER_CONST;
@@ -42,6 +43,9 @@ nonterminal FunCallExprNode FunCallExpr;
 nonterminal FunCallNode FunCall;
 nonterminal ArrayList<ExprNode> ExprList;
 nonterminal ExprNode Expr;
+nonterminal BodySwitch BodySwitch;
+nonterminal ArrayList<BodySwitch> BodySwitchList;
+nonterminal SwitchStatNode SwitchStat;
 
 // **************** Specifica precedence ****************
 
@@ -186,6 +190,8 @@ Stat ::= IfStat:ifStat
         {: RESULT = (WhileStatNode)whileStat; :}
 	   | FunCallStat:funCallStat SEMI
         {: RESULT = (FunCallStatNode)funCallStat; :}
+        | SwitchStat:switchStat SEMI
+        {: RESULT = (SwitchStatNode)switchStat; :}
 	   | RETURN Expr:expr SEMI
         {: RESULT = new ReturnStatNode("RETURN",(ExprNode)expr); :}
 	   | RETURN SEMI
@@ -279,3 +285,18 @@ Expr ::= TRUE {: RESULT = new ConstNode("Expr", "BOOLEAN", "TRUE"); :}
 	   | MINUS Expr:expr1 {: RESULT = new UniVarExprNode("Expr", "MINUS", expr1); :}
 	   | NOT Expr:expr1 {: RESULT = new UniVarExprNode("Expr", "NOT", expr1); :}
 	   | LPAR Expr:expr1 RPAR {: RESULT = expr1; :};
+
+//Aggiunta modifica SWITCH
+BodySwitch ::= Const:constNode COLON StatList:statList STOP SEMI {: RESULT = new BodySwitch("BodySwitch", (ConstNode)constNode, (ArrayList<StatNode>)statList); :};
+
+BodySwitchList ::= BodySwitch:b1 BodySwitch:b2 BodySwitch:b3 {: ArrayList<BodySwitch> bodyList = new ArrayList<>();
+                                                                                bodyList.add(b1);
+                                                                                bodyList.add(b2);
+                                                                                bodyList.add(b3);
+                                                                                RESULT = bodyList; :}
+                   | BodySwitch:b BodySwitchList:bodySwitchList{:
+                    ((ArrayList<BodySwitch>)bodySwitchList).add(b);
+                    RESULT = bodySwitchList;
+                    :};
+
+SwitchStat ::= SWITCH LPAR ID:id RPAR BodySwitchList:bodySwitchList END SWITCH {: RESULT = new SwitchStatNode("Switch", new IdNode("Expr", "ID", id), (ArrayList<BodySwitch>)bodySwitchList); :};

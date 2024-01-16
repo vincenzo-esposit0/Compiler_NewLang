@@ -40,6 +40,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
+            case "SwitchStatNode" -> visitSwitchStatNode((SwitchStatNode) node);
         }
 
         return codeGeneratorC;
@@ -453,6 +454,30 @@ public class MyCTranslatorVisitor implements MyVisitor {
 
         codeGeneratorC = sb.toString();
         stackScope.pop();
+    }
+
+    private void visitSwitchStatNode(SwitchStatNode node) {
+        StringBuilder sb = new StringBuilder();
+
+        IdNode idNode = node.getId();
+        ArrayList<BodySwitch> bodySwitchList = node.getBodySwitchList();
+
+        sb.append("switch (").append(idNode.accept(this)).append(")\n");
+        sb.append("{");
+
+        for(BodySwitch bodyEl: bodySwitchList){
+            sb.append("case ").append(bodyEl.getConstNode().getValue()).append(" : ");
+
+            for(StatNode statEl: bodyEl.getStatList()){
+                sb.append(statEl.accept(this)).append("\n");
+            }
+
+            sb.append("break;\n ");
+        }
+
+        sb.append("}");
+
+        codeGeneratorC = sb.toString();
     }
 
     private void visitReadStatNode(ReadStatNode node) {

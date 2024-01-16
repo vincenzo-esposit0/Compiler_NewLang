@@ -60,6 +60,11 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
     "-->"  { return new Symbol(sym.WRITE) ; }
     "-->!" { return new Symbol(sym.WRITELN) ; }
 
+    //Aggiunta modifica SWITCH
+    "switch" { return new Symbol(sym.SWITCH) ; }
+    "end" { return new Symbol(sym.END) ; }
+    "stop" { return new Symbol(sym.STOP) ; }
+
     "("  { return new Symbol(sym.LPAR) ; }
     ")"  { return new Symbol(sym.RPAR) ; }
     "{"  { return new Symbol(sym.LBRACK) ; }
