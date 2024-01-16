@@ -1,24 +1,49 @@
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ExprNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\IdNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\esercitazione5\sym.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\WriteStatNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ConstNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ElseNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ParDeclNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\esercitazione5\parser.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\IdInitNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\esercitazione5\Yylex.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\FunDeclNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ReadStatNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\BodyNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\StatNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ASTNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ForStatNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\VarDeclNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\WhileStatNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\FunCallNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\TypeNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\ProgramNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\AssignStatNode.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\visitor\MyVisitor.java
-D:\Universita\Magistrale\I Anno\I Semestre\Compilatori\Progetto\Esercitazione 5\prezioso-esposito_es5\src\main\java\nodes\IfStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/esercitazione5/sym.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/FunCallNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/Mapsum.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/BiVarExprNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ReturnStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ReadStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/FunDeclNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/WhileStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/MissingItemException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/FunCallExprNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ParDeclNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/NotFunctionException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/UniVarExprNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/WriteStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/IdInitNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/ReturnException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/IncompatibleNumberParamException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/AssignStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/IncompatibleTypeException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ForStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/IncompatibleParamException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/IfStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ExprListMapsum.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/MissingReturnException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ConstNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/AlreadyDeclaredVariableException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/table/SymbolTable.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/StatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/IncompatibleReturnException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/table/ParInitialize.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/visitor/MySyntaxTree.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ExprNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/esercitazione5/Main.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/visitor/MyVisitor.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/BodyNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/esercitazione5/parser.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ProgramNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/table/SymbolRecord.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/VarDeclNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/exceptions/IncompatibleAssignVarException.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/visitor/MyCTranslatorVisitor.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/visitor/MyScopeVisitor.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/esercitazione5/Yylex.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/IdNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/visitor/MyTypeVisitor.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/visitor/MyTypeChecker.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ASTNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/FunCallStatNode.java
+/Users/vincenzo/Desktop/Progetto/Compiler_NewLang/src/main/java/nodes/ElseNode.java

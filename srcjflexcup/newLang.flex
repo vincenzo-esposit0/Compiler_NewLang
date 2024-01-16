@@ -60,6 +60,9 @@ identifier = [$_A-Za-z][$_A-Za-z0-9]*
     "-->"  { return new Symbol(sym.WRITE) ; }
     "-->!" { return new Symbol(sym.WRITELN) ; }
 
+    //Aggiunta modifica
+    "mapsum" { return new Symbol(sym.MAPSUM) ; }
+
     "("  { return new Symbol(sym.LPAR) ; }
     ")"  { return new Symbol(sym.RPAR) ; }
     "{"  { return new Symbol(sym.LBRACK) ; }

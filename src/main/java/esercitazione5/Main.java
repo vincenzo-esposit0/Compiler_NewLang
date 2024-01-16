@@ -4,7 +4,6 @@ import nodes.ProgramNode;
 import org.apache.commons.io.FilenameUtils;
 import visitor.MyCTranslatorVisitor;
 import visitor.MyScopeVisitor;
-import visitor.MySyntaxTree;
 import visitor.MyTypeVisitor;
 
 import java.io.File;
@@ -42,6 +41,7 @@ public class Main {
         String codeGeneratorC = cTranslatorVisitor.visit(programNode);
         logger.info("C code generation done!");
         fileGenerator(codeGeneratorC,c_out + cGenerated);
+
 
         //Codice per compilare il file c in eseguibile
         logger.info("Starting C compiler...");

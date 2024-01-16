@@ -40,6 +40,7 @@ public class MyTypeVisitor implements MyVisitor {
             case "FunCallNode" -> visitFunCallNode((FunCallNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
+            case "Mapsum" -> visitMapsum((Mapsum) node);
         }
 
         return null;
@@ -93,7 +94,6 @@ public class MyTypeVisitor implements MyVisitor {
 
         stack.pop();
     }
-
 
     private void visitBodyNode(BodyNode node) {
         ArrayList<VarDeclNode> varDeclList = node.getVarDeclList();
@@ -379,6 +379,40 @@ public class MyTypeVisitor implements MyVisitor {
         int typeVar = symbolRecord.getTypeVar();
 
         node.setAstType(typeVar);
+    }
+
+    private void visitMapsum(Mapsum node) {
+        String functionName = node.getId().getNomeId();
+        SymbolRecord functionSymbolRecord = lookup(functionName);
+
+        //Check sulla funzione
+        if (!functionSymbolRecord.getKind().equals("FUN"))
+            throw new NotFunctionException(functionName + " is not a function!");
+
+        //Lista di parametri della funzione
+        ArrayList<Integer> paramsType = functionSymbolRecord.getParInitialize().getParamsTypeList();
+
+        //Lista dei parametri del Mapsum
+        ArrayList<ArrayList<ExprNode>> exprListMapsum = node.getExprListMapsum().getExprListMapsum();
+
+        for(ArrayList<ExprNode> arrayEl: exprListMapsum){
+            Collections.reverse(paramsType);
+
+            if(arrayEl.size() == paramsType.size()){
+                for(int i=0; i< arrayEl.size(); i++){
+                    arrayEl.get(i).accept(this);
+
+                    //Verifico che l'elemento i sia dello stesso tipo
+                    if(arrayEl.get(i).getAstType() != paramsType.get(i)){
+                        throw new IncompatibleTypeException("I tipi dei parametri della funzione non coincidono con la firma della funzione: " + arrayEl.get(i).getAstType() + " != " + paramsType.get(i));
+                    }
+                }
+            } else {
+                throw new IncompatibleNumberParamException("La lunghezza dell'array non corrisponde con quello della funzione: " + arrayEl.size() + " != " + paramsType.size());
+            }
+        }
+
+        node.setAstType(functionSymbolRecord.getTypeVar());
     }
 
     private void visitNodeList(ArrayList<? extends ASTNode> nodeList) {

@@ -5,7 +5,8 @@ terminal MAIN, SEMI, COMMA, PIPE, VAR, INTEGER, REAL, STRING, BOOL, CHAR, VOID,
          DEF, OUT, FOR, IF, ELSE, WHILE, TO, THEN, LOOP, WRITE, WRITELN, READ,
          LPAR, RPAR, LBRACK, RBRACK, COLON, ASSIGN, RETURN,
          TRUE, FALSE, PLUS, MINUS, TIMES, DIV, POW, STR_CONCAT,
-         EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT;
+         EQUALS, NE, LT, LE, GT, GE, AND, OR, NOT,
+         MAPSUM;
 
 terminal String ID, STRING_CONST;
 terminal String INTEGER_CONST;
@@ -42,6 +43,9 @@ nonterminal FunCallExprNode FunCallExpr;
 nonterminal FunCallNode FunCall;
 nonterminal ArrayList<ExprNode> ExprList;
 nonterminal ExprNode Expr;
+nonterminal ExprListMapsum ExprListMapsum;
+nonterminal Mapsum Mapsum;
+
 
 // **************** Specifica precedence ****************
 
@@ -278,4 +282,20 @@ Expr ::= TRUE {: RESULT = new ConstNode("Expr", "BOOLEAN", "TRUE"); :}
 	   | Expr:expr1 NE Expr:expr2 {: RESULT = new BiVarExprNode("Expr", "NE", expr1, expr2); :}
 	   | MINUS Expr:expr1 {: RESULT = new UniVarExprNode("Expr", "MINUS", expr1); :}
 	   | NOT Expr:expr1 {: RESULT = new UniVarExprNode("Expr", "NOT", expr1); :}
-	   | LPAR Expr:expr1 RPAR {: RESULT = expr1; :};
+	   | LPAR Expr:expr1 RPAR {: RESULT = expr1; :}
+	   | Mapsum:mapsum {: RESULT = mapsum; :};
+
+//Aggiunta modifica MAPSUM
+ExprListMapsum ::= LPAR ExprList:expr1 RPAR COMMA LPAR ExprList:expr2 RPAR COMMA LPAR ExprList:expr3 RPAR{:
+                ExprListMapsum exprListMapsum = new ExprListMapsum();
+                exprListMapsum.add(expr1);
+                exprListMapsum.add(expr2);
+                exprListMapsum.add(expr3);
+                RESULT = exprListMapsum;
+           :}
+	       | LPAR ExprList:expr RPAR COMMA ExprListMapsum:exprListMapsum {:
+                ((ExprListMapsum)exprListMapsum).add(expr);
+                RESULT = exprListMapsum;
+	       :};
+
+Mapsum ::= MAPSUM LPAR ID:id COMMA ExprListMapsum:exprListMapsum RPAR {: RESULT = new Mapsum("MAPSUM", " ", new IdNode("Expr", "ID", id), (ExprListMapsum)exprListMapsum); :};

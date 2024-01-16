@@ -1,0 +1,17 @@
+|*
+ Programma esemplificativo del linguaggio NewLang
+|
+
+integer a;
+var b << 1, c << 2;
+
+def myfun(integer i, s): integer{
+    return i*s;
+    }
+
+start:
+def esercizio(): void {  || funzione principale
+
+    a << mapsum(myfun, (b+1, c*4+2), (2, 4), (4, 5));
+    (a) -->!;
+}

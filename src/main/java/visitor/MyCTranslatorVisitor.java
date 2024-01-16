@@ -40,6 +40,7 @@ public class MyCTranslatorVisitor implements MyVisitor {
             case "UniVarExprNode" -> visitUniVarExprNode((UniVarExprNode) node);
             case "ConstNode" -> visitConstNode((ConstNode) node);
             case "IdNode" -> visitIdNode((IdNode) node);
+            case "Mapsum" -> visitMapsum((Mapsum) node);
         }
 
         return codeGeneratorC;
@@ -603,6 +604,31 @@ public class MyCTranslatorVisitor implements MyVisitor {
         }
 
         codeGeneratorC += sb.toString();
+    }
+
+    private void visitMapsum(Mapsum node) {
+        StringBuilder sb = new StringBuilder();
+
+        String functionName = node.getId().getNomeId();
+        ArrayList<ArrayList<ExprNode>> exprListMapsum = node.getExprListMapsum().getExprListMapsum();
+
+        for(ArrayList<ExprNode> arrayEl: exprListMapsum){
+            sb.append(functionName).append(" (");
+
+            for(ExprNode exprEl: arrayEl){
+                sb.append(exprEl.accept(this)).append(",");
+            }
+
+            //Elimino l'ultima virgola
+            sb.deleteCharAt(sb.length()-1);
+
+            sb.append(")+");
+        }
+
+        //Elimino l'ultima append
+        sb.deleteCharAt(sb.length()-1);
+
+        codeGeneratorC = sb.toString();
     }
 
     public String typeConverter(String typeConverter){
