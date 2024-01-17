@@ -13,156 +13,142 @@ L'elaborazione delle diverse fasi della compilazione, tra cui la *costruzione de
 La suddivisione delle fasi distintive in classi separate ha favorito la creazione di un codice più manutenibile e flessibile.
 
 #### 1. MySyntaxTree
-Si occupa di generare il syntax tree e di fornire una sua rappresentazione  in XML nel file.xml
+Ha il compito di creare l'albero sintattico e di fornire una sua rappresentazione in formato XML.
 
 #### 2. MyScopingVisitor
 Si occupa gestire lo scoping del linguaggio, grazie allo scoping vistor è stato possibile gestire l'uso prima della dichiarazione sia di una variabile che di una funzione.
 I costrutti che permettono la creazione di un nuovo scope in NewLang sono:
-  - while
-  - for
-  - if 
-  - else
-  - dichiarazione di funzione
-  - intero programma
+  - while;
+  - for;
+  - if; 
+  - else;
+  - dichiarazione di funzione;
+  - intero programma;
+  - tutti i costrutti che hanno al loro interno un body delegano a quest'ultimo la creazione e la gestione dello scope.
   
-  tutti i costrutti che hanno al loro interno un body delegano a quest'ultimo la creazione e la gestione dello scope.
-  
-  Inoltre viene anche data la possibilità di avere in scope innestati dichiarazioni di variabili già esistenti in scope superiori (Most-cloesly-nested rule)
+  Inoltre viene anche data la possibilità di avere in scope innestati dichiarazioni di variabili già esistenti in scope superiori (Most-cloesly-nested rule).
 
 
 #### 3. MyTypeVisitor
-Questo visitor si occupa di controllare i tipi seconodo le specifiche del type system del linguaggio ed eventuali errori semantici
-
-In questa classe viene implementata l'inferenza di tipo
+Questo visitor ha la responsabilità di verificare i tipi in conformità alle specifiche del sistema di tipi del linguaggio, nonché di individuare eventuali errori semantici. All'interno di questa classe, viene realizzata l'inferenza di tipo.
 
 #### 4. MyCTranslatorVisitor
-Questo visitor si occupa di tradurre il codice scritto in NewLang in codice C che verrà poi compilato tramite GCC.
+Il compito di questo visitor è effettuare la traduzione del codice scritto in NewLang in codice C, il quale successivamente sarà compilato mediante GCC.
 
 ### Tipi e conversioni
 
-Il linguaggio NewLang dispone dei seguenti tipi: *real*, *integer*, *char*, *string*, *bool*.
- Il linguaggio proposto non prevede casting impliciti per nessun tipo, fatta eccezione per il tipo integer.
- Infatti qualsiasi espressione di tipo integer può essere memorizzata o passata a una variabile di tipo real (attenzione, non è vero il contrario).
+Il linguaggio NewLang presenta i seguenti tipi: *real*, *integer*, *char*, *string* e *bool*. Nella proposta linguistica, non sono previsti casting impliciti per nessun tipo, ad eccezione del tipo integer. In pratica, qualsiasi espressione di tipo integer può essere assegnata o passata a una variabile di tipo real (vale la pena notare che la situazione opposta non è vera).
  
  ##### Inferenza di tipo:
- il linguaggio NewLang prevede la possibilità di dichiarare una variabile di tipo 
-var e contestualmente assegnarle un valore costante (es. var x << 10). L’analisi semantica in 
-questo caso deve inferire il tipo intero di x dal tipo della costante 10 ed inserire (x, int) nel type 
-environment corrente.
+Il linguaggio NewLang offre la facoltà di dichiarare una variabile utilizzando il tipo "var" e contemporaneamente assegnarle un valore costante (es. var x << 10). Nell'analisi semantica di questo contesto, è necessario dedurre il tipo intero di x dal tipo della costante 10 e aggiungere l'associazione (x, int) all'ambiente dei tipi corrente.
 
 ### Funzioni Write, WriteLn e Read
-Queste funziioni permettono di leggere e scrivere da standard output
-  - Write:()-->;
-    - Permette di comunicare con l'utente tramite console, la funzione accetta almeno un parametro o più intervallati da ","
-  - Writeln:()-->!; 
-    - Uguale alla precedente ma dopo la scrittura va a capo;
-  - Read: 
-    - <variabile><--; 
-    - <variabile><-- <"STRINGA">;
-      - La Read è presente in due versioni, quella dove viene semplicemente prelvato da console un input oppure quella in cui c'è un'aggiunta di una stringa che funge da label.
-     
-### Vincoli 
-I vincoli che seguono sono stati aggiunti per migliorare l'utilizzo e la comprensione:
+Queste funzioni consentono di effettuare operazioni di lettura e scrittura tramite standard output:
 
-  1. Non è possibile dichiarare una funzione con il nome "main" neanche la funzione start:
+- **Write:()-->:**
+  - Consente la comunicazione con l'utente attraverso la console. La funzione accetta almeno un parametro, o più parametri intervallati da ",".
+
+- **Writeln:()-->!;**
+  - Simile alla precedente, ma dopo la scrittura va a capo.
+
+- **Read:**
+  - **<variabile><--;**
+    - Legge un input dalla console e lo assegna alla variabile.
+  - **<variabile><-- <"STRINGA">;**
+    - Presenta due versioni: una in cui preleva un input dalla console e lo assegna a una variabile, e l'altra in cui viene aggiunta una stringa che funge da label.
+### Vincoli 
+I seguenti vincoli sono stati introdotti per potenziare l'usabilità e la chiarezza:
+ - Non è consentito dichiarare una funzione con il nome "main", né con il nome "start:"
   
 ## Get Started
-In primo luogo bidogna:
-  - clonare la seguente repository
-  - avviare il compile di maven
+Inizialmente, è necessario:
+  - Effettuare il clone del repository indicato.
+  - Avviare la compilazione mediante Maven.
   
 
-Il programma prende in input un file .txt contente codice in linguaggio NewLang, siccessivamente genera un file.xml che conterrà la rappresentazione dell'albero sintattico, in seguito genera un file .c e in automatico se si è su windows o su mac aprirà un prompt dei comandi avviando gcc e il programma sarà avviato.
+Il software riceve in ingresso un file .txt contenente codice scritto nel linguaggio NewLang e successivamente genera un file .c, il quale viene utilizzato per creare l'eseguibile.
 
 
 ```diff
--  importante che GCC sia installato sulla macchina!
--  importante che maven sia installato sulla macchina!
--  importante che java sia installato sulla macchina
+- E' essenziale avere GCC installato sulla macchina!
+- E' indispensabile che Maven sia presente sull'ambiente di sviluppo!
+- Assicurarsi che Java sia installato sulla macchina è fondamentale!
 
 ```
 ### Esempio di programma scritto in NewLang
 ```c
+|*
+ Programma esemplificativo del linguaggio NewLang
+|
 
-start: def test(): void{
 
-    integer condizione << 1, operazione ;
+def sommac(integer a, d | real b | out string size): real
+{
+	real result;
 
-    while condizione = 1 loop {
 
-       ("quale operazione aritmetica vuoi scegliere?") -->!;
-       ("se vuoi fare la somma scrivi 1 ") -->!;
-       ("se vuoi fare la sottrazione scrivi 2 ") -->!;
-       ("se vuoi fare la moltiplicazione scrivi 3 ") -->!;
-       ("se vuoi fare la divisione  scrivi 4 ") -->!;
-        ("se vuoi fare la potenza  scrivi 5 ") -->!;
-       operazione <-- "inserisci la tua scelta qui (1,2,3,4,5)";
+	result  <<  a + b + c + d;
 
-       if operazione = 1 or operazione = 2 or operazione = 3 or operazione =  4 or operazione =  5 then {
-           elaboraScelta(operazione);
+	if result > 100 then{
+		var valore << "grande";
+ 		size << valore; }
+	else {
+		var valore << "piccola";
+ 		size << valore;
+	}
 
-       }
-
-       ("vuoi continuare? scrivi 1, vuoi stopparti scrivi 0") -->!;
-       condizione <--;
-   }
+	return result;
 }
 
 
-def elaboraScelta(integer operazione ): void{
-
-    real numA, numB, result;
-    numA, numB, result << 0.0, 0.0, 0.0;
-
-    numA <-- "inserisci il primo numero";
-    numB <-- "inserisci il secondo numero";
-
-    if operazione = 1 then {
-               somma(numA, numB, result);
-               ("il risultato della somma  è :  " , result)-->!;
-           }
-    if operazione = 2 then {
-            sottrazione(numA,numB, result);
-            ("il risultato della sottrazione  è :  " , result)-->!;
-        }
-        if operazione = 3 then {
-            moltiplicazione(numA, numB, result);
-            ("il risultato della moltiplicazione  è :  " , result)-->!;
-        }
-        if operazione = 4 then {
-            if numB <> 0 then {
-                divisione(numA, numB, result);
-                ("il risultato della divisione  è :  " , result)-->!;
-            }else{
-                ("Divisione impossibile, il denomitaore non può essere 0") -->!;
-            }
-        }
-        if operazione = 5 then {
-                        potenza(numA, numB, result);
-                        ("il risultato della potenza  è :  " , result)-->!;
-                    }
+var c << 1;
 
 
+start:
+def esercizio() : void {  || funzione principale
+
+
+    var a << 1, b << 2.2, x << 3;
+
+    string taglia, ans1;
+    var ans << "no";
+    real risultato << sommac(a, x, b, taglia);
+
+
+    stampa("la somma  incrementata  è " );
+    (taglia) -->!;
+     stampa(" ed è pari a " );
+     (risultato) -->!;
+
+	("vuoi continuare? (si/no) - inserisci due volte la risposta")  -->! ;
+	ans, ans1 <--;
+    while ans = "si" loop {
+
+        a <-- "inserisci un intero:";
+        b <-- "inserisci un reale:";
+        risultato << sommac(a, x, b, taglia);
+        stampa("la somma  incrementata  è " );
+        (taglia) -->!;
+        stampa(" ed è pari a " );
+        (risultato) -->!;
+        ans <-- "vuoi continuare? (si/no):";
+    }
+
+    ("") -->! ;
+    ("ciao") -->;
 }
 
-def somma( real numA, numB | out real result): void {
-   result << numA + numB;
 
-}
+def stampa(string messaggio): void {  || funzione di stampa
 
-def sottrazione( real numA, numB | out real result): void {
-     result << numA - numB;
-}
-def divisione( real numA, numB | out real result): void {
+    integer a;
+    integer i;
+	for x << 4 to 1 loop {
+		("") -->! ;
+	}
 
-     result << numA / numB;
+	(messaggio) -->! ;
 
-}
-def moltiplicazione( real numA, numB | out real result): void {
-     result << numA * numB;
-}
-def potenza( real numA, numB | out real result): void {
-     result << numA^numB;
 }
 
 ```
@@ -170,120 +156,126 @@ def potenza( real numA, numB | out real result): void {
 
 ```c
 #include <stdio.h>
-
 #include <stdlib.h>
-
 #include <string.h>
-
-#include <stdbool.h>
-
 #include <math.h>
- //prototipi funzioni
-void elaboraScelta(int operazione);
-void somma(float numA, float numB, float * result);
-void sottrazione(float numA, float numB, float * result);
-void divisione(float numA, float numB, float * result);
-void moltiplicazione(float numA, float numB, float * result);
-void potenza(float numA, float numB, float * result);
-void test();
 
-char * conversioneFloat(float number) {
+float sommac (int, int, float, char **);
+void esercizio ();
+void stampa (char *);
 
-  char * buf = malloc(10 * sizeof(char));
-  sprintf(buf, "%f", number);
-  return buf;
+char * intToString (int var)
+{
+  char *int_str = malloc (256);
+  sprintf (int_str, "%d", var);
+  return int_str;
 }
-char * conversioneInt(int number) {
-  char * buf = malloc(10 * sizeof(char));
-  sprintf(buf, "%d", number);
-  return buf;
-}
-char supporto[100];
 
-void elaboraScelta(int operazione) {
-  float numA, numB, result;
-  numA = 0.0;
-  numB = 0.0;
-  result = 0.0;
-  printf("inserisci il primo numero");
-  scanf("%f", & numA);
-  printf("inserisci il secondo numero");
-  scanf("%f", & numB);
-  if (operazione == 1) {
-    somma(numA, numB, & result);
-    printf("%s %f \n", "il risultato della somma  è :  ", result);
-  }
-  if (operazione == 2) {
-    sottrazione(numA, numB, & result);
-    printf("%s %f \n", "il risultato della sottrazione  è :  ", result);
-  }
-  if (operazione == 3) {
-    moltiplicazione(numA, numB, & result);
-    printf("%s %f \n", "il risultato della moltiplicazione  è :  ", result);
-  }
-  if (operazione == 4) {
-    if (numB != 0) {
-      divisione(numA, numB, & result);
-      printf("%s %f \n", "il risultato della divisione  è :  ", result);
-    } else {
-      printf("%s \n", "Divisione impossibile, il denomitaore non può essere 0");
+char * doubleToString (double var)
+{
+  char *double_str = malloc (256);
+  sprintf (double_str, "%f", var);
+  return double_str;
+}
+
+char * boolToString (int var)
+{
+  if (var == 1)
+    {
+      return "true";
     }
-  }
-  if (operazione == 5) {
-    potenza(numA, numB, & result);
-    printf("%s %f \n", "il risultato della potenza  è :  ", result);
-  }
-}
-void somma(float numA, float numB, float * result) {
-  * result = numA + numB;
-}
-void sottrazione(float numA, float numB, float * result) {
-  * result = numA - numB;
-}
-void divisione(float numA, float numB, float * result) {
-  * result = numA / numB;
-}
-void moltiplicazione(float numA, float numB, float * result) {
-  * result = numA * numB;
-}
-void potenza(float numA, float numB, float * result) {
-  * result = pow(numA, numB);
-}
-void test() {
-  int operazione, condizione = 1;
-  while (condizione == 1) {
-    printf("%s \n", "quale operazione aritmetica vuoi scegliere?");
-    printf("%s \n", "se vuoi fare la somma scrivi 1 ");
-    printf("%s \n", "se vuoi fare la sottrazione scrivi 2 ");
-    printf("%s \n", "se vuoi fare la moltiplicazione scrivi 3 ");
-    printf("%s \n", "se vuoi fare la divisione  scrivi 4 ");
-    printf("%s \n", "se vuoi fare la potenza  scrivi 5 ");
-    printf("inserisci la tua scelta qui (1,2,3,4,5)");
-    scanf("%d", & operazione);
-    if (operazione == 1 || operazione == 2 || operazione == 3 || operazione == 4 || operazione == 5) {
-      elaboraScelta(operazione);
+  if (var == 0)
+    {
+      return "false";
     }
-    printf("%s \n", "vuoi continuare? scrivi 1, vuoi stopparti scrivi 0");
-    scanf("%d", & condizione);
-  }
+  return "";
 }
-int main() {
-  int intero = 0;
-  char carattere = ' ';
-  float float1 = 0;
-  char * stringa = "";
-  bool booleano = false;
-  test();
-  return 0;
+
+char * concat (char *s1, char *i)
+{
+  char *s = malloc (256);
+  sprintf (s, "%s%s", s1, i);
+  return s;
 }
+
+int c = 1;
+
+float sommac (int a, int d, float b, char **size)
+{
+  float result;
+  result = a + b + c + d;
+  if (result > 100)
+    {
+      char *valore = "grande";
+      *size = valore;
+    }
+  else
+    {
+      char *valore = "piccola";
+      *size = valore;
+    }
+  return result;
+}
+
+void esercizio ()
+{
+  char *taglia = "";
+  char *ans1 = "";
+  int a = 1;
+  int b = 2.2;
+  int x = 3;
+  char *ans = "no";
+
+  float risultato = sommac (a, x, b, &taglia);
+
+  stampa ("la somma  incrementata  C( ");
+
+  printf ("%s\n", taglia);
+  stampa (" ed C( pari a ");
+  printf ("%f\n", risultato);
+  printf ("%s\n",
+	  "vuoi continuare? (si/no) - inserisci due volte la risposta");
+  ans = malloc (256);
+  scanf ("%s", ans);
+  ans1 = malloc (256);
+  scanf ("%s", ans1);
+
+  while (!strcmp (ans, "si"))
+    {
+      printf ("inserisci un intero:\n");
+      scanf ("%d", &a);
+      printf ("inserisci un reale:\n");
+      scanf ("%d", &b);
+      risultato = sommac (a, x, b, &taglia);
+      stampa ("la somma  incrementata  C( ");
+      printf ("%s\n", taglia);
+      stampa (" ed C( pari a ");
+      printf ("%f\n", risultato);
+      printf ("vuoi continuare? (si/no):\n");
+      ans = malloc (256);
+      scanf ("%s", ans);
+    }
+  printf ("%s\n", "");
+  printf ("%s\n", "ciao");
+}
+
+int main (int argc, char **argv)
+{
+  esercizio ();
+  return (EXIT_SUCCESS);
+}
+
+void stampa (char *messaggio)
+{
+  int a;
+  int i;
+  int x;
+  for (x = 4; x >= 1; x--)
+    {
+      printf ("%s\n", "");
+    }
+  printf ("%s\n", messaggio);
+}
+
 
 ```
-
-
-
-
-
-  
-      
-    
- 
